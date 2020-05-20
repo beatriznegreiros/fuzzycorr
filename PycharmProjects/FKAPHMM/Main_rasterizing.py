@@ -2,26 +2,28 @@ import pandas as pd
 import fiona; fiona.supported_drivers
 import geo_operator
 
+
+# Input Data
+x_res_A = 0.1  # assuming these are the cell sizes
+y_res_A = 0.01111  # change as appropriate
+x_res_B = 0.2  # assuming these are the cell sizes
+y_res_B = 0.01111  # change as appropriate
+shape_A = "map_A.shp"
+shape_B = "map_B.shp"
+raster_A = "map_A.tif"
+raster_B = "map_B.tif"
+
 # Importing raw data into dataframe
 data_A = pd.read_csv("hexagon_experiment.csv", skip_blank_lines=True)
 data_B = pd.read_csv("hexagon_simulation.csv", skip_blank_lines=True)
-
+data_A.dropna(how='any', inplace=True, axis=0)
+data_B.dropna(how='any', inplace=True, axis=0)
 
 # Create shapefile from dataframe
-outname = "map_A.shp"
-outname2 = "map_B.shp"
-geo_operator.data_to_shape(data_A, outname)
-geo_operator.data_to_shape(data_B, outname2)
-
+geo_operator.data_to_shape(data_A, shape_A)
+geo_operator.data_to_shape(data_B, shape_B)
 
 # Create Raster from shapefile
-x_res = 0.1  # assuming these are the cell sizes
-y_res = 0.01111  # change as appropriate
-A_in = "map_A.shp"
-A_out = "map_A.tif"
-geo_operator.shape_to_raster(x_res, y_res, A_in, A_out)
-
-B_in = "map_B.shp"
-B_out = "map_B.tif"
-geo_operator.shape_to_raster(0.2, 0.01111, B_in, B_out)
+geo_operator.shape_to_raster(x_res_A, y_res_A, shape_A, raster_A)
+geo_operator.shape_to_raster(x_res_B, y_res_B, shape_B, raster_B)
 
