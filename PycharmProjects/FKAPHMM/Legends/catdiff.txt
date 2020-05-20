@@ -1,0 +1,13 @@
+Version 2
+NClasses 4
+Palette
+255	255	255
+000	255	000
+255	000	000
+000	000	255
+StateOrderColor 0
+LegendType 0
+in none of the maps
+in both maps
+only in map 1, not in map 2
+only in map 2, not in map 1
