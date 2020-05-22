@@ -12,13 +12,15 @@ at the end of October.
 ## Folder's Description
 
 This repository contains the following data folders:
-	- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
-	- codes: 
-		- anaylsis: Codes used for analysis of the data 
-		- debug: Folder for debugging and keeping track of previous problems
-		- main: Folder which contains the main codes for running the Fuzzy-Kappa for Numerical Model Validation
-		- testing: Initial tests, trials for getting familiar with functions and libraries in Python
-	- rasters: Contains the rasters produced by the main code in formats .tif and .asc
+- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
+- codes: 
+	- anaylsis: Codes used for analysis of the data 
+	- debug: Folder for debugging and keeping track of previous problems
+	- main: Folder which contains the main codes for running the Fuzzy-Kappa for Numerical Model Validation
+	- testing: Initial tests, trials for getting familiar with functions and libraries in Python
+- rasters: Contains the rasters produced by the main code in formats .tif and .asc
+- shapefiles: Contains shapefiles to be converted in raster
+- raw_data: Stores the data directory which the code will look for
 
 
 ## Data Description
