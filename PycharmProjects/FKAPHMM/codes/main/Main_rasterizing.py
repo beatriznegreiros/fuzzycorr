@@ -1,30 +1,37 @@
 import pandas as pd
-import fiona; fiona.supported_drivers
+import fiona;fiona.supported_drivers
 import geo_operator
 import gdal
+from pathlib import Path
 
-# 1. Input: Raw Data
-path_A = r"C:/Users/beatr/PycharmProjects/FKAPHMM/raw_data/hexagon_experiment.csv"
-path_B = r"C:/Users/beatr/PycharmProjects/FKAPHMM/raw_data/hexagon_simulation.csv"
 
-# 2. Input: Shapefiles Paths
-shape_A = r"C:/Users/beatr/PycharmProjects/FKAPHMM/shapefiles/map_A.shp"
-shape_B = r"C:/Users/beatr/PycharmProjects/FKAPHMM/shapefiles/map_B.shp"
+current_dir = Path.cwd().parent.parent
+# --------------------------INPUT DATA--------------------------
+# 1. Input:
+#  1.1 Raw Data:
+path_A = current_dir / "raw_data/hexagon_experiment.csv"
+path_B = current_dir / "raw_data/hexagon_simulation.csv"
 
-# 3. Input: Raster
+#  1.2 Raster Resolution: Change as appropriate
+#  NOTE: For the Fuzzy Analysis choose one unique resolution
+x_res_A = 0.1
+y_res_A = 0.1
+x_res_B = 0.1
+y_res_B = 0.1
+# --------------------------------------------------------------
+
+# 2. Shapefiles Paths
+shape_A = str(current_dir / "shapefiles/map_A.shp")
+shape_B = str(current_dir / "shapefiles/map_B.shp")
+
+# 3. Raster
 #  3.1 Raster paths: tif format (enter file path and file name ending with *.tif)
-raster_A = r"C:/Users/beatr/PycharmProjects/FKAPHMM/rasters/map_A.tif"
-raster_B = r"C:/Users/beatr/PycharmProjects/FKAPHMM/rasters/map_B.tif"
+raster_A = str(current_dir / "rasters/map_A.tif")
+raster_B = str(current_dir / "rasters/map_B.tif")
 
 #  3.2 Raster paths: ascii format (enter file path and file name ending with *.asc)
-raster_A_asc = r"C:/Users/beatr/PycharmProjects/FKAPHMM/rasters/map_A.asc"
-raster_B_asc = r"C:/Users/beatr/PycharmProjects/FKAPHMM/rasters/map_B.asc"
-
-#  3.2 Raster resolution
-x_res_A = 0.1  # assuming these are the cell sizes
-y_res_A = 0.1  # change as appropriate
-x_res_B = 0.1  # assuming these are the cell sizes
-y_res_B = 0.1  # change as appropriate
+raster_A_asc = str(current_dir / "rasters/map_A.asc")
+raster_B_asc = str(current_dir / "rasters/map_B.asc")
 
 # 4. Importing raw data into dataframe
 data_A = pd.read_csv(path_A, skip_blank_lines=True)
