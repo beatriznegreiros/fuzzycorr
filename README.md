@@ -1,5 +1,5 @@
 # Fuzzy Kappa Map Comparison for Numerical Model Validation
-=====
+***
 This repository contains the work developed during a Master Thesis on Fuzzy-Kappa 
 map comparison to assess the performance of hydro-morphodynamic models.
 
@@ -10,7 +10,7 @@ at the end of October.
 
 
 ## Folder's Description
-======
+------
 This repository contains the following data folders:
 	- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
 	- codes: 
@@ -22,7 +22,7 @@ This repository contains the following data folders:
 
 
 ## Data Description
-======
+------
 The input data necessary for the code to run should follow the format of files:
 hexagon_experiment.csv or hexagon_simulation.csv, in which the spatial data is stored 
 in tree columns x, y and delta z(respective difference in bed elevation).
@@ -31,7 +31,7 @@ The current data being used stems from an experimental physical model set-up. Th
 numerical model SSIIMM and the results of Bed Elevation Difference compared with the experiment's.
 
 ## Code Descriptions
-======
+------
 The code presented here is written in ``Python 3.7`` and will be coupled with a ``C++`` to run the Fuzzy-Kappa
 map comparison algorithm.
 
