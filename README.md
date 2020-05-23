@@ -3,7 +3,7 @@
 This repository contains the work developed during a Master Thesis on Fuzzy-Kappa 
 map comparison to assess the performance of hydro-morphodynamic models.
 
-Further improvements are being done and the project will be available
+Further improvements are being done and the final code will be available
 at the end of October. 
 
 - For usage please read the Lincense terms.
@@ -34,6 +34,6 @@ numerical model SSIIMM and the results of Bed Elevation Difference compared with
 
 ## Code Descriptions
 
-The code presented here is written in ``Python 3.7`` and will be coupled with a ``C++`` to run the Fuzzy-Kappa
+The code presented here is written in ``Python 3.7`` and will be coupled with ``C++`` to run the Fuzzy-Kappa
 map comparison algorithm.
 
