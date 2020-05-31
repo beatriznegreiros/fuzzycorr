@@ -57,7 +57,7 @@ def classifier(map_in, map_out,  class_bins):
     raster_ma = np.ma.masked_where(raster_class == 0.0,
                                    raster_class,
                                    copy=True)
-
+    print(raster_ma.shape)
     # Fill nodatavalues into array
     raster_ma_fi = np.ma.filled(raster_ma, fill_value=nodatavalue)
 
