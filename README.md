@@ -1,3 +1,7 @@
+# Greetings from Sebastian
+Bea - please restructure the PyCharmProjects/FKAPHMM/ folder (the two levels are not necessary) and paths can be shortened.
+
+
 # Fuzzy Kappa Map Comparison for Numerical Model Validation
 ***
 This repository contains the work developed during a Master Thesis on Fuzzy-Kappa 
