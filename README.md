@@ -11,7 +11,7 @@ at the end of October.
 
 ## Folder's Description
 
-This repository contains the following data folders:
+This repository contains the following folders:
 - (FMAPHMM) Fuzzy Map Comparison to Assess Performance of Morphodynamic Models:
 	- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
 	- codes: 
