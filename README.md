@@ -1,4 +1,4 @@
-# Fuzzy Map Comparison for Numerical Model Validation
+## Fuzzy Map Comparison for Numerical Model Validation
 ***
 This repository contains the work developed during a Master Thesis on fuzzy map comparison methods to assess the performance of hydro-morphodynamic models.
 
@@ -8,7 +8,7 @@ at the end of October.
 - For usage please read the Lincense terms.
 
 
-## Folder's Description
+### Projects's Description
 
 This repository contains the following folders:
 - (FMAPHMM) Fuzzy Map Comparison to Assess Performance of Morphodynamic Models:
@@ -24,7 +24,7 @@ This repository contains the following folders:
 - (GUI) Graphical User Interface
 	- trials: first steps of the GUI development
 
-## Data Description
+### Data Description
 
 The input data necessary for the code to run should follow the format of files:
 hexagon_experiment.csv or hexagon_simulation.csv, in which the spatial data is stored 
