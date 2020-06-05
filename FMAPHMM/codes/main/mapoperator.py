@@ -61,7 +61,7 @@ def raster_to_np(map_in, msk=True):
 
 
 def f_similarity(a, b):
-    return 1 - (abs(a - b))/max(abs(a), abs(b))
+    return 1 - (abs(a - b)) / max(abs(a), abs(b))
 
 
 class MapArray:
@@ -71,14 +71,17 @@ class MapArray:
     # Method to output class bins based on Natural Breaks
     def nb_classes(self, n_classes):
         # Classification based on Natural Breaks
-        breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes+1)
+        breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes + 1)
         print('The bins were optimized to be:', breaks.bins)
         class_bins = breaks.bins.tolist()
         return class_bins
 
-    def neighbours(self, x, y, nx=2, ny=2):
-        return self.array[max(x - nx, 0) : min(x + nx + 1, self.array.shape[0]), \
-               max(y - ny, 0) : min(y + ny + 1, self.array.shape[1])]
+    def neighbours(self, x, y, n=1):
+        x_up = max(x - n, 0)
+        x_lower = min(x + n + 1, self.array.shape[0])
+        y_up = max(y - n, 0)
+        y_lower = min(y + n + 1, self.array.shape[1])
+        return self.array[x_up: x_lower, y_up: y_lower]
 
     def classifier(self, map_out, class_bins):
         # Classify the original image array (digitize makes nodatavalues take the class 0)
@@ -97,4 +100,3 @@ class MapArray:
                 outf.write(raster_ma_fi.astype(rio.float32), 1)
         else:
             raise TypeError("Error filling NoDataValue to raster file")
-
