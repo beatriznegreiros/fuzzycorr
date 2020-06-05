@@ -4,10 +4,11 @@ try:
     import numpy as np
     import gdal
 except:
-    print('ExceptionERROR: Missing fundamental packages (required: pathlib, numpy, gdal, pysal).')
+    print('ExceptionERROR: Missing fundamental packages (required: pathlib, numpy).')
 
 # INPUT: d84 as parameter
 d = 0.013  # in cm
+n_classes = 6
 
 current_dir = Path.cwd().parent.parent
 Path(current_dir / "rasters").mkdir(exist_ok=True)
@@ -31,18 +32,18 @@ map_B_asc = str(current_dir / "rasters/map_B_class.asc")
 # ID (Intermediate Deposition), HID (High Intermediate Deposition), HD (High Deposition).
 '''class_bins = [-100 * d, -20 * d, -10 * d, -5 * d, -2 * d, -0.5 * d, 0.5 * d, 2 * d, 5 * d, 10 * d, 20 * d,
               np.iinfo(np.int32).max]
-
-# Classify raster and save
-mapoperator.classifier(map_A_in, map_A_out, class_bins)
-mapoperator.classifier(map_B_in, map_B_out, class_bins)'''
+'''
 
 # Import raster as np array
-array_A = mo.raster_to_np(map_A_in)
-nb_classes = mo.nb_classes(array_A, 7)
-mo.classifier(map_A_in, map_A_out, nb_classes)
-mo.classifier(map_B_in, map_B_out, nb_classes)
+array_A = mo.MapArray(mo.raster_to_np(map_A_in))
+array_B = mo.MapArray(mo.raster_to_np(map_B_in))
 
-# Convert to ascii file
+# Classify the array and save the output file as .tif raster
+nb_classes = array_A.nb_classes(n_classes) # Extract the optimized intervalls for the map A
+array_A.classifier(map_A_out, nb_classes)
+array_B.classifier(map_B_out, nb_classes)
+
+# Convert .tif to ascii file
 gdal.Translate(map_A_asc, map_A_out, format='AAIGrid')
 gdal.Translate(map_B_asc, map_B_out, format='AAIGrid')
 

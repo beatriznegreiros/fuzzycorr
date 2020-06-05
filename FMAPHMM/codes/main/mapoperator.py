@@ -50,42 +50,51 @@ def shape_to_raster(x_res, y_res, _in, _out):
     gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=dz'])
 
 
-def classifier(map_in, map_out, class_bins):
-    # Open and read the raster
+def raster_to_np(map_in, msk=True):
     with rio.open(map_in) as src:
-        raster = src.read(1, masked=True)
-        msk = src.read_masks(1)  # reading map's mask
+        raster_np = src.read(1, masked=msk)
+        global nodatavalue
         nodatavalue = src.nodata  # storing nodatavalue of raster
+        global meta
         meta = src.meta.copy()
-
-    # Classify the original image array (digitize makes nodatavalues take the class 0)
-    raster_class = np.digitize(raster, class_bins, right = True)
-
-    # Assigns nodatavalues back to array
-    raster_ma = np.ma.masked_where(raster_class == 0,
-                                   raster_class,
-                                   copy=True)
-
-    # Fill nodatavalues into array
-    raster_ma_fi = np.ma.filled(raster_ma, fill_value=nodatavalue)
-
-    if raster_ma_fi.min() == nodatavalue:
-        with rio.open(map_out, 'w', **meta) as outf:
-            outf.write(raster_ma_fi.astype(rio.float32), 1)
-    else:
-        raise TypeError("Error filling NoDataValue to raster file")
-
-
-def raster_to_np(map_in):
-    with rio.open(map_in) as src:
-        raster_np = src.read(1, masked=True)
     return raster_np
 
 
-def nb_classes(array, n_classes):
-    # Classification based on Natural Breaks
-    breaks = mc.NaturalBreaks(array.ravel(), k=n_classes)
-    print('The bins were optimized to be:', breaks.bins)
-    class_bins = breaks.bins.tolist()
-    return class_bins
+def f_similarity(a, b):
+    return 1 - (abs(a - b))/max(abs(a), abs(b))
+
+
+class MapArray:
+    def __init__(self, array):
+        self.array = array
+
+    # Method to output class bins based on Natural Breaks
+    def nb_classes(self, n_classes):
+        # Classification based on Natural Breaks
+        breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes+1)
+        print('The bins were optimized to be:', breaks.bins)
+        class_bins = breaks.bins.tolist()
+        return class_bins
+
+    def neighbours(self, x, y, nx=2, ny=2):
+        return self.array[max(x - nx, 0) : min(x + nx + 1, self.array.shape[0]), \
+               max(y - ny, 0) : min(y + ny + 1, self.array.shape[1])]
+
+    def classifier(self, map_out, class_bins):
+        # Classify the original image array (digitize makes nodatavalues take the class 0)
+        raster_class = np.digitize(self.array, class_bins, right=True)
+
+        # Assigns nodatavalues back to array
+        raster_ma = np.ma.masked_where(raster_class == 0,
+                                       raster_class,
+                                       copy=True)
+
+        # Fill nodatavalues into array
+        raster_ma_fi = np.ma.filled(raster_ma, fill_value=nodatavalue)
+
+        if raster_ma_fi.min() == nodatavalue:
+            with rio.open(map_out, 'w', **meta) as outf:
+                outf.write(raster_ma_fi.astype(rio.float32), 1)
+        else:
+            raise TypeError("Error filling NoDataValue to raster file")
 
