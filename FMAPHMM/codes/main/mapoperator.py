@@ -6,6 +6,7 @@ try:
     import numpy as np
     import mapclassify.classifiers as mc
     import pandas as pd
+    import math
     from pathlib import Path
 except:
     print('ExceptionERROR: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
@@ -76,12 +77,21 @@ class MapArray:
         class_bins = breaks.bins.tolist()
         return class_bins
 
-    def neighbours(self, x, y, n=1):
+    def neighbours(self, x, y, n=4, halving_dist=2):
         x_up = max(x - n, 0)
         x_lower = min(x + n + 1, self.array.shape[0])
         y_up = max(y - n, 0)
         y_lower = min(y + n + 1, self.array.shape[1])
-        return self.array[x_up: x_lower, y_up: y_lower]
+        memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=np.float64)
+        i = 0
+        for row in range(x_up, x_lower):
+            j = 0
+            for column in range(y_up, y_lower):
+                d = math.sqrt((row - x) ** 2 + (column - y) ** 2)
+                memb[i, j] = 2**(-d/halving_dist)
+                j += 1
+            i += 1
+        return memb, self.array[x_up: x_lower, y_up: y_lower]
 
     def classifier(self, map_out, class_bins):
         # Classify the original image array (digitize makes nodatavalues take the class 0)
