@@ -7,6 +7,13 @@ at the end of October.
 
 - For usage please read the Lincense terms.
 
+### The goal of the Study
+Sediment transport and river flow processes are simulated with numerical models such as SSIIMM, 
+Hydro_AS_2D and others. The validity of such models is done comparing simulated against the observed data sets. 
+With this purpose, two main methods of comparison arise: comparison via statistical methods such as RMSE 
+(Root Mean Squared Error) or visual human comparison. Local measures of similarity (or asimilarity) like the RMSE are very 
+sensible to locational and value uncertainty and may indicate low agreement even when the overall patterns where adequetivaly 
+simulated.
 
 ### Projects's Description
 
@@ -33,7 +40,8 @@ in tree columns x, y and delta z(respective difference in bed elevation).
 The current data being used stems from an experimental physical model set-up. The experiment was simulated using the
 numerical model SSIIMM and the results of Bed Elevation Difference compared with the experiment's.
 
-## Code Descriptions
+### Code Descriptions
+### Code Descriptions
 
 The code presented here is written in ``Python 3.7`` and will be coupled with ``C++`` to run the Fuzzy-Kappa
 map comparison algorithm.
