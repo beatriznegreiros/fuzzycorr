@@ -1,6 +1,4 @@
-Validation Tools ![alt text](Image.png)
-
-## Fuzzy Map Comparison for Numerical Model Validation
+## Fuzzy Map Comparison for Numerical Model Validation 
 ---
 This repository contains the work developed during a Master Thesis on fuzzy map comparison methods to assess the performance of hydro-morphodynamic models.
 
@@ -9,7 +7,7 @@ at the end of October.
 
 - For usage please read the Lincense terms.
 
-### The goal of the Study
+### The goal of the study
 
 Sediment transport and river flow processes are simulated with numerical models such as SSIIMM, 
 Hydro_AS_2D and others. The validity of such models is done comparing simulated against the observed data sets. 
@@ -33,7 +31,7 @@ This work addresses such necessity in evaluating model performance through the u
 could be applied to assess hydro-morphodynamic model's validity and aid modelers on designing calibration procedures.
 
 
-### Projects's Description
+### Projects's description
 
 This repository contains the following folders:
 - (FMAPHMM) Fuzzy Map Comparison to Assess Performance of Morphodynamic Models:
@@ -49,7 +47,7 @@ This repository contains the following folders:
 - (GUI) Graphical User Interface
 	- trials: first steps of the GUI development
 
-### Data Description
+### Data description
 
 The input data necessary for the code to run should follow the format of files:
 hexagon_experiment.csv or hexagon_simulation.csv, in which the spatial data is stored 
@@ -58,7 +56,7 @@ in tree columns x, y and delta z(respective difference in bed elevation).
 The current data being used stems from an experimental physical model set-up. The experiment was simulated using the
 numerical model SSIIMM and the results of Bed Elevation Difference compared with the experiment's.
 
-### Code Descriptions
+### Code description
 
 The repository is coded in  ``Python 3.7`` 
 
