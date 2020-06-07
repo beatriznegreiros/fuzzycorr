@@ -1,5 +1,7 @@
+Validation Tools ![Image](Image.png)
+
 ## Fuzzy Map Comparison for Numerical Model Validation
-***
+---
 This repository contains the work developed during a Master Thesis on fuzzy map comparison methods to assess the performance of hydro-morphodynamic models.
 
 Further improvements are being done and the final code will be available
@@ -8,6 +10,7 @@ at the end of October.
 - For usage please read the Lincense terms.
 
 ### The goal of the Study
+
 Sediment transport and river flow processes are simulated with numerical models such as SSIIMM, 
 Hydro_AS_2D and others. The validity of such models is done comparing simulated against the observed data sets. 
 With this purpose, two main methods of comparison arise: comparison via statistical methods such as RMSE 
