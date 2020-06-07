@@ -1,5 +1,3 @@
-![Image](Image.PNG)
-
 ## Fuzzy Map Comparison for Numerical Model Validation 
 ---
 This repository contains the work developed during a Master Thesis on fuzzy map comparison methods to assess the performance of hydro-morphodynamic models.
