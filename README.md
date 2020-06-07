@@ -1,4 +1,4 @@
-Validation Tools ![Image](Image.png)
+Validation Tools ![Image](Image.PNG)
 
 ## Fuzzy Map Comparison for Numerical Model Validation
 ---
