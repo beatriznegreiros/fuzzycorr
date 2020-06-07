@@ -22,7 +22,6 @@ map_B_in = str(current_dir / "rasters/map_B.tif")
 A = mo.MapArray(mo.raster_to_np(map_A_in))
 B = mo.MapArray(mo.raster_to_np(map_B_in))
 
-
 # Two-way similarity, first A x B then B x A
 s_AB = np.zeros(np.shape(A.array), dtype=float)
 s_BA = np.zeros(np.shape(A.array), dtype=float)
@@ -38,8 +37,6 @@ for index, a in np.ndenumerate(A.array):
         if f > f_i:
             f_i = f
     s_AB[index] = f_i
-print(s_AB)
-print(np.shape(s_AB))
 
 # Loop to calculate similarity A x B
 for index, a in np.ndenumerate(B.array):
@@ -53,12 +50,10 @@ for index, a in np.ndenumerate(B.array):
             f_i = f
     s_BA[index] = f_i
 
+# Mask pixels where there's no similarity measure
 S_i = np.minimum(s_AB, s_BA)
 S_i_ma = np.ma.masked_where(S_i == -np.inf,
-                               S_i,
-                               copy=True)
+                            S_i,
+                            copy=True)
 S = S_i_ma.mean()
-print(S)
-
-
-
+print("The overall average similarity is:", S)
