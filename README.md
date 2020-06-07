@@ -12,8 +12,23 @@ Sediment transport and river flow processes are simulated with numerical models 
 Hydro_AS_2D and others. The validity of such models is done comparing simulated against the observed data sets. 
 With this purpose, two main methods of comparison arise: comparison via statistical methods such as RMSE 
 (Root Mean Squared Error) or visual human comparison. Local measures of similarity (or asimilarity) like the RMSE are very 
-sensible to locational and value uncertainty and may indicate low agreement even when the overall patterns where adequetivaly 
-simulated.
+sensible to locational and value uncertainty and may indicate low agreement even when the overall patterns were adequately 
+simulated. 
+
+In contrast, visual comparison is able to capture global similarity, which is one of the reasons why modelers still
+use it for model validation. Humans are capable of finding patterns without deliberately trying and therefore this comparison offers 
+substantial advantages over local similarity measures. Nevertheless, more research has to be done to implement automated validation tools 
+with some features of human thinking. That is necessary because human comparison is not transparent and prone to subjective interpretations; 
+moreover, it is time consuming and hardly reproducible.
+
+In this context, the concept of fuzzy set theory has proven to be remarkable in capturing spatial patterns similar to human thinking.
+By introducing fuzziness of location, one introduces tolerance to spatial uncertainties in the outputs of hydro-morphodynamic models. 
+Fuzzy logic is, therefore, highly applicable to these models because the last hold considerable uncertainties in model's structure, 
+parameters and input data.
+
+This work addresses such necessity in evaluating model performance through the use of fuzzy map comparison. The tools developed here
+could be applied to assess hydro-morphodynamic model's validity and aid modelers on designing calibration procedures.
+
 
 ### Projects's Description
 
@@ -41,8 +56,7 @@ The current data being used stems from an experimental physical model set-up. Th
 numerical model SSIIMM and the results of Bed Elevation Difference compared with the experiment's.
 
 ### Code Descriptions
-### Code Descriptions
 
-The code presented here is written in ``Python 3.7`` and will be coupled with ``C++`` to run the Fuzzy-Kappa
-map comparison algorithm.
+The repository is coded in  ``Python 3.7`` 
+
 
