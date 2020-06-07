@@ -1,4 +1,5 @@
 title: valitools
 logo: Image.PNG
 description: Validation tools for numerical models
+google_analytics:
 theme: jekyll-theme-minimal
