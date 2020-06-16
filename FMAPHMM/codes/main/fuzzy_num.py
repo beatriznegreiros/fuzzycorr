@@ -29,8 +29,9 @@ def fuzzy_numerical(map_A, map_B):
     :return: overall performance index
     """
     # Read rasters as arrays
-    A = mo.MapArray(mo.raster_to_np(map_A))
-    B = mo.MapArray(mo.raster_to_np(map_B))
+
+    A = mo.MapArray(map_A)
+    B = mo.MapArray(map_B)
 
     # Two-way similarity, first A x B then B x A
     s_AB = np.zeros(np.shape(A.array), dtype=float)
@@ -68,18 +69,30 @@ def fuzzy_numerical(map_A, map_B):
     S = S_i_ma.mean()
     # Local similarity
 
-
     # Overall similarity
     print("The overall average similarity is:", S)
 
 
 if __name__ == '__main__':
-    # 2. Neighborhood definition
+    import timeit
+    # ------------------------INPUT--------------------------------------
+    # Neighborhood definition
     n = 4  # 'radius' of neighborhood
     halving_distance = 2
 
-    # 3. INPUT: Rasters input path
-    map_A_in = str(current_dir / "rasters/diamond_map_A_testing.tif")
-    map_B_in = str(current_dir / "rasters/diamond_map_A.tif")
+    # Rasters input path
+    map_A_in = str(current_dir / "rasters/diamond_map_A_res0.1_norm.tif")
+    map_B_in = str(current_dir / "rasters/diamond_map_B_res0.1_norm.tif")
+    # ------------------------------------------------------------------
 
+    # Start run time count
+    start = timeit.default_timer()
+
+    # Perform fuzzy comparison
     fuzzy_numerical(map_A_in, map_B_in)
+
+    # Stops run time count
+    stop = timeit.default_timer()
+
+    # Print run time:
+    print('Enlapsed time: ', stop - start, 's')
