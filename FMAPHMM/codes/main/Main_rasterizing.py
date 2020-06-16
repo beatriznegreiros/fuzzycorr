@@ -12,8 +12,8 @@ current_dir = Path.cwd().parent.parent
 path_A = str(current_dir / "raw_data/hexagon_experiment.csv")
 path_B = str(current_dir / "raw_data/hexagon_simulation.csv")
 
-name_map_A = "hexagon_map_A"
-name_map_B = "hexagon_map_B"
+name_map_A = "hexagon_map_A_res0.2"
+name_map_B = "hexagon_map_B_res0.2"
 
 #  1.2 Raster Resolution: Change as appropriate
 #  NOTE: For the Fuzzy Analysis choose one unique resolution

@@ -79,7 +79,7 @@ if __name__ == '__main__':
     halving_distance = 2
 
     # 3. INPUT: Rasters input path
-    map_A_in = str(current_dir / "rasters/hexagon_map_A.tif")
-    map_B_in = str(current_dir / "rasters/hexagon_map_B.tif")
+    map_A_in = str(current_dir / "rasters/diamond_map_A_testing.tif")
+    map_B_in = str(current_dir / "rasters/diamond_map_A.tif")
 
     fuzzy_numerical(map_A_in, map_B_in)
