@@ -197,33 +197,6 @@ class MapArray:
         class_bins = breaks.bins.tolist()
         return class_bins
 
-    def neighbours(self, x, y, n=4, halving_dist=2):
-        """ Takes the neighbours and their memberships
-
-        :param x: int, cell in x
-        :param y: int, cell in y
-        :param n: int, 'radius' of neighbourhood
-        :param halving_dist: int, halving distance of the distance decay function
-        :return: ndarray (float) membership of the neighbours, ndarray (float) neighbours' cells
-        """
-        x_up = max(x - n, 0)
-        x_lower = min(x + n + 1, self.array.shape[0])
-        y_up = max(y - n, 0)
-        y_lower = min(y + n + 1, self.array.shape[1])
-        memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=np.float32)
-
-        np.seterr(divide='ignore', invalid='ignore')
-
-        i = 0
-        for row in range(x_up, x_lower):
-            j = 0
-            for column in range(y_up, y_lower):
-                d = math.sqrt((row - x) ** 2 + (column - y) ** 2)
-                memb[i, j] = 2 ** (-d / halving_dist)
-                j += 1
-            i += 1
-
-        return memb, self.array[x_up: x_lower, y_up: y_lower]
 
     def classifier(self, map_out, class_bins):
         """ Classifies the raster according to the classification bins
