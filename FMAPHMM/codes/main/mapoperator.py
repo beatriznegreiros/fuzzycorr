@@ -151,8 +151,8 @@ class SpatialField:
         transform = from_origin(self.xmin, self.ymax, self.res, self.res)
 
         new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
-                                    height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
-                                    crs=self.crs, transform=transform, nodata=nodatavalue)
+                               height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
+                               crs=self.crs, transform=transform, nodata=nodatavalue)
         new_dataset.write(array, 1)
         new_dataset.close()
 
@@ -206,3 +206,35 @@ class MapArray:
             raise TypeError("Error filling NoDataValue to raster file")
 
 
+if __name__ == '__main__':
+    # ------------------------INPUT--------------------------------------
+    #  Raw data input path
+    data_A = "diamond_experiment.csv"
+    data_B = "diamond_simulation.csv"
+    attribute = 'dz'
+
+    name_map_A = "diamond_map_A_res0.1.tif"
+    name_map_B = "diamond_map_B_res0.1.tif"
+
+    #  Raster Resolution: Change as appropriate
+    #  NOTE: Fuzzy Analysis has unique resolution
+    res = 0.1
+
+    # Projection
+    crs = "EPSG:4326"
+    nodatavalue = -9999
+    # -----------------------------------------------------------------------
+
+    if '.' not in data_A[-4:]:
+        data_A += '.csv'
+    path_A = str(dir / "raw_data/") + "/" + data_A
+
+    if '.' not in data_B[-4]:
+        data_A += '.csv'
+    path_B = str(dir / "raw_data/") + "/" + data_B
+
+    map_A = SpatialField(name_map_A, pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs)
+    map_A.norm_raster(nodatavalue=nodatavalue, res=res)
+
+    map_B = SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs)
+    map_B.norm_raster(nodatavalue=nodatavalue, res=res)
