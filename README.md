@@ -44,6 +44,7 @@ This repository contains the following folders:
 	- rasters: Contains the rasters produced by the main code in formats .tif and .asc
 	- shapefiles: Contains shapefiles to be converted in raster
 	- raw_data: Stores the data directory which the code will read
+	- results: Output of fuzzy comparisons are automatically saved here
 - (GUI) Graphical User Interface
 	- trials: first steps of the GUI development
 
