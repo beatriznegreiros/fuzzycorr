@@ -1,6 +1,7 @@
 theme: jekyll-theme-minimal
 title: valitools
-logo: Image.PNG
-description: Validation tools for numerical models
+logo: logo.PNG
+description: Validation and calibration tools for numerical models
+
 show_downloads: true
 
