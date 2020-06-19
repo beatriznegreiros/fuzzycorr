@@ -7,11 +7,12 @@ try:
     from rasterio.transform import from_origin
     from pathlib import Path
 except:
-    print('ExceptionERROR: Missing fundamental packages (required: pathlib, numpy, gdal).')
+    print('ModuleNotFoundError: Missing fundamental packages (required: pathlib, numpy, gdal, rasterio, math, sys).')
 
 # Create directory if not existent
-current_dir = Path.cwd().parent.parent
-Path(current_dir / "rasters").mkdir(exist_ok=True)
+dir = Path.cwd().parent.parent
+Path(dir / "rasters").mkdir(exist_ok=True)
+Path(dir / "results").mkdir(exist_ok=True)
 
 
 class FuzzyComparison:
@@ -25,7 +26,7 @@ class FuzzyComparison:
         self.array_B, self.nodatavalue_B, self.meta_B = self.read_raster(self.raster_B)
 
         if self.nodatavalue != self.nodatavalue_B:
-            print("Warning: Maps have different NoDataValues, I'll use the NoDataValue of the first map")
+            print('Warning: Maps have different NoDataValues, I will use the NoDataValue of the first map')
         if self.meta_A != self.meta_B:
             sys.exit('MapError: Maps have different MetaData. Hint: Make sure both maps have same src.')
 
@@ -48,11 +49,9 @@ class FuzzyComparison:
     def neighbours(self, array, x, y):
         """ Takes the neighbours and their memberships
 
-        :param array:
+        :param array: array A or B
         :param x: int, cell in x
         :param y: int, cell in y
-        :param n: int, 'radius' of neighbourhood
-        :param halving_dist: int, halving distance of the distance decay function
         :return: ndarray (float) membership of the neighbours, ndarray (float) neighbours' cells
         """
         x_up = max(x - n, 0)
@@ -63,22 +62,20 @@ class FuzzyComparison:
 
         np.seterr(divide='ignore', invalid='ignore')
 
-        i = 0
-        for row in range(x_up, x_lower):
-            j = 0
-            for column in range(y_up, y_lower):
+        for i, row in np.ndenumerate(np.arange(x_up, x_lower)):
+            for j, column in np.ndenumerate(np.arange(y_up, y_lower)):
                 d = math.sqrt((row - x) ** 2 + (column - y) ** 2)
                 memb[i, j] = 2 ** (-d / self.halving_distance)
-                j += 1
-            i += 1
 
         return memb, array[x_up: x_lower, y_up: y_lower]
 
-    def fuzzy_numerical(self, comparison_name):
-        """Compares a pair of maps using fuzzy numerical spatial comparison
+    def fuzzy_numerical(self, comparison_name, map_of_comparison=True):
+        """ Reads and compares a pair of raster maps using fuzzy numerical spatial comparison
 
+        :param comparison_name: string, name of the comparison
         :param map_A: path of one raster
         :param map_B: path of the other raster
+        :param map_of_comparison: boolean, create map of comparison
         :return: overall performance index
         """
 
@@ -118,6 +115,27 @@ class FuzzyComparison:
         # Overall similarity
         S = S_i_ma.mean()
 
+        # Fill nodatavalues into array
+        S_i_ma_fi = np.ma.filled(S_i_ma, fill_value=self.nodatavalue)
+
+        # Saves a results file
+        result_file = str(dir / "results") + "/" + comparison_name + ".txt"
+        lines = ["Fuzzy numerical spatial comparison \n", "\n", "Compared maps: \n",
+                 str(self.raster_A) + "\n", str(self.raster_B) + "\n", "\n"]
+        file1 = open(result_file, "w")
+        file1.writelines(lines)
+        file1.write('Average fuzzy similarity: ' + str(format(S, '.4f')))
+        file1.close()
+
+        # Create map of comparison
+        if map_of_comparison:
+            if '.' not in comparison_name[-4:]:
+                comparison_name += '.tif'
+            comp_map = str(dir / "results") + "/" + comparison_name
+            raster = rio.open(comp_map, 'w', **self.meta_A)
+            raster.write(S_i_ma_fi, 1)
+            raster.close()
+
         return S
 
 
@@ -131,8 +149,8 @@ if __name__ == '__main__':
     comparison_name = "diamond_res0.1_norm_comparison"
 
     # Rasters input path
-    map_A_in = str(current_dir / "rasters/diamond_map_A_res0.1_norm.tif")
-    map_B_in = str(current_dir / "rasters/diamond_map_B_res0.1_norm.tif")
+    map_A_in = str(dir / "rasters/diamond_map_A_res0.1_norm.tif")
+    map_B_in = str(dir / "rasters/diamond_map_B_res0.1_norm.tif")
     # ------------------------------------------------------------------
 
     # Start run time count
@@ -143,7 +161,7 @@ if __name__ == '__main__':
     global_simil = compareAB.fuzzy_numerical(comparison_name)
 
     # Print global similarity
-    print("Average fuzzy similarity:", global_simil)
+    print('Average fuzzy similarity:', global_simil)
 
     # Stops run time count
     stop = timeit.default_timer()
@@ -151,12 +169,4 @@ if __name__ == '__main__':
     # Print run time:
     print('Enlapsed time: ', stop - start, 's')
 
-# Local similarity
-'''S_i_ma = np.flipud(np.array(S_i_ma))
-comparison_map = str(current_dir / "rasters") + "/" + comparison_name + ".tif"
-transform = from_origin(self.xmin, self.ymax, self.res, self.res)
-new_dataset = rio.open(comparison_map, 'w', driver='GTiff',
-                       height=S_i_ma.shape[0], width=S_i_ma.shape[1], count=1, dtype=S_i_ma.dtype,
-                       crs=S_i_ma.crs, transform=transform, nodata=nodatavalue)
-new_dataset.write(array, 1)
-new_dataset.close()'''
+

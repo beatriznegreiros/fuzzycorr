@@ -15,18 +15,18 @@ except:
     print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
           'mapclassify, pandas, pathlib).')
 
-current_dir = Path.cwd().parent.parent
-Path(current_dir / "shapefiles").mkdir(exist_ok=True)
-Path(current_dir / "rasters").mkdir(exist_ok=True)
+dir = Path.cwd().parent.parent
+Path(dir / "shapefiles").mkdir(exist_ok=True)
+Path(dir / "rasters").mkdir(exist_ok=True)
 
 
 class SpatialField:
     def __init__(self, name_dataset, pd, attribute, crs):
         self.pd = pd
         self.name = name_dataset
-        self.shapefile = str(current_dir / "shapefiles") + "/" + self.name + ".shp"
-        self.raster = str(current_dir / "rasters") + "/" + self.name + ".tif"
-        self.normraster = str(current_dir / "rasters") + "/" + self.name + "_norm.tif"
+        self.shapefile = str(dir / "shapefiles") + "/" + self.name + ".shp"
+        self.raster = str(dir / "rasters") + "/" + self.name + ".tif"
+        self.normraster = str(dir / "rasters") + "/" + self.name + "_norm.tif"
         self.crs = crs
         self.attribute = attribute
 
@@ -46,7 +46,7 @@ class SpatialField:
         self.z = gdf[attribute].values
 
     def points_to_grid(self):
-        """
+        """ Create a grid of new points in the desired resolution to be interpolated
 
         :return: array of size nrow, ncol
 
@@ -67,7 +67,7 @@ class SpatialField:
         return array
 
     def norm_array(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
-        """
+        """ Normalizes the raw data in equally sparsed points depending on the selected resolution
 
         :return: interpolated and normalized array with selected resolution
 
@@ -98,9 +98,11 @@ class SpatialField:
         array = self.points_to_grid()
         x = np.arange(0, self.ncol)
         y = np.arange(0, self.nrow)
+
         # mask invalid values
         array = np.ma.masked_invalid(array)
         xx, yy = np.meshgrid(x, y)
+
         # get only the valid values
         x1 = xx[~array.mask]
         y1 = yy[~array.mask]
@@ -113,15 +115,10 @@ class SpatialField:
         self.gdf.to_file(self.shapefile)
 
     def plain_raster(self, res, nodatavalue=np.nan):
-        """ Converts shapefile to rasters (.tif)
+        """ Converts raw data to shapefile(.shp) and rasters(.tif) without normalizing
 
-        :param nodatavalue:
-        :param normalize_data:
-        :param use_template:
-        :param x_res: float, resolution of the cell in x
-        :param y_res: float, resolution of the cell in y
-        :param shapefile: string, path of the shapefile to be converted
-        :param _out: string, path of the raster to be saved (.tif)
+        :param nodatavalue: selected nodatavalue to be filled in the output raster
+        :param res: float, resolution of the cell
         :return: no output, saves the raster in the default directory
         """
         self.shape()
@@ -141,8 +138,18 @@ class SpatialField:
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
     def norm_raster(self, nodatavalue=np.nan, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
+        """ Saves a raster using interpolation
+
+        :param nodatavalue: selected nodatavalue to be filled in the output raster
+        :param res: float, resolution of the cell
+        :param ulc: tuple, upper left corner
+        :param lrc: tuple, lower right corner
+        :param method: interpolation method {‘linear’, ‘nearest’, ‘cubic’}, more info at: https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
+        :return: no output, saves the raster in the default directory
+        """
         array = self.norm_array(res=res, ulc=ulc, lrc=lrc, method=method)
         transform = from_origin(self.xmin, self.ymax, self.res, self.res)
+
         new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
                                     height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
                                     crs=self.crs, transform=transform, nodata=nodatavalue)
@@ -150,29 +157,6 @@ class SpatialField:
         new_dataset.close()
 
         return new_dataset
-
-'''    def data_to_raster(self, x_res, y_res, nodatavalue=-9999, asc_format=True):
-        """ Generates raster and shapefile from .csv data
-        NOTE: data must contain 3 columns [x,y, attribute]
-
-        :param path: string, path of the .csv file
-        :param name: string, name of the file to be output
-        :param x_res: float, resolution in x of the raster
-        :param y_res: float, resolution in y of the raster
-        :return: no return, saves shapefile and raster in default directory
-        """
-
-        raster_asc = str(current_dir / "rasters") + "/" + self.name + ".asc"
-
-        # Create shapefile from dataframe
-        self.data_to_shape()
-
-        # Create Raster from shapefile
-        self.shape_to_raster(x_res, y_res, nodatavalue=nodatavalue)
-
-        if asc_format:
-            # Converts raster to .asc format
-            gdal.Translate(raster_asc, self.raster, format='AAIGrid') '''
 
 
 class MapArray:
@@ -196,7 +180,6 @@ class MapArray:
         print('The bins were optimized to:', breaks.bins)
         class_bins = breaks.bins.tolist()
         return class_bins
-
 
     def classifier(self, map_out, class_bins):
         """ Classifies the raster according to the classification bins
