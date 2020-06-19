@@ -160,8 +160,9 @@ class SpatialField:
 
 
 class MapArray:
-    def __init__(self, raster):
+    def __init__(self, map_name, raster):
         self.raster = raster
+        self.map_name = map_name
 
         with rio.open(self.raster) as src:
             raster_np = src.read(1, masked=True)
@@ -181,7 +182,7 @@ class MapArray:
         class_bins = breaks.bins.tolist()
         return class_bins
 
-    def classifier(self, map_out, class_bins):
+    def categorized_raster(self, class_bins, save_ascii = True):
         """ Classifies the raster according to the classification bins
 
         :param map_out: string, path of the classified map to be generated
@@ -199,11 +200,17 @@ class MapArray:
         # Fill nodatavalues into array
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)
 
+        map_out = str(dir / "rasters") + "/" + self.map_name + ".tif"
+
         if raster_ma_fi.min() == self.nodatavalue:
-            with rio.open(map_out, 'w', **self.nodatavalue) as outf:
+            with rio.open(map_out, 'w', **self.meta) as outf:
                 outf.write(raster_ma_fi.astype(rio.float32), 1)
         else:
             raise TypeError("Error filling NoDataValue to raster file")
+
+        if save_ascii:
+            map_asc = str(dir / "rasters") + "/" + self.map_name + ".asc"
+            gdal.Translate(map_asc, map_out, format='AAIGrid')
 
 
 if __name__ == '__main__':
