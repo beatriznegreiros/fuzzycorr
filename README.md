@@ -31,28 +31,33 @@ This work addresses such necessity in evaluating model performance through the u
 could be applied to assess hydro-morphodynamic model's validity and aid modelers on designing calibration procedures.
 
 
-### Projects's description
+### Repo's description
 
-This repository contains the following folders:
-- (FMAPHMM) Fuzzy Map Comparison to Assess Performance of Morphodynamic Models:
-	- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
-	- codes: 
-		- anaylsis: Codes used for analysis of the data 
-		- debug: Folder for debugging and keeping track of previous problems
-		- main: Folder which contains the main codes for running the Fuzzy-Kappa for Numerical Model Validation
-		- testing: Initial tests, trials for getting familiar with functions and libraries in Python
-	- rasters: Contains the rasters produced by the main code in formats .tif and .asc
-	- shapefiles: Contains shapefiles to be converted in raster
-	- raw_data: Stores the data directory which the code will read
-	- results: Output of fuzzy comparisons are automatically saved here
-- (GUI) Graphical User Interface
-	- trials: first steps of the GUI development
+This repository contains the following modules (both can run as stand-alone):
+- mapoperator: This module's capabilities include the reading, normalizing and rasterizing spatial data
+- fuzzynumerical: Module for model evaluation based on fuzzy numerical map comparison
+
+Create your project's directory and save in it your raw data in a subdirectory named ``raw_data``.
+If rasters are already in hand, just create a subdirectory named ``rasters`` 
+- raw_data: Stores the data directory which the code will read
+- rasters: Rasters will be saved and searched for here
+
+The following subdirectories are automatically generated:
+- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
+- shapefiles: Contains shapefiles output or to be covnerted to rasters
+- results: Output of fuzzy comparisons are automatically saved here
+
 
 ### Data description
 
 The input data necessary for the code to run should follow the format of files:
 hexagon_experiment.csv or hexagon_simulation.csv, in which the spatial data is stored 
 in tree columns x, y and delta z(respective difference in bed elevation).
+
+Create your project's directory and save in it your raw data in a subdirectory named ``raw_data``.
+If rasters are already in hand, just create a subdirectory named ``rasters`` 
+- raw_data: Stores the data directory which the code will read
+- rasters: Rasters will be saved and searched for here
 
 The current data being used stems from an experimental physical model set-up. The experiment was simulated using the
 numerical model SSIIMM and the results of Bed Elevation Difference compared with the experiment's.
