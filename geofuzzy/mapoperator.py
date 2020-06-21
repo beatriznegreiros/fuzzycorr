@@ -15,21 +15,17 @@ except:
     print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
           'mapclassify, pandas, pathlib).')
 
-dir = Path.cwd().parent.parent
-Path(dir / "shapefiles").mkdir(exist_ok=True)
-Path(dir / "rasters").mkdir(exist_ok=True)
-
 
 class SpatialField:
-    def __init__(self, name_dataset, pd, attribute, crs):
+    def __init__(self, name_dataset, pd, attribute, crs, project_dir, nodatavalue):
         self.pd = pd
         self.name = name_dataset
-        self.shapefile = str(dir / "shapefiles") + "/" + self.name + ".shp"
-        self.raster = str(dir / "rasters") + "/" + self.name + ".tif"
-        self.normraster = str(dir / "rasters") + "/" + self.name + "_norm.tif"
+        self.shapefile = str(project_dir / "shapefiles") + "/" + self.name + ".shp"
+        self.raster = str(project_dir / "rasters") + "/" + self.name + ".tif"
+        self.normraster = str(project_dir / "rasters") + "/" + self.name + "_norm.tif"
         self.crs = crs
         self.attribute = attribute
-
+        self.nodatavalue = nodatavalue
         # Standardize the dataframe
         self.pd.dropna(how='any', inplace=True, axis=0)
 
@@ -107,17 +103,16 @@ class SpatialField:
         x1 = xx[~array.mask]
         y1 = yy[~array.mask]
         newarr = array[~array.mask]
-        GD1 = interpolate.griddata((x1, y1), newarr.ravel(), (xx, yy), method=method, fill_value=np.nan)
+        GD1 = interpolate.griddata((x1, y1), newarr.ravel(), (xx, yy), method=method, fill_value=self.nodatavalue)
 
         return GD1
 
     def shape(self):
         self.gdf.to_file(self.shapefile)
 
-    def plain_raster(self, res, nodatavalue=np.nan):
+    def plain_raster(self, res):
         """ Converts raw data to shapefile(.shp) and rasters(.tif) without normalizing
 
-        :param nodatavalue: selected nodatavalue to be filled in the output raster
         :param res: float, resolution of the cell
         :return: no output, saves the raster in the default directory
         """
@@ -132,15 +127,14 @@ class SpatialField:
         _raster = gdal.GetDriverByName('GTiff').Create(self.raster, cols, rows, 1, gdal.GDT_Float32)
         _raster.SetGeoTransform((x_min, res, 0, y_max, 0, res))
         _band = _raster.GetRasterBand(1)
-        _band.SetNoDataValue(nodatavalue)
+        _band.SetNoDataValue(self.nodatavalue)
 
         # Rasterize
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
-    def norm_raster(self, nodatavalue=np.nan, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
+    def norm_raster(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
         """ Saves a raster using interpolation
 
-        :param nodatavalue: selected nodatavalue to be filled in the output raster
         :param res: float, resolution of the cell
         :param ulc: tuple, upper left corner
         :param lrc: tuple, lower right corner
@@ -152,7 +146,7 @@ class SpatialField:
 
         new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
-                               crs=self.crs, transform=transform, nodata=nodatavalue)
+                               crs=self.crs, transform=transform, nodata=self.nodatavalue)
         new_dataset.write(array, 1)
         new_dataset.close()
 
@@ -161,8 +155,8 @@ class SpatialField:
 
 class MapArray:
     def __init__(self, map_name, raster):
-        self.raster = raster
         self.map_name = map_name
+        self.raster = raster
 
         with rio.open(self.raster) as src:
             raster_np = src.read(1, masked=True)
@@ -171,7 +165,7 @@ class MapArray:
         self.array = raster_np
 
     def nb_classes(self, n_classes):
-        """ Class bins based on Natural Breaks
+        """ Class bins based on the Natural Breaks method
 
         :param n_classes: integer, number of classes
         :return: list, optimized bins
@@ -182,10 +176,10 @@ class MapArray:
         class_bins = breaks.bins.tolist()
         return class_bins
 
-    def categorized_raster(self, class_bins, save_ascii = True):
+    def categorize_raster(self, class_bins, project_dir, save_ascii=True):
         """ Classifies the raster according to the classification bins
 
-        :param map_out: string, path of the classified map to be generated
+        :param project_dir: path of the project directory
         :param class_bins: list
         :return: no return, saves the classified raster in the chosen directory
         """
@@ -200,16 +194,16 @@ class MapArray:
         # Fill nodatavalues into array
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)
 
-        map_out = str(dir / "rasters") + "/" + self.map_name + ".tif"
+        map_out = str(project_dir / "rasters/") + "/" + self.map_name + ".tif"
 
         if raster_ma_fi.min() == self.nodatavalue:
             with rio.open(map_out, 'w', **self.meta) as outf:
-                outf.write(raster_ma_fi.astype(rio.float32), 1)
+                outf.write(raster_ma_fi.astype(rio.float64), 1)
         else:
             raise TypeError("Error filling NoDataValue to raster file")
 
         if save_ascii:
-            map_asc = str(dir / "rasters") + "/" + self.map_name + ".asc"
+            map_asc = str(project_dir / "rasters") + "/" + self.map_name + ".asc"
             gdal.Translate(map_asc, map_out, format='AAIGrid')
 
 
@@ -220,8 +214,8 @@ if __name__ == '__main__':
     data_B = "diamond_simulation.csv"
     attribute = 'dz'
 
-    name_map_A = "diamond_map_A_res0.1.tif"
-    name_map_B = "diamond_map_B_res0.1.tif"
+    name_map_A = "diamond_map_A_res0.1"
+    name_map_B = "diamond_map_B_res0.1"
 
     #  Raster Resolution: Change as appropriate
     #  NOTE: Fuzzy Analysis has unique resolution
@@ -232,6 +226,11 @@ if __name__ == '__main__':
     nodatavalue = -9999
     # -----------------------------------------------------------------------
 
+    # Create directories if not existent
+    dir = Path.cwd()
+    Path(dir / "shapefiles").mkdir(exist_ok=True)
+    Path(dir / "rasters").mkdir(exist_ok=True)
+
     if '.' not in data_A[-4:]:
         data_A += '.csv'
     path_A = str(dir / "raw_data/") + "/" + data_A
@@ -240,8 +239,11 @@ if __name__ == '__main__':
         data_A += '.csv'
     path_B = str(dir / "raw_data/") + "/" + data_B
 
-    map_A = SpatialField(name_map_A, pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs)
-    map_A.norm_raster(nodatavalue=nodatavalue, res=res)
+    map_A = SpatialField(name_map_A, pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
+                         project_dir=dir, nodatavalue=nodatavalue)
+    map_A.norm_raster(res)
 
-    map_B = SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs)
-    map_B.norm_raster(nodatavalue=nodatavalue, res=res)
+    map_B = SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs,
+                         project_dir=dir, nodatavalue=nodatavalue)
+    map_B.norm_raster(res)
+

@@ -9,11 +9,6 @@ try:
 except:
     print('ModuleNotFoundError: Missing fundamental packages (required: pathlib, numpy, gdal, rasterio, math, sys).')
 
-# Create directory if not existent
-dir = Path.cwd().parent.parent
-Path(dir / "rasters").mkdir(exist_ok=True)
-Path(dir / "results").mkdir(exist_ok=True)
-
 
 class FuzzyComparison:
     def __init__(self, rasterA, rasterB, neigh=4, halving_distance=2):
@@ -148,7 +143,10 @@ if __name__ == '__main__':
     halving_distance = 2
     comparison_name = "diamond_res0.1_norm_comparison"
 
-    # Rasters input path
+    # Create directory if not existent
+    dir = Path.cwd()
+    Path(dir / "rasters").mkdir(exist_ok=True)
+    Path(dir / "results").mkdir(exist_ok=True)
     map_A_in = str(dir / "rasters/diamond_map_A_res0.1_norm.tif")
     map_B_in = str(dir / "rasters/diamond_map_B_res0.1_norm.tif")
     # ------------------------------------------------------------------

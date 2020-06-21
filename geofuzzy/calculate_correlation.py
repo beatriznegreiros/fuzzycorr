@@ -2,7 +2,7 @@ from pathlib import Path
 from scipy import stats
 import mapoperator
 
-current_dir = Path.cwd().parent.parent
+current_dir = Path.cwd()
 # INPUT: Raster input path
 map_A_in = str(current_dir / "rasters/map_A.tif")
 map_B_in = str(current_dir / "rasters/map_B.tif")

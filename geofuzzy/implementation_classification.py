@@ -11,17 +11,17 @@ d = 0.013  # in cm
 n_classes = 6
 
 # Measured Data:
-raster_A = "hexagon_map_A.tif"
+raster_A = "diamond_map_A_res0.1_norm"
 
 # Simulated Data:
-raster_B = "hexagon_map_B.tif"
+raster_B = "diamond_map_B_res0.1_norm"
 
 # Selected output names for the classified rasters
-name_categorized_A = "hexagon_A_class_nb"
-name_categorized_B = "hexagon_B_class_nb"
+name_A = "diamond_A_res0.1_norm_class"
+name_B = "diamond_B_res0.1_norm_class"
 # --------------------------------------------------------------------
 
-dir = Path.cwd().parent.parent
+dir = Path.cwd()
 Path(dir / "rasters").mkdir(exist_ok=True)
 
 if '.' not in raster_A[-4:]:
@@ -32,7 +32,6 @@ if '.' not in raster_B[-4:]:
     raster_B += '.tif'
 map_B_in = str(dir / "rasters/") + "/" + raster_B
 
-
 # Classification based on d84
 # Bins to classify the data Legend: HE (High Erosion), HIE (High Intermediate Erosion), IE (Intermediate Erosion),
 # LIE (Low Intermediate Erosion), LE (Low Erosion), Static,  LD (Low Deposition), LID (Low Intermediate Deposition),
@@ -42,14 +41,10 @@ map_B_in = str(dir / "rasters/") + "/" + raster_B
 '''
 
 # Import raster as np array
-array_A = mo.MapArray(name_categorized_A, map_A_in)
-array_B = mo.MapArray(name_categorized_B, map_B_in)
+array_A = mo.MapArray(name_A, map_A_in)
+array_B = mo.MapArray(name_B, map_B_in)
 
 # Classify the array and save the output file as .tif raster
 nb_classes = array_A.nb_classes(n_classes)  # Extract the optimized intervals for the map A
-array_A.categorized_raster(nb_classes)
-array_B.categorized_raster(nb_classes)
-
-
-
-
+array_A.categorize_raster(nb_classes, dir)
+array_B.categorize_raster(nb_classes, dir)
