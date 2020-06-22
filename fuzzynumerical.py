@@ -11,26 +11,31 @@ except:
 
 
 class FuzzyComparison:
-    def __init__(self, rasterA, rasterB, neigh=4, halving_distance=2):
+    def __init__(self, rasterA, rasterB, project_dir, neigh=4, halving_distance=2):
         self.raster_A = rasterA
         self.raster_B = rasterB
+        self.dir = project_dir
         self.neigh = neigh
         self.halving_distance = halving_distance
 
-        self.array_A, self.nodatavalue, self.meta_A = self.read_raster(self.raster_A)
-        self.array_B, self.nodatavalue_B, self.meta_B = self.read_raster(self.raster_B)
+        self.array_A, self.nodatavalue, self.meta_A, self.src_A, self.dtype_A = \
+            self.read_raster(self.raster_A)
+        self.array_B, self.nodatavalue_B, self.meta_B, self.src_B,self.dtype_B = \
+            self.read_raster(self.raster_B)
 
         if self.nodatavalue != self.nodatavalue_B:
             print('Warning: Maps have different NoDataValues, I will use the NoDataValue of the first map')
-        if self.meta_A != self.meta_B:
-            sys.exit('MapError: Maps have different MetaData. Hint: Make sure both maps have same src.')
+        if self.src_A != self.src_B:
+            sys.exit('MapError: Maps have different coordinate system')
+        if self.dtype_A != self.dtype_B:
+            print('Warning: Maps have different data types, I will use the datatype of the first map')
 
     def read_raster(self, raster):
         with rio.open(raster) as src:
             raster_np = src.read(1, masked=True)
             nodatavalue = src.nodata  # storing nodatavalue of raster
             meta = src.meta.copy()
-        return raster_np, nodatavalue, meta
+        return raster_np, nodatavalue, meta, meta['crs'], meta['dtype']
 
     def f_similarity(self, a, b):
         """ Similarity function for the fuzzy numerical comparison
@@ -53,7 +58,7 @@ class FuzzyComparison:
         x_lower = min(x + n + 1, array.shape[0])
         y_up = max(y - n, 0)
         y_lower = min(y + n + 1, array.shape[1])
-        memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=np.float32)
+        memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=self.dtype_A)
 
         np.seterr(divide='ignore', invalid='ignore')
 
@@ -68,15 +73,13 @@ class FuzzyComparison:
         """ Reads and compares a pair of raster maps using fuzzy numerical spatial comparison
 
         :param comparison_name: string, name of the comparison
-        :param map_A: path of one raster
-        :param map_B: path of the other raster
         :param map_of_comparison: boolean, create map of comparison
         :return: overall performance index
         """
 
         # Two-way similarity, first A x B then B x A
-        s_AB = np.zeros(np.shape(self.array_A), dtype=np.float64)
-        s_BA = np.zeros(np.shape(self.array_A), dtype=np.float64)
+        s_AB = np.zeros(np.shape(self.array_A), dtype=self.dtype_A)
+        s_BA = np.zeros(np.shape(self.array_A), dtype=self.dtype_A)
 
         #  Loop to calculate similarity A x B
         for index, a in np.ndenumerate(self.array_A):
@@ -114,7 +117,8 @@ class FuzzyComparison:
         S_i_ma_fi = np.ma.filled(S_i_ma, fill_value=self.nodatavalue)
 
         # Saves a results file
-        result_file = str(dir / "results") + "/" + comparison_name + ".txt"
+        Path(self.dir / "results").mkdir(exist_ok=True)
+        result_file = str(self.dir / "results") + "/" + comparison_name + ".txt"
         lines = ["Fuzzy numerical spatial comparison \n", "\n", "Compared maps: \n",
                  str(self.raster_A) + "\n", str(self.raster_B) + "\n", "\n"]
         file1 = open(result_file, "w")
@@ -126,7 +130,7 @@ class FuzzyComparison:
         if map_of_comparison:
             if '.' not in comparison_name[-4:]:
                 comparison_name += '.tif'
-            comp_map = str(dir / "results") + "/" + comparison_name
+            comp_map = str(self.dir / "results") + "/" + comparison_name
             raster = rio.open(comp_map, 'w', **self.meta_A)
             raster.write(S_i_ma_fi, 1)
             raster.close()
@@ -146,7 +150,6 @@ if __name__ == '__main__':
     # Create directory if not existent
     dir = Path.cwd()
     Path(dir / "rasters").mkdir(exist_ok=True)
-    Path(dir / "results").mkdir(exist_ok=True)
     map_A_in = str(dir / "rasters/diamond_map_A_res0.1_norm.tif")
     map_B_in = str(dir / "rasters/diamond_map_B_res0.1_norm.tif")
     # ------------------------------------------------------------------
@@ -155,7 +158,7 @@ if __name__ == '__main__':
     start = timeit.default_timer()
 
     # Perform fuzzy comparison
-    compareAB = FuzzyComparison(map_A_in, map_B_in, n, halving_distance)
+    compareAB = FuzzyComparison(map_A_in, map_B_in, dir, n, halving_distance)
     global_simil = compareAB.fuzzy_numerical(comparison_name)
 
     # Print global similarity
