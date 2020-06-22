@@ -1,0 +1,20 @@
+name: env-valitools
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - gdal
+  - geopandas
+  - mapclassify
+  - matplotlib
+  - numpy
+  - pandas
+  - math
+  - pyproj
+  - pathlib
+  - pip
+  - python=3.7
+  - rasterio
+  - scikit-learn
+  - scipy

@@ -1,2 +1,2 @@
-import valitools.fuzzynumerical, valitools.mapoperator
+import fuzzynumerical, mapoperator
 __all__ = ['fuzzynumerical', 'mapoperator']
