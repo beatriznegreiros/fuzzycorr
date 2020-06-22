@@ -20,7 +20,7 @@ class FuzzyComparison:
 
         self.array_A, self.nodatavalue, self.meta_A, self.src_A, self.dtype_A = \
             self.read_raster(self.raster_A)
-        self.array_B, self.nodatavalue_B, self.meta_B, self.src_B,self.dtype_B = \
+        self.array_B, self.nodatavalue_B, self.meta_B, self.src_B, self.dtype_B = \
             self.read_raster(self.raster_B)
 
         if self.nodatavalue != self.nodatavalue_B:
@@ -36,6 +36,10 @@ class FuzzyComparison:
             nodatavalue = src.nodata  # storing nodatavalue of raster
             meta = src.meta.copy()
         return raster_np, nodatavalue, meta, meta['crs'], meta['dtype']
+
+    def jaccard(self, a, b):
+        jac = 1 - (a * b) / (2 * abs(a) + 2 * abs(b) - a * b)
+        return jac
 
     def f_similarity(self, a, b):
         """ Similarity function for the fuzzy numerical comparison
@@ -120,7 +124,8 @@ class FuzzyComparison:
         Path(self.dir / "results").mkdir(exist_ok=True)
         result_file = str(self.dir / "results") + "/" + comparison_name + ".txt"
         lines = ["Fuzzy numerical spatial comparison \n", "\n", "Compared maps: \n",
-                 str(self.raster_A) + "\n", str(self.raster_B) + "\n", "\n"]
+                 str(self.raster_A) + "\n", str(self.raster_B) + "\n", "\n", "Halving distance: " +
+                 str(self.halving_distance) + "cells  \n", "Neighbourhood: " + str(self.neigh) + " cells  \n", "\n"]
         file1 = open(result_file, "w")
         file1.writelines(lines)
         file1.write('Average fuzzy similarity: ' + str(format(S, '.4f')))
@@ -145,7 +150,7 @@ if __name__ == '__main__':
     # Neighborhood definition
     n = 4  # 'radius' of neighborhood
     halving_distance = 2
-    comparison_name = "diamond_res0.1_norm_comparison"
+    comparison_name = "diamond_res0.1_norm_comparison_jac"
 
     # Create directory if not existent
     dir = Path.cwd()
@@ -169,5 +174,3 @@ if __name__ == '__main__':
 
     # Print run time:
     print('Enlapsed time: ', stop - start, 's')
-
-
