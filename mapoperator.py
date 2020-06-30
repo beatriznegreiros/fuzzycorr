@@ -61,7 +61,7 @@ class SpatialField:
 
         return array
 
-    def norm_array(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='spline'):
+    def norm_array(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
         """ Normalizes the raw data in equally sparsed points depending on the selected resolution
         :return: interpolated and normalized array with selected resolution
         https://github.com/rosskush/skspatial
@@ -128,7 +128,7 @@ class SpatialField:
         # Rasterize
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
-    def norm_raster(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='spline', save_ascii=True):
+    def norm_raster(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear', save_ascii=True):
         """ Saves a raster using interpolation
         :param save_ascii:
         :param res: float, resolution of the cell
@@ -209,12 +209,12 @@ class MapArray:
 if __name__ == '__main__':
     # ------------------------INPUT--------------------------------------
     #  Raw data input path
-    data_A = "hexagon_experiment.csv"
-    data_B = "hexagon_simulation.csv"
+    data_A = "diamond_experiment.csv"
+    data_B = "diamond_simulation.csv"
     attribute = 'dz'
 
-    name_map_A = "hexagon_exp_01"
-    name_map_B = "hexagon_sim_01"
+    name_map_A = "diamond_exp_01"
+    name_map_B = "diamond_sim_01"
 
     #  Raster Resolution: Change as appropriate
     #  NOTE: Fuzzy Analysis has unique resolution
@@ -240,9 +240,9 @@ if __name__ == '__main__':
 
     map_A = SpatialField(name_map_A, pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
                          project_dir=dir, nodatavalue=nodatavalue)
-    map_A.norm_raster(res)
+    map_A.norm_raster(res, method='cubic')
 
     map_B = SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs,
                          project_dir=dir, nodatavalue=nodatavalue)
-    map_B.norm_raster(res)
+    map_B.norm_raster(res, method='cubic')
 
