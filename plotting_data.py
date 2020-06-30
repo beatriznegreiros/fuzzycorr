@@ -1,36 +1,41 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import genfromtxt
+from pathlib import Path
 
 
-# Input data
-path_A = r"C:/Users/beatr/valitools/raw_data/hexagon_experiment.csv"
-path_B = r"C:/Users/beatr/valitools/raw_data/hexagon_simulation.csv"
+class DataPlotter:
+    def __init__(self, path_textfile, hist_title, variable):
+        self.textfile = path_textfile
+        self.his_title = hist_title
+        self.variable = variable
+
+    def make_hist(self, outputfile):
+        file = genfromtxt(self.textfile, delimiter=',', skip_header=1)
+        lon, lat, attribute = file[:, 0], file[:, 1], file[:, 2]
+
+        # Printing histograms of the map
+        plt.hist(attribute, bins=50, density=True)
+        plt.title(self.his_title)
+        plt.xlabel(self.variable)
+        plt.ylabel('Frequencies')
+        plt.savefig(outputfile, dpi=600)
+        plt.clf()
 
 
-# Importing raw data of map A (experimental data) as numpy array
-map_A = genfromtxt(path_A, delimiter=',', skip_header=1)
-lon_A, lat_A, dz_A = map_A[:, 0], map_A[:, 1], map_A[:, 2]
+if __name__ == '__main__':
 
+    dir = Path.cwd()
 
-# Importing raw data from map B (simulation data) as np array
-map_B = genfromtxt(path_B, delimiter=',', skip_header=1)
-lon_B, lat_B, dz_B = map_B[:, 0], map_B[:, 1], map_B[:, 2]
+    # Input data
+    path_A = r"C:/Users/beatr/valitools/raw_data/diamond_experiment.csv"
+    path_B = r"C:/Users/beatr/valitools/raw_data/diamond_simulation.csv"
 
-# Printing histograms of the map A and B
-plt.hist(dz_A, bins=30)
-outputfp = r"C:/Users/beatr/valitools/results/hist_hexa_raw_mapA.png"
-plt.title('Histogram of map A')
-plt.xlabel('Delta z')
-plt.ylabel('Frequencies')
-plt.savefig(outputfp, dpi=600)
-plt.clf()
+    histA = DataPlotter(path_A, 'Histogram: Diamond-shaped', 'Measured bed level change [cm]')
+    histB = DataPlotter(path_B, 'Histogram: Diamond-shaped', 'Simulated bed level change [cm]')
 
+    outA = str(dir/"results/hist_diamond_raw_meas.png")
+    outB = str(dir/"results/hist_diamond_raw_sim.png")
 
-plt.hist(dz_B, bins=30)
-outputfp = r"C:/Users/beatr/valitools/results/hist_hexa_raw_mapB.png"
-plt.title('Histogram of map B')
-plt.xlabel('Delta z')
-plt.ylabel('Frequencies')
-plt.savefig(outputfp, dpi=600)
-plt.clf()
+    histA.make_hist(outA)
+    histB.make_hist(outB)

@@ -23,6 +23,7 @@ class SpatialField:
         self.shapefile = str(project_dir / "shapefiles") + "/" + self.name + ".shp"
         self.raster = str(project_dir / "rasters") + "/" + self.name + ".tif"
         self.normraster = str(project_dir / "rasters") + "/" + self.name + "_norm.tif"
+        self.norm_ascii = str(project_dir / "rasters") + "/" + self.name + "_norm.asc"
         self.crs = crs
         self.attribute = attribute
         self.nodatavalue = nodatavalue
@@ -43,9 +44,7 @@ class SpatialField:
 
     def points_to_grid(self):
         """ Create a grid of new points in the desired resolution to be interpolated
-
         :return: array of size nrow, ncol
-
         http://chris35wills.github.io/gridding_data/
         """
         hrange = ((self.ymin, self.ymax),
@@ -62,11 +61,9 @@ class SpatialField:
 
         return array
 
-    def norm_array(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
+    def norm_array(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='spline'):
         """ Normalizes the raw data in equally sparsed points depending on the selected resolution
-
         :return: interpolated and normalized array with selected resolution
-
         https://github.com/rosskush/skspatial
         """
         if np.isfinite(ulc[0]) and np.isfinite(lrc[0]):
@@ -112,7 +109,6 @@ class SpatialField:
 
     def plain_raster(self, res):
         """ Converts raw data to shapefile(.shp) and rasters(.tif) without normalizing
-
         :param res: float, resolution of the cell
         :return: no output, saves the raster in the default directory
         """
@@ -132,9 +128,9 @@ class SpatialField:
         # Rasterize
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
-    def norm_raster(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
+    def norm_raster(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='spline', save_ascii=True):
         """ Saves a raster using interpolation
-
+        :param save_ascii:
         :param res: float, resolution of the cell
         :param ulc: tuple, upper left corner
         :param lrc: tuple, lower right corner
@@ -150,7 +146,12 @@ class SpatialField:
         new_dataset.write(array, 1)
         new_dataset.close()
 
+        if save_ascii:
+            map_asc = self.norm_ascii
+            gdal.Translate(map_asc, self.normraster, format='AAIGrid')
+
         return new_dataset
+
 
 
 class MapArray:
@@ -166,7 +167,6 @@ class MapArray:
 
     def nb_classes(self, n_classes):
         """ Class bins based on the Natural Breaks method
-
         :param n_classes: integer, number of classes
         :return: list, optimized bins
         """
@@ -178,7 +178,6 @@ class MapArray:
 
     def categorize_raster(self, class_bins, project_dir, save_ascii=True):
         """ Classifies the raster according to the classification bins
-
         :param project_dir: path of the project directory
         :param class_bins: list
         :return: no return, saves the classified raster in the chosen directory
@@ -210,12 +209,12 @@ class MapArray:
 if __name__ == '__main__':
     # ------------------------INPUT--------------------------------------
     #  Raw data input path
-    data_A = "diamond_experiment.csv"
-    data_B = "diamond_simulation.csv"
+    data_A = "hexagon_experiment.csv"
+    data_B = "hexagon_simulation.csv"
     attribute = 'dz'
 
-    name_map_A = "diamond_map_A_res0.1"
-    name_map_B = "diamond_map_B_res0.1"
+    name_map_A = "hexagon_exp_01"
+    name_map_B = "hexagon_sim_01"
 
     #  Raster Resolution: Change as appropriate
     #  NOTE: Fuzzy Analysis has unique resolution

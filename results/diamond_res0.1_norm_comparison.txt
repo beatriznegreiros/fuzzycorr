@@ -1,7 +1,10 @@
 Fuzzy numerical spatial comparison 
 
 Compared maps: 
-C:\Users\beatr\valitools\rasters\diamond_map_A_res0.1_norm.tif
-C:\Users\beatr\valitools\rasters\diamond_map_B_res0.1_norm.tif
+C:\Users\beatr\valitools\rasters\diamond_map_A_res01_norm.tif
+C:\Users\beatr\valitools\rasters\diamond_map_B_res01_norm.tif
 
-Average fuzzy similarity: 0.9084
+Halving distance: 2 cells  
+Neighbourhood: 4 cells  
+
+Average fuzzy similarity: 0.9479

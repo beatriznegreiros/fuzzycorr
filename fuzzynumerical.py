@@ -58,10 +58,10 @@ class FuzzyComparison:
         :param y: int, cell in y
         :return: ndarray (float) membership of the neighbours, ndarray (float) neighbours' cells
         """
-        x_up = max(x - n, 0)
-        x_lower = min(x + n + 1, array.shape[0])
-        y_up = max(y - n, 0)
-        y_lower = min(y + n + 1, array.shape[1])
+        x_up = max(x - self.neigh, 0)
+        x_lower = min(x + self.neigh + 1, array.shape[0])
+        y_up = max(y - self.neigh, 0)
+        y_lower = min(y + self.neigh + 1, array.shape[1])
         memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=self.dtype_A)
 
         np.seterr(divide='ignore', invalid='ignore')
@@ -82,17 +82,16 @@ class FuzzyComparison:
         """
 
         # Two-way similarity, first A x B then B x A
-        s_AB = np.zeros(np.shape(self.array_A), dtype=self.dtype_A)
-        s_BA = np.zeros(np.shape(self.array_A), dtype=self.dtype_A)
+        s_AB = np.full(np.shape(self.array_A), -np.inf, dtype=self.dtype_A)
+        s_BA = np.full(np.shape(self.array_A), -np.inf, dtype=self.dtype_A)
 
         #  Loop to calculate similarity A x B
         for index, a in np.ndenumerate(self.array_A):
             memb, neighbours = self.neighbours(self.array_B, index[0], index[1])
             f_i = -np.inf
-            for nei_index, neighbor in np.ndenumerate(neighbours):
+            for nei_index, neighbour in np.ndenumerate(neighbours):
                 a = self.array_A[index]
-                b = neighbor
-                f = self.f_similarity(a, b) * memb[nei_index]
+                f = self.f_similarity(a, neighbour) * memb[nei_index]
                 if f > f_i:
                     f_i = f
             s_AB[index] = f_i
@@ -101,10 +100,9 @@ class FuzzyComparison:
         for index, a in np.ndenumerate(self.array_B):
             memb, neighbours = self.neighbours(self.array_A, index[0], index[1])
             f_i = -np.inf
-            for nei_index, neighbor in np.ndenumerate(neighbours):
+            for nei_index, neighbour in np.ndenumerate(neighbours):
                 a = self.array_B[index]
-                b = neighbor
-                f = self.f_similarity(a, b) * memb[nei_index]
+                f = self.f_similarity(a, neighbour) * memb[nei_index]
                 if f > f_i:
                     f_i = f
             s_BA[index] = f_i
@@ -125,7 +123,7 @@ class FuzzyComparison:
         result_file = str(self.dir / "results") + "/" + comparison_name + ".txt"
         lines = ["Fuzzy numerical spatial comparison \n", "\n", "Compared maps: \n",
                  str(self.raster_A) + "\n", str(self.raster_B) + "\n", "\n", "Halving distance: " +
-                 str(self.halving_distance) + "cells  \n", "Neighbourhood: " + str(self.neigh) + " cells  \n", "\n"]
+                 str(self.halving_distance) + " cells  \n", "Neighbourhood: " + str(self.neigh) + " cells  \n", "\n"]
         file1 = open(result_file, "w")
         file1.writelines(lines)
         file1.write('Average fuzzy similarity: ' + str(format(S, '.4f')))
@@ -150,13 +148,13 @@ if __name__ == '__main__':
     # Neighborhood definition
     n = 4  # 'radius' of neighborhood
     halving_distance = 2
-    comparison_name = "diamond_res0.1_norm_comparison_jac"
+    comparison_name = "Hydro_FT_2010-2013_manual_simil"
 
     # Create directory if not existent
     dir = Path.cwd()
     Path(dir / "rasters").mkdir(exist_ok=True)
-    map_A_in = str(dir / "rasters/diamond_map_A_res0.1_norm.tif")
-    map_B_in = str(dir / "rasters/diamond_map_B_res0.1_norm.tif")
+    map_A_in = str(dir / "rasters/dz_meas_2010-2013_norm.tif")
+    map_B_in = str(dir / "rasters/Hydro_FT-2D_manual_2013_norm.tif")
     # ------------------------------------------------------------------
 
     # Start run time count
