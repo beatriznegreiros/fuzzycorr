@@ -19,17 +19,21 @@ except:
 class SpatialField:
     def __init__(self, name_dataset, pd, attribute, crs, project_dir, nodatavalue):
         self.pd = pd
+        if not isinstance(name_dataset, str):
+            print("ERROR: name_dataset must be a string")
+        if not isinstance(attribute, str):
+            print("ERROR: attribute must be a string, check the name on your textfile")
         self.name = name_dataset
-        self.shapefile = str(project_dir / "shapefiles") + "/" + self.name + ".shp"
+        self.project_dir = project_dir
         self.raster = str(project_dir / "rasters") + "/" + self.name + ".tif"
         self.normraster = str(project_dir / "rasters") + "/" + self.name + "_norm.tif"
         self.norm_ascii = str(project_dir / "rasters") + "/" + self.name + "_norm.asc"
         self.crs = crs
         self.attribute = attribute
         self.nodatavalue = nodatavalue
+
         # Standardize the dataframe
         self.pd.dropna(how='any', inplace=True, axis=0)
-
         # Create the dictionary with new label names and then rename for standardization
         new_names = {self.pd.columns[0]: 'x', self.pd.columns[1]: 'y', self.pd.columns[2]: self.attribute}
         self.pd = self.pd.rename(columns=new_names)
@@ -105,6 +109,7 @@ class SpatialField:
         return GD1
 
     def shape(self):
+        self.shapefile = str(self.project_dir / 'shapefiles') + "/" + self.name + ".shp"
         self.gdf.to_file(self.shapefile)
 
     def plain_raster(self, res):
@@ -138,11 +143,12 @@ class SpatialField:
         :return: no output, saves the raster in the default directory
         """
         array = self.norm_array(res=res, ulc=ulc, lrc=lrc, method=method)
-        transform = from_origin(self.xmin, self.ymax, self.res, self.res)
+        self.transform = from_origin(self.xmin, self.ymax, self.res, self.res)
 
         new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
-                               crs=self.crs, transform=transform, nodata=self.nodatavalue)
+                               crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
+        print(np.shape(array))
         new_dataset.write(array, 1)
         new_dataset.close()
 
@@ -152,6 +158,37 @@ class SpatialField:
 
         return new_dataset
 
+    def create_polygon(self, shape_polygon, alpha=np.nan):
+        try:
+            import alphashape
+            # If the user doesnt select an alpha value, the alpha will be optimized automatically.
+            if np.isfinite(alpha):
+                polygon = alphashape.alphashape(self.gdf, alpha)
+            else:
+                polygon = alphashape.alphashape(self.gdf)
+            try:
+                polygon.to_file(shape_polygon)
+            except:
+                print(
+                    "Error saving polygon shapefile. Try changing the alpha values and closing the file in other "
+                    "programs")
+        except:
+            print('ModuleNotFoundError: Missing fundamental package: alphashape')
+
+    def clip_raster(self, polygon, out_raster):
+        import earthpy.spatial as es
+        crop_extent = geopandas.read_file(polygon)
+        print(crop_extent)
+        with rio.open(self.normraster) as src:
+            raster_crop, raster_meta = es.crop_image(src, crop_extent)
+        '''with rio.open(out_raster, 'w', **raster_meta) as ff:
+            out = ff.write(raster_crop[0], 1)'''
+        out = rio.open(out_raster, 'w', driver='GTiff',
+                       height=raster_crop[0].shape[0], width=raster_crop[0].shape[1], count=1, dtype=raster_crop[0].dtype,
+                       crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
+        out.write(raster_crop[0], 1)
+        out.close()
+        return out
 
 
 class MapArray:
@@ -209,19 +246,19 @@ class MapArray:
 if __name__ == '__main__':
     # ------------------------INPUT--------------------------------------
     #  Raw data input path
-    data_A = "diamond_experiment.csv"
-    data_B = "diamond_simulation.csv"
+    data_A = "hexagon_experiment.csv"
+    data_B = "hexagon_simulation.csv"
     attribute = 'dz'
 
-    name_map_A = "diamond_exp_01"
-    name_map_B = "diamond_sim_01"
+    name_map_A = "hexagon_exp_02"
+    name_map_B = "hexagon_sim_02"
 
     #  Raster Resolution: Change as appropriate
     #  NOTE: Fuzzy Analysis has unique resolution
-    res = 0.1
+    res = 0.2
 
     # Projection
-    crs = "EPSG:4326"
+    crs = 'EPSG:4326'
     nodatavalue = -9999
     # -----------------------------------------------------------------------
 
@@ -240,9 +277,8 @@ if __name__ == '__main__':
 
     map_A = SpatialField(name_map_A, pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
                          project_dir=dir, nodatavalue=nodatavalue)
-    map_A.norm_raster(res, method='cubic')
+    map_A.norm_raster(res, method='linear')
 
     map_B = SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs,
                          project_dir=dir, nodatavalue=nodatavalue)
-    map_B.norm_raster(res, method='cubic')
-
+    map_B.norm_raster(res, method='linear')
