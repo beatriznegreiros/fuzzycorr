@@ -167,7 +167,8 @@ class SpatialField:
             else:
                 polygon = alphashape.alphashape(self.gdf)
             try:
-                polygon.to_file(shape_polygon)
+                polygon.crs = self.crs
+                polygon.to_file(shape_polygon, driver='ESRI Shapefile')
             except:
                 print(
                     "Error saving polygon shapefile. Try changing the alpha values and closing the file in other "
@@ -178,13 +179,11 @@ class SpatialField:
     def clip_raster(self, polygon, out_raster):
         import earthpy.spatial as es
         crop_extent = geopandas.read_file(polygon)
-        print(crop_extent)
-        with rio.open(self.normraster) as src:
-            raster_crop, raster_meta = es.crop_image(src, crop_extent)
-        '''with rio.open(out_raster, 'w', **raster_meta) as ff:
-            out = ff.write(raster_crop[0], 1)'''
+        src = rio.open(self.normraster)
+        raster_crop, raster_meta = es.crop_image(src, crop_extent)
         out = rio.open(out_raster, 'w', driver='GTiff',
-                       height=raster_crop[0].shape[0], width=raster_crop[0].shape[1], count=1, dtype=raster_crop[0].dtype,
+                       height=raster_crop[0].shape[0], width=raster_crop[0].shape[1], count=1,
+                       dtype=raster_crop[0].dtype,
                        crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
         out.write(raster_crop[0], 1)
         out.close()
