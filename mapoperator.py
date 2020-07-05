@@ -4,16 +4,14 @@ try:
     import gdal
     import rasterio as rio
     import numpy as np
-    import mapclassify.classifiers as mc
     import pandas as pd
     import math
     from pathlib import Path
     from pyproj import CRS
     from scipy import interpolate
-    from rasterio.transform import from_origin
 except:
     print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
-          'mapclassify, pandas, pathlib).')
+          'pandas, pathlib, math, pyproj and scipy).')
 
 
 class SpatialField:
@@ -143,7 +141,7 @@ class SpatialField:
         :return: no output, saves the raster in the default directory
         """
         array = self.norm_array(res=res, ulc=ulc, lrc=lrc, method=method)
-        self.transform = from_origin(self.xmin, self.ymax, self.res, self.res)
+        self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
 
         new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
@@ -162,32 +160,43 @@ class SpatialField:
         try:
             import alphashape
             # If the user doesnt select an alpha value, the alpha will be optimized automatically.
+        except ImportError as e:
+            print(e)
+        else:
             if np.isfinite(alpha):
-                polygon = alphashape.alphashape(self.gdf, alpha)
+                try:
+                    polygon = alphashape.alphashape(self.gdf, alpha)
+                except FileNotFoundError as e:
+                    print(e)
             else:
-                polygon = alphashape.alphashape(self.gdf)
-            try:
-                polygon.crs = self.crs
-                polygon.to_file(shape_polygon, driver='ESRI Shapefile')
-            except:
-                print(
-                    "Error saving polygon shapefile. Try changing the alpha values and closing the file in other "
-                    "programs")
-        except:
-            print('ModuleNotFoundError: Missing fundamental package: alphashape')
+                try:
+                    polygon = alphashape.alphashape(self.gdf)
+                except FileNotFoundError as e:
+                    print(e)
+                else:
+                    polygon.crs = self.crs
+                    polygon.to_file(shape_polygon, driver='ESRI Shapefile')
 
     def clip_raster(self, polygon, out_raster):
-        import earthpy.spatial as es
-        crop_extent = geopandas.read_file(polygon)
-        src = rio.open(self.normraster)
-        raster_crop, raster_meta = es.crop_image(src, crop_extent)
-        out = rio.open(out_raster, 'w', driver='GTiff',
-                       height=raster_crop[0].shape[0], width=raster_crop[0].shape[1], count=1,
-                       dtype=raster_crop[0].dtype,
-                       crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
-        out.write(raster_crop[0], 1)
-        out.close()
-        return out
+        try:
+            import earthpy.spatial as es
+        except ModuleNotFoundError as e:
+            print(e)
+        else:
+            try:
+                src = rio.open(self.normraster)
+                crop_extent = geopandas.read_file(polygon)
+            except FileNotFoundError as e:
+                print(e)
+            else:
+                raster_crop, raster_meta = es.crop_image(src, crop_extent)
+                out = rio.open(out_raster, 'w', driver='GTiff',
+                               height=raster_crop[0].shape[0], width=raster_crop[0].shape[1], count=1,
+                               dtype=raster_crop[0].dtype,
+                               crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
+                out.write(raster_crop[0], 1)
+                out.close()
+                return out
 
 
 class MapArray:
@@ -203,14 +212,19 @@ class MapArray:
 
     def nb_classes(self, n_classes):
         """ Class bins based on the Natural Breaks method
-        :param n_classes: integer, number of classes
-        :return: list, optimized bins
+            :param n_classes: integer, number of classes
+            :return: list, optimized bins
         """
-        # Classification based on Natural Breaks
-        breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes + 1)
-        print('The bins were optimized to:', breaks.bins)
-        class_bins = breaks.bins.tolist()
-        return class_bins
+        try:
+            import mapclassify.classifiers as mc
+        except ModuleNotFoundError as e:
+            print(e)
+        else:
+            # Classification based on Natural Breaks
+            breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes + 1)
+            print('The bins were optimized to:', breaks.bins)
+            class_bins = breaks.bins.tolist()
+            return class_bins
 
     def categorize_raster(self, class_bins, project_dir, save_ascii=True):
         """ Classifies the raster according to the classification bins
