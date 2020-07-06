@@ -10,7 +10,6 @@ dependencies:
   - matplotlib
   - numpy
   - pandas
-  - math
   - pyproj
   - pathlib
   - pip
@@ -18,3 +17,5 @@ dependencies:
   - rasterio
   - scikit-learn
   - scipy
+  - alphashape
+  - earthpy
