@@ -66,4 +66,8 @@ numerical model SSIIMM and the results of Bed Elevation Difference compared with
 
 The repository is coded in  ``Python 3.7`` 
 
+### Necessary packages
+
+The necessary modules for running this repo are specified in the ``environment.yml`` file, to install all packages in the environment simply navigate with the Anaconda Prompt through your directories to the ``.yml`` file, type ``conda env create -f environment.yml`` and your environment is set to go under the name ``env-valitools``.
+
 
