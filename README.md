@@ -64,7 +64,7 @@ numerical model SSIIMM and the results of Bed Elevation Difference compared with
 
 ### Code description
 
-The repository is coded in  ``Python 3.7`` 
+The repository is coded in  ``Python 3.6 x`` 
 
 ### Necessary packages
 
