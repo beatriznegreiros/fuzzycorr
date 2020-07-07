@@ -2,7 +2,10 @@ import gdal
 from pathlib import Path
 
 dir = Path.cwd()
-map_asc = str(dir/'rasters') + '/vali_aPC_MAP_norm_clipped.asc'
-map_in = str(dir/'rasters') + '/vali_aPC_MAP_norm_clipped.tif'
+file = 'vali_meas_2013_res5_clipped'
 
+
+map_asc = str(dir/'rasters') + '/' + file + '.asc'
+map_in = str(dir/'rasters') + '/' + file + '.tif'
 gdal.Translate(map_asc, map_in, format='AAIGrid')
+

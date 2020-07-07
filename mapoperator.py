@@ -182,8 +182,10 @@ class SpatialField:
         from rasterio import plot
         import matplotlib.pyplot as plt
 
+        result = gdal.Warp(out_raster, self.normraster, cutlineDSName=polygon)
+
         # Read the raster to be cropped
-        with rio.open(self.normraster, count=1) as src:
+        '''with rio.open(self.normraster, count=1) as src:
             # Read the shapefile
             crop_extent = geopandas.read_file(polygon)
             crop_extent = crop_extent.to_crs(src.crs)
@@ -215,7 +217,7 @@ class SpatialField:
 
         # Save the raster
         with rio.open(out_raster, 'w', **raster_meta) as outf:
-            outf.write(raster_crop[0].astype(rio.float64), 1)
+            outf.write(raster_crop[0].astype(rio.float64), 1)'''
 
 
 class MapArray:

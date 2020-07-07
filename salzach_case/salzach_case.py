@@ -6,12 +6,12 @@ import fuzzynumerical as fuzz
 # ---------------Data Pre-processing---------------------------------
 # ------------------------INPUT--------------------------------------
 #  Raw data input path
-data_A = 'vali_meas_2013.csv'
-data_B = 'vali_hydro_FT_manual_2013.csv'
+data_A = 'cali_Hydro_FT-2D_MAP_2010.csv'
+data_B = 'cali_meas_2010.csv'
 attribute = 'dz'
 
-name_map_A = 'vali_meas_2013'
-name_map_B = 'vali_hydro_FT_manual_2013'
+name_map_A = 'cali_Hydro_FT-2D_MAP_2010_res5'
+name_map_B = 'cali_meas_2010_res5'
 
 # Polygon and raster of area of interest
 polyname = 'polygon_salzach'
@@ -35,7 +35,27 @@ current_dir = Path.cwd()
 Path(current_dir / 'shapefiles').mkdir(exist_ok=True)
 Path(current_dir / 'rasters').mkdir(exist_ok=True)
 
-if '.' not in data_A[-4:]:
+poly_path = str(current_dir / 'shapefiles') + '/' + polyname + '.shp'
+
+list_files = ['cali_aPC_MAP_2010', 'cali_hydro_FT_manual_2010', 'cali_Hydro_FT-2D_MAP_2010',
+              'cali_meas_2010', 'vali_aPC_MAP_2013', 'vali_hydro_FT_manual_2013', 'vali_Hydro_FT-2D_MAP_2013',
+              'vali_meas_2013']
+
+for file in list_files:
+    path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
+    name_file = file + '_res' + str(res)
+    map_file = mo.SpatialField(name_file, pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
+                               project_dir=current_dir, nodatavalue=nodatavalue)
+    clip_raster = str(current_dir / 'rasters') + '/' + file + '_clipped' + '.tif'
+    map_file.norm_raster(res, ulc=ulc, lrc=lrc, method='nearest')
+    map_file.clip_raster(poly_path, clip_raster)
+
+
+
+
+
+
+'''if '.' not in data_A[-4:]:
     data_A += '.csv'
 path_A = str(current_dir / 'raw_data') + '/' + data_A
 
@@ -49,8 +69,8 @@ map_B = mo.SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), 
                         project_dir=current_dir, nodatavalue=nodatavalue)
 
 # Write rasters of interpolated values
-map_A.norm_raster(res, ulc=ulc, lrc=lrc, method='linear')
-map_B.norm_raster(res, ulc=ulc, lrc=lrc, method='linear')
+map_A.norm_raster(res, ulc=ulc, lrc=lrc, method='nearest')
+map_B.norm_raster(res, ulc=ulc, lrc=lrc, method='nearest')
 
 # Save shape of points cloud
 # map_A.shape()
@@ -62,7 +82,7 @@ clip_raster_B = str(current_dir / 'rasters') + '/' + name_map_B + '_clipped' + '
 
 map_A.create_polygon(poly_path, alpha=0.01)
 map_A.clip_raster(poly_path, clip_raster_A)
-map_B.clip_raster(poly_path, clip_raster_B)
+map_B.clip_raster(poly_path, clip_raster_B)'''
 
 
 # ---------------Fuzzy map comparison---------------------------------
