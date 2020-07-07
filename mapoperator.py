@@ -26,7 +26,7 @@ class SpatialField:
         self.raster = str(project_dir / "rasters") + "/" + self.name + ".tif"
         self.normraster = str(project_dir / "rasters") + "/" + self.name + "_norm.tif"
         self.norm_ascii = str(project_dir / "rasters") + "/" + self.name + "_norm.asc"
-        self.crs = crs
+        self.crs = CRS(crs)
         self.attribute = attribute
         self.nodatavalue = nodatavalue
 
@@ -38,7 +38,7 @@ class SpatialField:
 
         # Create geodataframe from the dataframe
         gdf = geopandas.GeoDataFrame(self.pd, geometry=geopandas.points_from_xy(self.pd.x, self.pd.y))
-        gdf.crs = CRS(self.crs)
+        gdf.crs = self.crs
         self.gdf = gdf
         self.x = gdf.geometry.x.values
         self.y = gdf.geometry.y.values
@@ -142,7 +142,6 @@ class SpatialField:
         """
         array = self.norm_array(res=res, ulc=ulc, lrc=lrc, method=method)
         self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
-
         new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
                                crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
@@ -175,28 +174,48 @@ class SpatialField:
                     print(e)
                 else:
                     polygon.crs = self.crs
-                    polygon.to_file(shape_polygon, driver='ESRI Shapefile')
+                    polygon.to_file(shape_polygon)
 
     def clip_raster(self, polygon, out_raster):
-        try:
-            import earthpy.spatial as es
-        except ModuleNotFoundError as e:
-            print(e)
-        else:
-            try:
-                src = rio.open(self.normraster)
-                crop_extent = geopandas.read_file(polygon)
-            except FileNotFoundError as e:
-                print(e)
-            else:
-                raster_crop, raster_meta = es.crop_image(src, crop_extent)
-                out = rio.open(out_raster, 'w', driver='GTiff',
-                               height=raster_crop[0].shape[0], width=raster_crop[0].shape[1], count=1,
-                               dtype=raster_crop[0].dtype,
-                               crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
-                out.write(raster_crop[0], 1)
-                out.close()
-                return out
+        import earthpy.spatial as es
+        import earthpy.plot as ep
+        from rasterio import plot
+        import matplotlib.pyplot as plt
+
+        # Read the raster to be cropped
+        with rio.open(self.normraster, count=1) as src:
+            # Read the shapefile
+            crop_extent = geopandas.read_file(polygon)
+            crop_extent = crop_extent.to_crs(src.crs)
+
+            # Crop the raster
+            raster_crop, raster_meta = es.crop_image(src, crop_extent, all_touched=True)
+        raster_meta.update({'transform': raster_meta["transform"],
+                            'height': raster_crop.shape[1],
+                            'width': raster_crop.shape[2],
+                            'nodata': self.nodatavalue})
+
+        print(raster_meta["transform"])
+
+        raster_plot = plot.plotting_extent(raster_crop[0], raster_meta["transform"])
+
+        print(raster_crop[0])
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        # Plot the shapefile
+        crop_extent.boundary.plot(ax=ax, color="red", zorder=10)
+
+        # Plot the raster
+        ep.plot_bands(
+            raster_crop[0],
+            ax=ax,
+            extent=raster_plot,
+            title="test", cmap='Greys')
+        plt.show()
+
+        # Save the raster
+        with rio.open(out_raster, 'w', **raster_meta) as outf:
+            outf.write(raster_crop[0].astype(rio.float64), 1)
 
 
 class MapArray:
