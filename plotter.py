@@ -10,16 +10,17 @@ class RasterDataPlotter:
         self.file = file
         self.path = path
 
-    def make_hist(self, legendx, legendy, title, outputpath):
-
+    def make_hist(self, legendx, legendy, title, fontsize, outputpath):
+        plt.rcParams.update({'font.size': fontsize})
         with rio.open(self.path) as src:
             raster_np = src.read(1, masked=True)
         fig, ax = plt.subplots()
         ax.hist(raster_np[~raster_np.mask], bins=60)
         plt.xlabel(legendx)
         plt.ylabel(legendy)
-        plt.title(title)
+        #plt.title(title)
         plt.grid(True)
+        plt.subplots_adjust(left=0.17, bottom=0.15)
         plt.savefig(outputpath, dpi=600)
         plt.clf()
 
