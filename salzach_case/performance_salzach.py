@@ -15,7 +15,7 @@ list_titles = ['aPC surrogate model (Calibration)',
                'aPC surrogate against manually calibrated model (Calibration)',
                'aPC surrogate against manually calibrated model (Validation)']
 
-legendx = 'Global Fuzzy Similarity [-]'
+legendx = 'Fuzzy Similarity [-]'
 legendy = 'Frequency'
 
 current_dir = Path.cwd()

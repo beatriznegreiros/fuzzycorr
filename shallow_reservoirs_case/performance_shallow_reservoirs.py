@@ -7,7 +7,7 @@ list_files = ['diamond_comp',
 list_titles = ['Diamond-shaped model',
                'Hexagon-shaped model']
 
-legendx = 'Global Fuzzy Similarity [-]'
+legendx = 'Fuzzy Similarity [-]'
 legendy = 'Frequency'
 
 current_dir = Path.cwd()
