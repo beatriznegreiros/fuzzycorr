@@ -10,8 +10,9 @@ data_A = 'cali_Hydro_FT-2D_MAP_2010.csv'
 data_B = 'cali_meas_2010.csv'
 attribute = 'dz'
 
-name_map_A = 'cali_Hydro_FT-2D_MAP_2010_res5'
-name_map_B = 'cali_meas_2010_res5'
+interpol_method = 'linear'
+name_map_A = 'cali_Hydro_FT-2D_MAP_2010_nearest_res1'
+name_map_B = 'cali_meas_2010_nearest_res1'
 
 # Polygon and raster of area of interest
 polyname = 'polygon_salzach'
@@ -44,16 +45,14 @@ list_files = ['cali_aPC_MAP_2010', 'cali_hydro_FT_manual_2010', 'cali_Hydro_FT-2
 for file in list_files:
     path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
     name_file = file + '_res' + str(res)
+    raster_file = str(current_dir / 'rasters') + '/' + file + '.tif'
     map_file = mo.SpatialField(name_file, pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
-                               project_dir=current_dir, nodatavalue=nodatavalue)
+                               project_dir=current_dir, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
     clip_raster = str(current_dir / 'rasters') + '/' + file + '_clipped' + '.tif'
-    map_file.norm_raster(res, ulc=ulc, lrc=lrc, method='nearest')
-    map_file.clip_raster(poly_path, clip_raster)
 
-
-
-
-
+    array_ = map_file.norm_array(method='cubic')
+    map_file.array2raster(array_, raster_file, save_ascii=True)
+    map_file.clip_raster(poly_path, raster_file, clip_raster)
 
 '''if '.' not in data_A[-4:]:
     data_A += '.csv'
@@ -83,7 +82,6 @@ clip_raster_B = str(current_dir / 'rasters') + '/' + name_map_B + '_clipped' + '
 map_A.create_polygon(poly_path, alpha=0.01)
 map_A.clip_raster(poly_path, clip_raster_A)
 map_B.clip_raster(poly_path, clip_raster_B)'''
-
 
 # ---------------Fuzzy map comparison---------------------------------
 # ------------------------INPUT--------------------------------------

@@ -15,7 +15,8 @@ except:
 
 
 class SpatialField:
-    def __init__(self, name_dataset, pd, attribute, crs, project_dir, nodatavalue):
+    def __init__(self, name_dataset, pd, attribute, crs, project_dir, nodatavalue, res=None, ulc=(np.nan, np.nan),
+                 lrc=(np.nan, np.nan)):
         self.pd = pd
         if not isinstance(name_dataset, str):
             print("ERROR: name_dataset must be a string")
@@ -44,30 +45,6 @@ class SpatialField:
         self.y = gdf.geometry.y.values
         self.z = gdf[attribute].values
 
-    def points_to_grid(self):
-        """ Create a grid of new points in the desired resolution to be interpolated
-        :return: array of size nrow, ncol
-        http://chris35wills.github.io/gridding_data/
-        """
-        hrange = ((self.ymin, self.ymax),
-                  (self.xmin, self.xmax))  # any points outside of this will be condisdered outliers and not used
-
-        zi, yi, xi = np.histogram2d(self.y, self.x, bins=(int(self.nrow), int(self.ncol)), weights=self.z, normed=False,
-                                    range=hrange)
-        counts, _, _ = np.histogram2d(self.y, self.x, bins=(int(self.nrow), int(self.ncol)), range=hrange)
-        np.seterr(divide='ignore', invalid='ignore')  # we're dividing by zero but it's no big deal
-        zi = np.divide(zi, counts)
-        np.seterr(divide=None, invalid=None)  # we'll set it back now
-        zi = np.ma.masked_invalid(zi)
-        array = np.flipud(np.array(zi))
-
-        return array
-
-    def norm_array(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear'):
-        """ Normalizes the raw data in equally sparsed points depending on the selected resolution
-        :return: interpolated and normalized array with selected resolution
-        https://github.com/rosskush/skspatial
-        """
         if np.isfinite(ulc[0]) and np.isfinite(lrc[0]):
             self.xmax = lrc[0]
             self.xmin = ulc[0]
@@ -90,6 +67,30 @@ class SpatialField:
         self.ncol = int(np.ceil((self.xmax - self.xmin) / self.res))  # delx
         self.nrow = int(np.ceil((self.ymax - self.ymin) / self.res))  # dely
 
+    def points_to_grid(self):
+        """ Create a grid of new points in the desired resolution to be interpolated
+        :return: array of size nrow, ncol
+        http://chris35wills.github.io/gridding_data/
+        """
+        hrange = ((self.ymin, self.ymax),
+                  (self.xmin, self.xmax))  # any points outside of this will be condisdered outliers and not used
+
+        zi, yi, xi = np.histogram2d(self.y, self.x, bins=(int(self.nrow), int(self.ncol)), weights=self.z, normed=False,
+                                    range=hrange)
+        counts, _, _ = np.histogram2d(self.y, self.x, bins=(int(self.nrow), int(self.ncol)), range=hrange)
+        np.seterr(divide='ignore', invalid='ignore')  # we're dividing by zero but it's no big deal
+        zi = np.divide(zi, counts)
+        np.seterr(divide=None, invalid=None)  # we'll set it back now
+        zi = np.ma.masked_invalid(zi)
+        array = np.flipud(np.array(zi))
+
+        return array
+
+    def norm_array(self, method='linear'):
+        """ Normalizes the raw data in equally sparsed points depending on the selected resolution
+        :return: interpolated and normalized array with selected resolution
+        https://github.com/rosskush/skspatial
+        """
         array = self.points_to_grid()
         x = np.arange(0, self.ncol)
         y = np.arange(0, self.nrow)
@@ -102,9 +103,10 @@ class SpatialField:
         x1 = xx[~array.mask]
         y1 = yy[~array.mask]
         newarr = array[~array.mask]
-        GD1 = interpolate.griddata((x1, y1), newarr.ravel(), (xx, yy), method=method, fill_value=self.nodatavalue)
 
-        return GD1
+        out_array = interpolate.griddata((x1, y1), newarr.ravel(), (xx, yy), method=method, fill_value=self.nodatavalue)
+
+        return out_array
 
     def shape(self):
         self.shapefile = str(self.project_dir / 'shapefiles') + "/" + self.name + ".shp"
@@ -131,7 +133,7 @@ class SpatialField:
         # Rasterize
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
-    def norm_raster(self, res=None, ulc=(np.nan, np.nan), lrc=(np.nan, np.nan), method='linear', save_ascii=True):
+    def array2raster(self, array, path, save_ascii=True):
         """ Saves a raster using interpolation
         :param save_ascii:
         :param res: float, resolution of the cell
@@ -140,9 +142,11 @@ class SpatialField:
         :param method: interpolation method {‘linear’, ‘nearest’, ‘cubic’}, more info at: https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
         :return: no output, saves the raster in the default directory
         """
-        array = self.norm_array(res=res, ulc=ulc, lrc=lrc, method=method)
+        if '.' not in path[-4:]:
+            path += '.tif'
+
         self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
-        new_dataset = rio.open(self.normraster, 'w', driver='GTiff',
+        new_dataset = rio.open(path, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
                                crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
         print(np.shape(array))
@@ -150,10 +154,48 @@ class SpatialField:
         new_dataset.close()
 
         if save_ascii:
-            map_asc = self.norm_ascii
-            gdal.Translate(map_asc, self.normraster, format='AAIGrid')
+            map_asc = str(Path(path[0:-4] + '.asc'))
+            gdal.Translate(map_asc, path, format='AAIGrid')
 
         return new_dataset
+
+    def ok_2D(self, n_closest_points=None, variogram_model='linear', verbose=False,
+              coordinates_type='geographic', backend='vectorized'):  # Ordinary Kriging
+
+        # Credit from 'https://github.com/bsmurphy/PyKrige'
+        pykrige_install = True
+        try:
+            from pykrige.ok import OrdinaryKriging
+        except:
+            pykrige_install = False
+
+        if not pykrige_install:
+            raise ValueError('Pykrige is not installed, try pip install pykrige')
+
+        OK = OrdinaryKriging(self.x, self.y, self.z, variogram_model=variogram_model, verbose=verbose,
+                             enable_plotting=False, coordinates_type=coordinates_type)
+        x, y = np.arange(0, self.ncol), np.arange(0, self.nrow)
+
+        xpts = np.arange(self.xmin + self.res / 2, self.xmax + self.res / 2, self.res)
+        ypts = np.arange(self.ymin + self.res / 2, self.ymax + self.res / 2, self.res)
+        ypts = ypts[::-1]
+
+        xp, yp = [], []
+        for yi in ypts:
+            for xi in xpts:
+                xp.append(xi)
+                yp.append(yi)
+
+        if n_closest_points is not None:
+            backend = 'loop'
+
+        # krige_array, ss = OK.execute('points', x, y, n_closest_points=n_closest_points,backend=backend)
+        krige_array, ss = OK.execute('points', xp, yp, n_closest_points=n_closest_points, backend=backend)
+
+        krige_array = np.reshape(krige_array, (self.nrow, self.ncol))
+        # print(krige_array.shape)
+
+        return krige_array
 
     def create_polygon(self, shape_polygon, alpha=np.nan):
         try:
@@ -176,13 +218,9 @@ class SpatialField:
                     polygon.crs = self.crs
                     polygon.to_file(shape_polygon)
 
-    def clip_raster(self, polygon, out_raster):
-        import earthpy.spatial as es
-        import earthpy.plot as ep
-        from rasterio import plot
-        import matplotlib.pyplot as plt
+    def clip_raster(self, polygon, in_raster, out_raster):
 
-        result = gdal.Warp(out_raster, self.normraster, cutlineDSName=polygon)
+        gdal.Warp(out_raster, in_raster, cutlineDSName=polygon)
 
         # Read the raster to be cropped
         '''with rio.open(self.normraster, count=1) as src:
@@ -275,44 +313,3 @@ class MapArray:
         if save_ascii:
             map_asc = str(project_dir / "rasters") + "/" + self.map_name + ".asc"
             gdal.Translate(map_asc, map_out, format='AAIGrid')
-
-
-if __name__ == '__main__':
-    # ------------------------INPUT--------------------------------------
-    #  Raw data input path
-    data_A = "hexagon_experiment.csv"
-    data_B = "hexagon_simulation.csv"
-    attribute = 'dz'
-
-    name_map_A = "hexagon_exp_02"
-    name_map_B = "hexagon_sim_02"
-
-    #  Raster Resolution: Change as appropriate
-    #  NOTE: Fuzzy Analysis has unique resolution
-    res = 0.2
-
-    # Projection
-    crs = 'EPSG:4326'
-    nodatavalue = -9999
-    # -----------------------------------------------------------------------
-
-    # Create directories if not existent
-    dir = Path.cwd()
-    Path(dir / "shapefiles").mkdir(exist_ok=True)
-    Path(dir / "rasters").mkdir(exist_ok=True)
-
-    if '.' not in data_A[-4:]:
-        data_A += '.csv'
-    path_A = str(dir / "raw_data/") + "/" + data_A
-
-    if '.' not in data_B[-4]:
-        data_A += '.csv'
-    path_B = str(dir / "raw_data/") + "/" + data_B
-
-    map_A = SpatialField(name_map_A, pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
-                         project_dir=dir, nodatavalue=nodatavalue)
-    map_A.norm_raster(res, method='linear')
-
-    map_B = SpatialField(name_map_B, pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs,
-                         project_dir=dir, nodatavalue=nodatavalue)
-    map_B.norm_raster(res, method='linear')
