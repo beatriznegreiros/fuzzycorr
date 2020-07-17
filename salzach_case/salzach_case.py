@@ -46,8 +46,7 @@ for file in list_files:
     path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
     name_file = file + '_res' + str(res)
     raster_file = str(current_dir / 'rasters') + '/' + file + '.tif'
-    map_file = mo.SpatialField(name_file, pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
-                               project_dir=current_dir, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
+    map_file = mo.SpatialField(name_file, pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs, project_dir=current_dir, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
     clip_raster = str(current_dir / 'rasters') + '/' + file + '_clipped' + '.tif'
 
     array_ = map_file.norm_array(method='cubic')

@@ -86,26 +86,22 @@ class FuzzyComparison:
         s_BA = np.full(np.shape(self.array_A), -np.inf, dtype=self.dtype_A)
 
         #  Loop to calculate similarity A x B
-        for index, a in np.ndenumerate(self.array_A):
+        for index, central_cell in np.ndenumerate(self.array_A):
             memb, neighbours = self.neighbours(self.array_B, index[0], index[1])
-            f_i = -np.inf
+            f_i = []
             for nei_index, neighbour in np.ndenumerate(neighbours):
-                a = self.array_A[index]
-                f = self.f_similarity(a, neighbour) * memb[nei_index]
-                if f > f_i:
-                    f_i = f
-            s_AB[index] = f_i
+                #  a = self.array_A[index]
+                f_i.append(self.f_similarity(central_cell, neighbour) * memb[nei_index])
+            s_AB[index] = max(f_i)
 
         #  Loop to calculate similarity B x A
-        for index, a in np.ndenumerate(self.array_B):
+        for index, central_cell in np.ndenumerate(self.array_B):
             memb, neighbours = self.neighbours(self.array_A, index[0], index[1])
-            f_i = -np.inf
+            f_i = []
             for nei_index, neighbour in np.ndenumerate(neighbours):
-                a = self.array_B[index]
-                f = self.f_similarity(a, neighbour) * memb[nei_index]
-                if f > f_i:
-                    f_i = f
-            s_BA[index] = f_i
+                #  a = self.array_B[index]
+                f_i.append(self.f_similarity(central_cell, neighbour) * memb[nei_index])
+            s_BA[index] = max(f_i)
 
         # Mask pixels where there's no similarity measure
         S_i = np.minimum(s_AB, s_BA)
@@ -141,34 +137,3 @@ class FuzzyComparison:
         return S
 
 
-if __name__ == '__main__':
-    import timeit
-
-    # ------------------------INPUT--------------------------------------
-    # Neighborhood definition
-    n = 4  # 'radius' of neighborhood
-    halving_distance = 2
-    comparison_name = "Hydro_FT_2010-2013_manual_simil"
-
-    # Create directory if not existent
-    dir = Path.cwd()
-    Path(dir / "rasters").mkdir(exist_ok=True)
-    map_A_in = str(dir / "rasters/dz_meas_2010-2013_norm.tif")
-    map_B_in = str(dir / "rasters/Hydro_FT-2D_manual_2013_norm.tif")
-    # ------------------------------------------------------------------
-
-    # Start run time count
-    start = timeit.default_timer()
-
-    # Perform fuzzy comparison
-    compareAB = FuzzyComparison(map_A_in, map_B_in, dir, n, halving_distance)
-    global_simil = compareAB.fuzzy_numerical(comparison_name)
-
-    # Print global similarity
-    print('Average fuzzy similarity:', global_simil)
-
-    # Stops run time count
-    stop = timeit.default_timer()
-
-    # Print run time:
-    print('Enlapsed time: ', stop - start, 's')

@@ -1,17 +1,14 @@
-try:
-    import geopandas
-    import ogr
-    import gdal
-    import rasterio as rio
-    import numpy as np
-    import pandas as pd
-    import math
-    from pathlib import Path
-    from pyproj import CRS
-    from scipy import interpolate
-except:
-    print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
-          'pandas, pathlib, math, pyproj and scipy).')
+import geopandas
+import ogr
+import gdal
+import rasterio as rio
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from pyproj import CRS
+from scipy import interpolate
+
+#print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, pathlib, math, pyproj and scipy).')
 
 
 class SpatialField:
