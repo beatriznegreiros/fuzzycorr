@@ -4,15 +4,15 @@ import fuzzynumerical as fz
 
 # ------------------------INPUT--------------------------------------
 # Neighborhood definition
-n = 4  # 'radius' of neighborhood
-halving_distance = 2
-comparison_name = "Hydro_FT_vali_manual_simil"
+n = 2  # 'radius' of neighborhood
+halving_distance = 1
+comparison_name = "diamond_comp"
 
 # Create directory if not existent
 current_dir = Path.cwd()
 Path(current_dir / "rasters").mkdir(exist_ok=True)
-map_A_in = str(current_dir / "rasters/vali_meas_2013_clipped.tif")
-map_B_in = str(current_dir / "rasters/vali_hydro_FT_manual_2013_clipped.tif")
+map_A_in = str(current_dir / "rasters/diamond_sim_01_norm.tif")
+map_B_in = str(current_dir / "rasters/diamond_exp_01_norm.tif")
 # ------------------------------------------------------------------
 
 # Start run time count
