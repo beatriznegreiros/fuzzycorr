@@ -16,6 +16,7 @@ class RasterDataPlotter:
             raster_np = src.read(1, masked=True)
         fig, ax = plt.subplots()
         ax.hist(raster_np[~raster_np.mask], bins=60)
+        np.savetxt('trial.csv', raster_np[~raster_np.mask], delimiter=',')
         plt.xlabel(legendx)
         plt.ylabel(legendy)
         #plt.title(title)

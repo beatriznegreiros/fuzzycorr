@@ -1,14 +1,16 @@
-import geopandas
-import ogr
-import gdal
-import rasterio as rio
-import numpy as np
-import pandas as pd
-from pathlib import Path
-from pyproj import CRS
-from scipy import interpolate
-
-#print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, pathlib, math, pyproj and scipy).')
+try:
+    import geopandas
+    import ogr
+    import gdal
+    import rasterio as rio
+    import numpy as np
+    import pandas as pd
+    from pathlib import Path
+    from pyproj import CRS
+    from scipy import interpolate
+except:
+    print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
+          'pandas, pathlib, math, pyproj and scipy).')
 
 
 class SpatialField:
@@ -159,7 +161,7 @@ class SpatialField:
     def ok_2D(self, n_closest_points=None, variogram_model='linear', verbose=False,
               coordinates_type='geographic', backend='vectorized'):  # Ordinary Kriging
 
-        # Credit from 'https://github.com/bsmurphy/PyKrige'
+        # Credit to 'https://github.com/bsmurphy/PyKrige'
         pykrige_install = True
         try:
             from pykrige.ok import OrdinaryKriging
