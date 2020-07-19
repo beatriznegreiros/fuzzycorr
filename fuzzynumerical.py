@@ -24,7 +24,7 @@ class FuzzyComparison:
             self.read_raster(self.raster_B)
 
         if halving_distance <= 0:
-            print('Halving distance must be at least ')
+            print('Halving distance must be at least 1')
         if self.nodatavalue != self.nodatavalue_B:
             print('Warning: Maps have different NoDataValues, I will use the NoDataValue of the first map')
         if self.src_A != self.src_B:
@@ -50,7 +50,8 @@ class FuzzyComparison:
         :param neighbours: numpy array of floats
         :return: numpy array of floats, Local similarity between each of two cells
         """
-        simil_neigh = np.ma.masked_array(np.zeros(np.shape(neighbours)), mask=neighbours.mask)
+        # simil_neigh = np.ma.masked_array(np.zeros(np.shape(neighbours)), mask=neighbours.mask)
+        simil_neigh = np.zeros(np.shape(neighbours))
         for index, entry in np.ndenumerate(neighbours):
             simil_neigh[index] = 1 - (abs(entry - centrall_cell)) / max(abs(entry), abs(centrall_cell))
         return simil_neigh
@@ -63,6 +64,8 @@ class FuzzyComparison:
         :param y: int, cell in y
         :return: ndarray (float) membership of the neighbours, ndarray (float) neighbours' cells
         """
+        array_ma = np.ma.masked_where(array == self.nodatavalue, array, copy=True)
+
         x_up = max(x - self.neigh, 0)
         x_lower = min(x + self.neigh + 1, array.shape[0])
         y_up = max(y - self.neigh, 0)
@@ -70,16 +73,15 @@ class FuzzyComparison:
 
         memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=self.dtype_A)
 
-        np.seterr(divide='ignore', invalid='ignore')
-
         for i, row in np.ndenumerate(np.arange(x_up, x_lower)):
             for j, column in np.ndenumerate(np.arange(y_up, y_lower)):
-                d = ((row - x)**2 + (column - y)**2)**0.5
-                memb[i, j] = 2**(-d / self.halving_distance)
+                d = ((row - x) ** 2 + (column - y) ** 2) ** 0.5
+                memb[i, j] = 2 ** (-d / self.halving_distance)
 
-            #memb = np.ma.masked_array(memb, mask=array[x_up: x_lower, y_up: y_lower].mask)
+        memb_ma = np.ma.masked_array(memb, mask=array_ma[x_up: x_lower, y_up: y_lower].mask)
 
-        return memb, array[x_up: x_lower, y_up: y_lower]
+        return memb_ma[~memb_ma.mask], array_ma[x_up: x_lower, y_up: y_lower][
+            ~array_ma[x_up: x_lower, y_up: y_lower].mask]
 
     def fuzzy_numerical(self, comparison_name, map_of_comparison=True):
         """ compares a pair of raster maps using fuzzy numerical spatial comparison
@@ -95,25 +97,24 @@ class FuzzyComparison:
 
         #  Loop to calculate similarity A x B
         for index, central in np.ndenumerate(self.array_A):
-            memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
-            f_i = np.ma.multiply(self.f_similarity(self.array_A[index], neighboursA), memb)
-            f_i = np.ma.filled(f_i, fill_value=self.nodatavalue)
-            '''print('neighboursA',neighboursA)
-            print('simil', self.f_similarity(self.array_A[index], neighboursA))
-            print('memb',memb)
-            print('f_i', f_i)'''
-            s_AB[index] = np.amax(f_i)
+            if not self.array_A.mask[index]:
+                memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
+                f_i = np.ma.multiply(self.f_similarity(self.array_A[index], neighboursA), memb)
+                if f_i.size != 0:
+                    s_AB[index] = np.amax(f_i)
 
         #  Loop to calculate similarity B x A
         for index, central in np.ndenumerate(self.array_B):
-            memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
-            f_i = np.ma.multiply(self.f_similarity(self.array_B[index], neighboursB), memb)
-            f_i = np.ma.filled(f_i, fill_value=self.nodatavalue)
-            s_BA[index] = np.amax(f_i)
-
-        # Mask cells where there's no similarity measure
+            if not self.array_B.mask[index]:
+                memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
+                f_i = np.ma.multiply(self.f_similarity(self.array_B[index], neighboursB), memb)
+                # f_i = np.ma.filled(f_i, fill_value=self.nodatavalue)
+                if f_i.size != 0:
+                    s_BA[index] = np.amax(f_i)
 
         S_i = np.minimum(s_AB, s_BA)
+
+        # Mask cells where there's no similarity measure
         S_i_ma = np.ma.masked_where(S_i == self.nodatavalue, S_i, copy=True)
 
         # Overall similarity

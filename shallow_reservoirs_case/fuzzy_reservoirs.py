@@ -6,13 +6,13 @@ import fuzzynumerical as fz
 # Neighborhood definition
 n = 2  # 'radius' of neighborhood
 halving_distance = 1
-comparison_name = "diamond_comp"
+comparison_name = "hexagon_comp"
 
 # Create directory if not existent
 current_dir = Path.cwd()
 Path(current_dir / "rasters").mkdir(exist_ok=True)
-map_A_in = str(current_dir / "rasters/diamond_sim_01_norm.tif")
-map_B_in = str(current_dir / "rasters/diamond_exp_01_norm.tif")
+map_A_in = str(current_dir / "rasters/hexagon_sim_01_norm.tif")
+map_B_in = str(current_dir / "rasters/hexagon_exp_01_norm.tif")
 # ------------------------------------------------------------------
 
 # Start run time count
