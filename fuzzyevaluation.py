@@ -55,6 +55,16 @@ class FuzzyComparison:
             simil_neigh[index] = 1 - (abs(entry - centrall_cell)) / max(abs(entry), abs(centrall_cell))
         return simil_neigh
 
+    def squared_error(self, centrall_cell, neighbours):
+        """ Similarity function for the fuzzy numerical comparison
+
+        :param centrall_cell: float
+        :param neighbours: numpy array of floats
+        :return: numpy array of floats, Local similarity between each of two cells
+        """
+        simil_neigh = (neighbours - centrall_cell) ** 2
+        return simil_neigh
+
     def neighbours(self, array, x, y):
         """ Takes the neighbours and their memberships
 
@@ -74,7 +84,7 @@ class FuzzyComparison:
         neigh_array = np.ma.masked_where(neigh_array == self.nodatavalue, neigh_array)
 
         # Distance (in cells) of all neighbours to the cell in x,y in analysis
-        d = np.linalg.norm(np.indices(neigh_array.shape, sparse=True)-np.array([x-x_up, y-y_up]), axis=0)
+        d = np.linalg.norm(np.indices(neigh_array.shape, sparse=True) - np.array([x - x_up, y - y_up]), axis=0)
 
         # Calculate the membership based on the distance decay function
         memb = 2 ** (-d / self.halving_distance)
@@ -91,7 +101,7 @@ class FuzzyComparison:
         :param map_of_comparison: boolean, create map of comparison
         :return: overall performance index
         """
-
+        print('Performing fuzzy numerical comparison...')
         # Two-way similarity, first A x B then B x A
         s_AB = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
         s_BA = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
@@ -121,27 +131,84 @@ class FuzzyComparison:
         # Overall similarity
         S = S_i_ma.mean()
 
+        # Save results
+        self.save_results(S, comparison_name)
+
         # Fill nodatavalues into array
         S_i_ma_fi = np.ma.filled(S_i_ma, fill_value=self.nodatavalue)
 
+        # Saves comparison raster
+        if map_of_comparison:
+            self.save_comparison_raster(S_i_ma_fi, comparison_name)
+
+        return S
+
+    def fuzzy_rmse(self, comparison_name, map_of_comparison=True):
+        """ compares a pair of raster maps using fuzzy root mean square error as spatial comparison
+
+        :param comparison_name: string, name of the comparison
+        :param map_of_comparison: boolean, create map of comparison
+        :return: overall performance index
+        """
+        print('Performing fuzzy RMSE comparison...')
+        # Two-way similarity, first A x B then B x A
+        s_AB = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
+        s_BA = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
+
+        #  Loop to calculate similarity A x B
+        for index, central in np.ndenumerate(self.array_A):
+            if not self.array_A.mask[index]:
+                memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
+                f_i = np.ma.divide(self.squared_error(self.array_A[index], neighboursA), memb)
+
+                if f_i.size != 0:
+                    s_AB[index] = np.amin(f_i)
+
+        #  Loop to calculate similarity B x A
+        for index, central in np.ndenumerate(self.array_B):
+            if not self.array_B.mask[index]:
+                memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
+                f_i = np.ma.divide(self.squared_error(self.array_B[index], neighboursB), memb)
+                if f_i.size != 0:
+                    s_BA[index] = np.amin(f_i)
+
+        S_i = np.maximum(s_AB, s_BA)
+
+        # Mask cells where there's no similarity measure
+        S_i_ma = np.ma.masked_where(S_i == self.nodatavalue, S_i, copy=True)
+
+        # Overall similarity
+        S = (S_i_ma.mean()) ** 0.5
+
+        # Save results
+        self.save_results(S, comparison_name)
+
+        # Fill nodatavalues into array
+        S_i_ma_fi = np.ma.filled(S_i_ma, fill_value=self.nodatavalue)
+
+        # Save comparison raster
+        if map_of_comparison:
+            self.save_comparison_raster(S_i_ma_fi, comparison_name)
+
+        return S
+
+    def save_results(self, measure, name):
         # Saves a results file
         Path(self.dir / "results").mkdir(exist_ok=True)
-        result_file = str(self.dir / "results") + "/" + comparison_name + ".txt"
+        result_file = str(self.dir / "results") + "/" + name + ".txt"
         lines = ["Fuzzy numerical spatial comparison \n", "\n", "Compared maps: \n",
                  str(self.raster_A) + "\n", str(self.raster_B) + "\n", "\n", "Halving distance: " +
                  str(self.halving_distance) + " cells  \n", "Neighbourhood: " + str(self.neigh) + " cells  \n", "\n"]
         file1 = open(result_file, "w")
         file1.writelines(lines)
-        file1.write('Average fuzzy similarity: ' + str(format(S, '.4f')))
+        file1.write('Average fuzzy similarity: ' + str(format(measure, '.4f')))
         file1.close()
 
+    def save_comparison_raster(self, array_local_measures, file_name):
         # Create map of comparison
-        if map_of_comparison:
-            if '.' not in comparison_name[-4:]:
-                comparison_name += '.tif'
-            comp_map = str(self.dir / "results") + "/" + comparison_name
-            raster = rio.open(comp_map, 'w', **self.meta_A)
-            raster.write(S_i_ma_fi, 1)
-            raster.close()
-
-        return S
+        if '.' not in file_name[-4:]:
+            file_name += '.tif'
+        comp_map = str(self.dir / "results") + "/" + file_name
+        raster = rio.open(comp_map, 'w', **self.meta_A)
+        raster.write(array_local_measures, 1)
+        raster.close()
