@@ -6,6 +6,7 @@ try:
     import sys
     from rasterio.transform import from_origin
     from pathlib import Path
+    import timeit
 except:
     print('ModuleNotFoundError: Missing fundamental packages (required: pathlib, numpy, gdal, rasterio, math, sys).')
 
@@ -46,10 +47,7 @@ class FuzzyComparison:
         :param neighbours: numpy array of floats
         :return: numpy array of floats, Local similarity between each of two cells
         """
-        # simil_neigh = np.ma.masked_array(np.zeros(np.shape(neighbours)), mask=neighbours.mask)
-        simil_neigh = np.zeros(np.shape(neighbours))
-        for index, entry in np.ndenumerate(neighbours):
-            simil_neigh[index] = ((entry - centrall_cell) ** 2)
+        simil_neigh = (neighbours - centrall_cell) ** 2
         return simil_neigh
 
     def residual(self, centrall_cell, neighbours):
@@ -60,9 +58,7 @@ class FuzzyComparison:
         :return: numpy array of floats, Local similarity between each of two cells
         """
         # simil_neigh = np.ma.masked_array(np.zeros(np.shape(neighbours)), mask=neighbours.mask)
-        simil_neigh = np.zeros(np.shape(neighbours))
-        for index, entry in np.ndenumerate(neighbours):
-            simil_neigh[index] = (entry - centrall_cell)
+        simil_neigh = (neighbours - centrall_cell)
         return simil_neigh
 
     def neighbours(self, array, x, y):
@@ -73,24 +69,26 @@ class FuzzyComparison:
         :param y: int, cell in y
         :return: ndarray (float) membership of the neighbours (without mask), ndarray (float) neighbours' cells (without mask)
         """
-        array_ma = np.ma.masked_where(array == self.nodatavalue, array, copy=True)
 
         x_up = max(x - self.neigh, 0)
         x_lower = min(x + self.neigh + 1, array.shape[0])
         y_up = max(y - self.neigh, 0)
         y_lower = min(y + self.neigh + 1, array.shape[1])
 
-        memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=self.dtype_A)
+        # Masked array that contains only neighbours
+        neigh_array = array[x_up: x_lower, y_up: y_lower]
+        neigh_array = np.ma.masked_where(neigh_array == self.nodatavalue, neigh_array)
 
-        for i, row in np.ndenumerate(np.arange(x_up, x_lower)):
-            for j, column in np.ndenumerate(np.arange(y_up, y_lower)):
-                d = ((row - x) ** 2 + (column - y) ** 2) ** 0.5
-                memb[i, j] = 2 ** (-d / self.halving_distance)
+        # Distance (in cells) of all neighbours to the cell in x,y in analysis
+        d = np.linalg.norm(np.indices(neigh_array.shape, sparse=True)-np.array([x-x_up, y-y_up]), axis=0)
 
-        memb_ma = np.ma.masked_array(memb, mask=array_ma[x_up: x_lower, y_up: y_lower].mask)
+        # Calculate the membership based on the distance decay function
+        memb = 2 ** (-d / self.halving_distance)
 
-        return memb_ma[~memb_ma.mask], array_ma[x_up: x_lower, y_up: y_lower][
-            ~array_ma[x_up: x_lower, y_up: y_lower].mask]
+        # Mask the array of memberships
+        memb_ma = np.ma.masked_array(memb, mask=neigh_array.mask)
+
+        return memb_ma[~memb_ma.mask], neigh_array[~neigh_array.mask]
 
     def fuzzy_error(self, comparison_name, map_of_comparison=True):
         """ compares a pair of raster maps using fuzzy numerical spatial comparison
@@ -106,12 +104,16 @@ class FuzzyComparison:
 
         #  Loop to calculate similarity A x B
         for index, central in np.ndenumerate(self.array_A):
+            start = timeit.default_timer()
             if not self.array_A.mask[index]:
+                sn = timeit.default_timer()
                 memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
+                en = timeit.default_timer()
                 f_i = np.ma.divide(self.squared_error(self.array_A[index], neighboursA), memb)
+
                 if f_i.size != 0:
                     s_AB[index] = np.amin(f_i)
-
+            end = timeit.default_timer()
         #  Loop to calculate similarity B x A
         for index, central in np.ndenumerate(self.array_B):
             if not self.array_B.mask[index]:
