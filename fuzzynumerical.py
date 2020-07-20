@@ -50,7 +50,6 @@ class FuzzyComparison:
         :param neighbours: numpy array of floats
         :return: numpy array of floats, Local similarity between each of two cells
         """
-        # simil_neigh = np.ma.masked_array(np.zeros(np.shape(neighbours)), mask=neighbours.mask)
         simil_neigh = np.zeros(np.shape(neighbours))
         for index, entry in np.ndenumerate(neighbours):
             simil_neigh[index] = 1 - (abs(entry - centrall_cell)) / max(abs(entry), abs(centrall_cell))
@@ -62,26 +61,28 @@ class FuzzyComparison:
         :param array: array A or B
         :param x: int, cell in x
         :param y: int, cell in y
-        :return: ndarray (float) membership of the neighbours, ndarray (float) neighbours' cells
+        :return: ndarray (float) membership of the neighbours (without mask), ndarray (float) neighbours' cells (without mask)
         """
-        array_ma = np.ma.masked_where(array == self.nodatavalue, array, copy=True)
 
         x_up = max(x - self.neigh, 0)
         x_lower = min(x + self.neigh + 1, array.shape[0])
         y_up = max(y - self.neigh, 0)
         y_lower = min(y + self.neigh + 1, array.shape[1])
 
-        memb = np.zeros((x_lower - x_up, y_lower - y_up), dtype=self.dtype_A)
+        # Masked array that contains only neighbours
+        neigh_array = array[x_up: x_lower, y_up: y_lower]
+        neigh_array = np.ma.masked_where(neigh_array == self.nodatavalue, neigh_array)
 
-        for i, row in np.ndenumerate(np.arange(x_up, x_lower)):
-            for j, column in np.ndenumerate(np.arange(y_up, y_lower)):
-                d = ((row - x) ** 2 + (column - y) ** 2) ** 0.5
-                memb[i, j] = 2 ** (-d / self.halving_distance)
+        # Distance (in cells) of all neighbours to the cell in x,y in analysis
+        d = np.linalg.norm(np.indices(neigh_array.shape, sparse=True)-np.array([x-x_up, y-y_up]), axis=0)
 
-        memb_ma = np.ma.masked_array(memb, mask=array_ma[x_up: x_lower, y_up: y_lower].mask)
+        # Calculate the membership based on the distance decay function
+        memb = 2 ** (-d / self.halving_distance)
 
-        return memb_ma[~memb_ma.mask], array_ma[x_up: x_lower, y_up: y_lower][
-            ~array_ma[x_up: x_lower, y_up: y_lower].mask]
+        # Mask the array of memberships
+        memb_ma = np.ma.masked_array(memb, mask=neigh_array.mask)
+
+        return memb_ma[~memb_ma.mask], neigh_array[~neigh_array.mask]
 
     def fuzzy_numerical(self, comparison_name, map_of_comparison=True):
         """ compares a pair of raster maps using fuzzy numerical spatial comparison
