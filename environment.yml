@@ -1,12 +1,9 @@
 name: env-valitools
 channels:
-  - anaconda
   - conda-forge
-  - defaults
 dependencies:
   - python=3.6
   - geopandas
-  - ogr
   - gdal
   - rasterio
   - numpy
@@ -17,5 +14,3 @@ dependencies:
   - pyproj
   - scipy
   - pykrige
-  - sys
-
