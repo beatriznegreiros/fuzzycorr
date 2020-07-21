@@ -1,12 +1,12 @@
 from pathlib import Path
 import timeit
-import fuzzynumerical as fz
+import fuzzyevaluation as fuzz
 
 # ------------------------INPUT--------------------------------------
 # Neighborhood definition
-n = 4  # 'radius' of neighborhood
-halving_distance = 2
-comparison_name = "Hydro_FT_vali_manual_simil"
+n = 8  # 'radius' of neighborhood
+halving_distance = 4
+comparison_name = "vali_hydroman_meas_simil_fuzzyRMSE_n8hd4"
 
 # Create directory if not existent
 current_dir = Path.cwd()
@@ -19,8 +19,8 @@ map_B_in = str(current_dir / "rasters/vali_hydro_FT_manual_2013_clipped.tif")
 start = timeit.default_timer()
 
 # Perform fuzzy comparison
-compareAB = fz.FuzzyComparison(map_A_in, map_B_in, current_dir, n, halving_distance)
-global_simil = compareAB.fuzzy_numerical(comparison_name)
+compareAB = fuzz.FuzzyComparison(map_A_in, map_B_in, current_dir, n, halving_distance)
+global_simil = compareAB.fuzzy_rmse(comparison_name)
 
 # Print global similarity
 print('Average fuzzy similarity:', global_simil)

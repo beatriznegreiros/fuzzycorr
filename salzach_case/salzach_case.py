@@ -1,7 +1,7 @@
 from pathlib import Path
 import mapoperator as mo
 import pandas as pd
-import fuzzynumerical as fuzz
+import fuzzyevaluation as fuzz
 
 # ---------------Data Pre-processing---------------------------------
 # ------------------------INPUT--------------------------------------

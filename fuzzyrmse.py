@@ -35,6 +35,7 @@ class FuzzyComparison:
 
     def read_raster(self, raster):
         with rio.open(raster) as src:
+            print('Reading raster ', str(raster))
             raster_np = src.read(1, masked=True)
             nodatavalue = src.nodata  # storing nodatavalue of raster
             meta = src.meta.copy()
@@ -97,29 +98,25 @@ class FuzzyComparison:
         :param map_of_comparison: boolean, create map of comparison
         :return: overall performance index
         """
-
+        print('Performing fuzzy comparison...')
         # Two-way similarity, first A x B then B x A
         s_AB = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
         s_BA = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
 
         #  Loop to calculate similarity A x B
         for index, central in np.ndenumerate(self.array_A):
-            start = timeit.default_timer()
             if not self.array_A.mask[index]:
-                sn = timeit.default_timer()
                 memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
-                en = timeit.default_timer()
                 f_i = np.ma.divide(self.squared_error(self.array_A[index], neighboursA), memb)
 
                 if f_i.size != 0:
                     s_AB[index] = np.amin(f_i)
-            end = timeit.default_timer()
+
         #  Loop to calculate similarity B x A
         for index, central in np.ndenumerate(self.array_B):
             if not self.array_B.mask[index]:
                 memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
                 f_i = np.ma.divide(self.squared_error(self.array_B[index], neighboursB), memb)
-                # f_i = np.ma.filled(f_i, fill_value=self.nodatavalue)
                 if f_i.size != 0:
                     s_BA[index] = np.amin(f_i)
 
