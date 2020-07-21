@@ -2,12 +2,11 @@ try:
     import numpy as np
     import gdal
     import rasterio as rio
-    import math
     import sys
     from rasterio.transform import from_origin
     from pathlib import Path
 except:
-    print('ModuleNotFoundError: Missing fundamental packages (required: numpy, gdal, rasterio, pathlib).')
+    print('ModuleNotFoundError: Missing fundamental packages (required: numpy, gdal, rasterio, pathlib, sys).')
 
 
 class FuzzyComparison:
