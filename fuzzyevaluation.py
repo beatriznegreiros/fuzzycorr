@@ -1,12 +1,11 @@
 try:
     import numpy as np
-    import gdal
     import rasterio as rio
     import sys
-    from rasterio.transform import from_origin
     from pathlib import Path
-except:
+except ModuleNotFoundError as e:
     print('ModuleNotFoundError: Missing fundamental packages (required: numpy, gdal, rasterio, pathlib, sys).')
+    print(e)
 
 
 class FuzzyComparison:
@@ -83,7 +82,21 @@ class FuzzyComparison:
         neigh_array = np.ma.masked_where(neigh_array == self.nodatavalue, neigh_array)
 
         # Distance (in cells) of all neighbours to the cell in x,y in analysis
-        d = np.linalg.norm(np.indices(neigh_array.shape, sparse=True) - np.array([x - x_up, y - y_up]), axis=0)
+        #indices = np.indices(neigh_array.shape, sparse=True)
+
+        i, j = np.indices(neigh_array.shape)
+        i = i.flatten() - (x-x_up)
+        j = j.flatten() - (y-y_up)
+        d = np.reshape((i**2 + j**2)**0.5, neigh_array.shape)
+        #print('indices', type(indices))
+        #ref = np.array([x - x_up, y - y_up])
+
+        #print('ref', type(ref))
+        #d = np.linalg.norm(indices - ref, axis=0)
+        '''print('neigh_array.shape', neigh_array.shape)
+        print('np.indices(neigh_array.shape, sparse=True)', np.indices(neigh_array.shape, sparse=True))
+        print('np.array([x - x_up, y - y_up])', np.array([x - x_up, y - y_up]))
+        print('d', d)'''
 
         # Calculate the membership based on the distance decay function
         memb = 2 ** (-d / self.halving_distance)
