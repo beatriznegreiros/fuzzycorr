@@ -5,12 +5,14 @@ try:
     import rasterio as rio
     import numpy as np
     import pandas as pd
+    import alphashape
+    import mapclassify.classifiers as mc
     from pathlib import Path
     from pyproj import CRS
     from scipy import interpolate
+    from pykrige.ok import OrdinaryKriging
 except:
-    print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, '
-          'pandas, pathlib, math, pyproj and scipy).')
+    print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
 
 
 class SpatialField:
@@ -162,14 +164,6 @@ class SpatialField:
               coordinates_type='geographic', backend='vectorized'):  # Ordinary Kriging
 
         # Credit to 'https://github.com/bsmurphy/PyKrige'
-        pykrige_install = True
-        try:
-            from pykrige.ok import OrdinaryKriging
-        except:
-            pykrige_install = False
-
-        if not pykrige_install:
-            raise ValueError('Pykrige is not installed, try pip install pykrige')
 
         OK = OrdinaryKriging(self.x, self.y, self.z, variogram_model=variogram_model, verbose=verbose,
                              enable_plotting=False, coordinates_type=coordinates_type)
@@ -197,64 +191,23 @@ class SpatialField:
         return krige_array
 
     def create_polygon(self, shape_polygon, alpha=np.nan):
-        try:
-            import alphashape
-            # If the user doesnt select an alpha value, the alpha will be optimized automatically.
-        except ImportError as e:
-            print(e)
+        if np.isfinite(alpha):
+            try:
+                polygon = alphashape.alphashape(self.gdf, alpha)
+            except FileNotFoundError as e:
+                print(e)
         else:
-            if np.isfinite(alpha):
-                try:
-                    polygon = alphashape.alphashape(self.gdf, alpha)
-                except FileNotFoundError as e:
-                    print(e)
+            try:
+                polygon = alphashape.alphashape(self.gdf)
+            except FileNotFoundError as e:
+                print(e)
             else:
-                try:
-                    polygon = alphashape.alphashape(self.gdf)
-                except FileNotFoundError as e:
-                    print(e)
-                else:
-                    polygon.crs = self.crs
-                    polygon.to_file(shape_polygon)
+                polygon.crs = self.crs
+                polygon.to_file(shape_polygon)
 
     def clip_raster(self, polygon, in_raster, out_raster):
 
         gdal.Warp(out_raster, in_raster, cutlineDSName=polygon)
-
-        # Read the raster to be cropped
-        '''with rio.open(self.normraster, count=1) as src:
-            # Read the shapefile
-            crop_extent = geopandas.read_file(polygon)
-            crop_extent = crop_extent.to_crs(src.crs)
-
-            # Crop the raster
-            raster_crop, raster_meta = es.crop_image(src, crop_extent, all_touched=True)
-        raster_meta.update({'transform': raster_meta["transform"],
-                            'height': raster_crop.shape[1],
-                            'width': raster_crop.shape[2],
-                            'nodata': self.nodatavalue})
-
-        print(raster_meta["transform"])
-
-        raster_plot = plot.plotting_extent(raster_crop[0], raster_meta["transform"])
-
-        print(raster_crop[0])
-        fig, ax = plt.subplots(figsize=(12, 6))
-
-        # Plot the shapefile
-        crop_extent.boundary.plot(ax=ax, color="red", zorder=10)
-
-        # Plot the raster
-        ep.plot_bands(
-            raster_crop[0],
-            ax=ax,
-            extent=raster_plot,
-            title="test", cmap='Greys')
-        plt.show()
-
-        # Save the raster
-        with rio.open(out_raster, 'w', **raster_meta) as outf:
-            outf.write(raster_crop[0].astype(rio.float64), 1)'''
 
 
 class MapArray:
@@ -273,16 +226,11 @@ class MapArray:
             :param n_classes: integer, number of classes
             :return: list, optimized bins
         """
-        try:
-            import mapclassify.classifiers as mc
-        except ModuleNotFoundError as e:
-            print(e)
-        else:
-            # Classification based on Natural Breaks
-            breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes + 1)
-            print('The bins were optimized to:', breaks.bins)
-            class_bins = breaks.bins.tolist()
-            return class_bins
+        # Classification based on Natural Breaks
+        breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes + 1)
+        print('The bins were optimized to:', breaks.bins)
+        class_bins = breaks.bins.tolist()
+        return class_bins
 
     def categorize_raster(self, class_bins, project_dir, save_ascii=True):
         """ Classifies the raster according to the classification bins

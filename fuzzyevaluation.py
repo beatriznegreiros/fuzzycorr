@@ -7,7 +7,7 @@ try:
     from rasterio.transform import from_origin
     from pathlib import Path
 except:
-    print('ModuleNotFoundError: Missing fundamental packages (required: pathlib, numpy, gdal, rasterio, math, sys).')
+    print('ModuleNotFoundError: Missing fundamental packages (required: numpy, gdal, rasterio, pathlib).')
 
 
 class FuzzyComparison:
