@@ -42,11 +42,11 @@ class FuzzyComparison:
         return jac
 
     def f_similarity(self, centrall_cell, neighbours):
-        """ Similarity function for the fuzzy numerical comparison
+        """ calculate the similarity function for each pair of values (fuzzy numerical method)
 
-        :param centrall_cell: float
-        :param neighbours: numpy array of floats
-        :return: numpy array of floats, Local similarity between each of two cells
+        :param centrall_cell: float, cell under analysis in map A
+        :param neighbours: np.array of floats, neighbours in map B
+        :return: np.array of floats, each similarity between each of two cells
         """
         simil_neigh = np.zeros(np.shape(neighbours))
         for index, entry in np.ndenumerate(neighbours):
@@ -54,22 +54,22 @@ class FuzzyComparison:
         return simil_neigh
 
     def squared_error(self, centrall_cell, neighbours):
-        """ Similarity function for the fuzzy numerical comparison
+        """ Calculate the error measure fuzzy rmse
 
-        :param centrall_cell: float
-        :param neighbours: numpy array of floats
-        :return: numpy array of floats, Local similarity between each of two cells
+        :param centrall_cell: float, cell under analysis in map A
+        :param neighbours: np.array of floats, neighbours in map B
+        :return: np.array of floats, each similarity between each of two cells
         """
         simil_neigh = (neighbours - centrall_cell) ** 2
         return simil_neigh
 
     def neighbours(self, array, x, y):
-        """ Takes the neighbours and their memberships
+        """ Captures the neighbours and their memberships
 
         :param array: array A or B
         :param x: int, cell in x
         :param y: int, cell in y
-        :return: ndarray (float) membership of the neighbours (without mask), ndarray (float) neighbours' cells (without mask)
+        :return: np.array (float) membership of the neighbours (without mask), np.array (float) neighbours' cells (without mask)
         """
 
         x_up = max(x - self.neigh, 0)
@@ -82,21 +82,10 @@ class FuzzyComparison:
         neigh_array = np.ma.masked_where(neigh_array == self.nodatavalue, neigh_array)
 
         # Distance (in cells) of all neighbours to the cell in x,y in analysis
-        #indices = np.indices(neigh_array.shape, sparse=True)
-
         i, j = np.indices(neigh_array.shape)
         i = i.flatten() - (x-x_up)
         j = j.flatten() - (y-y_up)
         d = np.reshape((i**2 + j**2)**0.5, neigh_array.shape)
-        #print('indices', type(indices))
-        #ref = np.array([x - x_up, y - y_up])
-
-        #print('ref', type(ref))
-        #d = np.linalg.norm(indices - ref, axis=0)
-        '''print('neigh_array.shape', neigh_array.shape)
-        print('np.indices(neigh_array.shape, sparse=True)', np.indices(neigh_array.shape, sparse=True))
-        print('np.array([x - x_up, y - y_up])', np.array([x - x_up, y - y_up]))
-        print('d', d)'''
 
         # Calculate the membership based on the distance decay function
         memb = 2 ** (-d / self.halving_distance)
@@ -107,12 +96,13 @@ class FuzzyComparison:
         return memb_ma[~memb_ma.mask], neigh_array[~neigh_array.mask]
 
     def fuzzy_numerical(self, comparison_name, map_of_comparison=True):
-        """ compares a pair of raster maps using fuzzy numerical spatial comparison
+        """ Compares a pair of raster maps using fuzzy numerical spatial comparison
 
         :param comparison_name: string, name of the comparison
-        :param map_of_comparison: boolean, create map of comparison
+        :param map_of_comparison: boolean, create map of comparison in the project directory if True
         :return: overall performance index
         """
+
         print('Performing fuzzy numerical comparison...')
         # Two-way similarity, first A x B then B x A
         s_AB = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
@@ -156,13 +146,14 @@ class FuzzyComparison:
         return S
 
     def fuzzy_rmse(self, comparison_name, map_of_comparison=True):
-        """ compares a pair of raster maps using fuzzy root mean square error as spatial comparison
+        """ Compares a pair of raster maps using fuzzy root mean square error as spatial comparison
 
         :param comparison_name: string, name of the comparison
-        :param map_of_comparison: boolean, create map of comparison
-        :return: overall performance index
+        :param map_of_comparison: boolean, create map of of local squared errors (in the project directory) if True
+        :return: overall rmse
         """
         print('Performing fuzzy RMSE comparison...')
+
         # Two-way similarity, first A x B then B x A
         s_AB = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
         s_BA = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
