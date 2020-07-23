@@ -6,13 +6,11 @@ import fuzzyevaluation as fuzz
 # ---------------Data Pre-processing---------------------------------
 # ------------------------INPUT--------------------------------------
 #  Raw data input path
-data_A = 'cali_Hydro_FT-2D_MAP_2010.csv'
-data_B = 'cali_meas_2010.csv'
+list_files = ['vali_aPC_MAP_2013', 'vali_meas_2013']
+
 attribute = 'dz'
 
 interpol_method = 'linear'
-name_map_A = 'cali_Hydro_FT-2D_MAP_2010_nearest_res1'
-name_map_B = 'cali_meas_2010_nearest_res1'
 
 # Polygon and raster of area of interest
 polyname = 'polygon_salzach'
@@ -38,9 +36,9 @@ Path(current_dir / 'rasters').mkdir(exist_ok=True)
 
 poly_path = str(current_dir / 'shapefiles') + '/' + polyname + '.shp'
 
-list_files = ['cali_aPC_MAP_2010', 'cali_hydro_FT_manual_2010', 'cali_Hydro_FT-2D_MAP_2010',
+'''list_files = ['cali_aPC_MAP_2010', 'cali_hydro_FT_manual_2010', 'cali_Hydro_FT-2D_MAP_2010',
               'cali_meas_2010', 'vali_aPC_MAP_2013', 'vali_hydro_FT_manual_2013', 'vali_Hydro_FT-2D_MAP_2013',
-              'vali_meas_2013']
+              'vali_meas_2013']'''
 
 for file in list_files:
     path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
