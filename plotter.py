@@ -5,10 +5,8 @@ from pathlib import Path
 import rasterio as rio
 import earthpy.plot as ep
 import matplotlib.patches as patches
-import matplotlib.cm
 from matplotlib import colors
-from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+import matplotlib
 
 
 class RasterDataPlotter:
@@ -28,20 +26,21 @@ class RasterDataPlotter:
         np.savetxt('trial.csv', raster_np[~raster_np.mask], delimiter=',')
         plt.xlabel(legendx)
         plt.ylabel(legendy)
-        #plt.title(title)
+        # plt.title(title)
         plt.grid(True)
         plt.subplots_adjust(left=0.17, bottom=0.15)
         plt.savefig(outputpath, dpi=600)
         plt.clf()
 
-    def plot_raster(self, save_name, title=None):
+    def plot_raster(self, save_name, bounds, list_colors, title=None):
         raster_np = self.read_raster()
         f, ax = plt.subplots(figsize=(10, 8))
-        im = ax.imshow(raster_np)
-        ep.colorbar(im)
-        divcolor = colors.TwoSlopeNorm(vcenter=0., vmax=1., vmin=-0.2)
-        im = ax.imshow(raster_np, cmap='Spectral', norm=divcolor)
-        ep.colorbar(im)
+        cmap = matplotlib.colors.ListedColormap(list_colors)
+        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+        #divcolor = colors.TwoSlopeNorm(vcenter=0., vmax=1., vmin=-0.2)
+        #im = ax.imshow(raster_np, cmap='Spectral', norm=divcolor)
+        im = ax.imshow(raster_np, cmap=cmap, norm=norm)
+        ep.colorbar(im, pad=0.3, size='5%')
         plt.title(title)
         ax.set_xticks([])
         ax.set_yticks([])
@@ -53,7 +52,7 @@ class RasterDataPlotter:
         plt.yticks(visible=False)
         plt.xticks(visible=False)
         mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")'''
-        rectangle = patches.Rectangle((0, 0), 120, 140, fill=False)
+        rectangle = patches.Rectangle((100, 200), 120, 140, fill=False)
         ax.add_patch(rectangle)
         plt.savefig(save_name, dpi=600)
         plt.show()
