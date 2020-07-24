@@ -6,6 +6,9 @@ import rasterio as rio
 import earthpy.plot as ep
 import matplotlib.patches as patches
 import matplotlib.cm
+from matplotlib import colors
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 
 class RasterDataPlotter:
@@ -40,12 +43,23 @@ class RasterDataPlotter:
         current_cmap = matplotlib.cm.get_cmap()
         current_cmap.set_bad(color='red')
         plt.tight_layout()
+        divcolor = colors.TwoSlopeNorm(vcenter=0., vmax=1., vmin=-0.2)
+        im = ax.imshow(raster_np, cmap='Spectral', norm=divcolor)
+        ep.colorbar(im)
         plt.title(title)
         ax.set_xticks([])
         ax.set_yticks([])
+        '''axins = zoomed_inset_axes(ax, 10, loc=1)  # zoom-factor: 2.5, location: upper-left
+        axins.plot()
+        x1, x2, y1, y2 = 0, 140, 0, 120  # specify the limits
+        axins.set_xlim(x1, x2)  # apply the x-limits
+        axins.set_ylim(y1, y2)  # apply the y-limits
+        plt.yticks(visible=False)
+        plt.xticks(visible=False)
+        mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")'''
         rectangle = patches.Rectangle((0, 0), 120, 140, fill=False)
         ax.add_patch(rectangle)
-        f.savefig(save_name, dpi=600, orientation='portrait')
+        plt.savefig(save_name, dpi=600)
         plt.show()
 
     def plot_patch(self, xy, width, height, save_name):
