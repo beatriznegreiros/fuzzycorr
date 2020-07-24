@@ -6,6 +6,7 @@ import rasterio as rio
 import earthpy.plot as ep
 import matplotlib.patches as patches
 
+
 class RasterDataPlotter:
     def __init__(self, path):
         self.path = path
@@ -33,7 +34,8 @@ class RasterDataPlotter:
         raster_np = self.read_raster()
         f, ax = plt.subplots(figsize=(10, 8))
         im = ax.imshow(raster_np)
-        ep.colorbar(im)
+        cbar = ep.colorbar(im)
+        cbar.ax.tick_params(labelsize=12)
         plt.tight_layout()
         plt.title(title)
         ax.set_xticks([])
