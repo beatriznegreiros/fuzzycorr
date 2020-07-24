@@ -110,22 +110,16 @@ class FuzzyComparison:
             if not self.array_A.mask[index]:
                 memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
                 f_i = np.ma.multiply(self.f_similarity(self.array_A[index], neighboursA), memb)
-                a = f_i.sum()
-                if np.isnan(a):
-                    print('here is nan at loop 1:', index)
                 if f_i.size != 0:
-                    s_AB[index] = np.amax(f_i)
+                    s_AB[index] = np.nanmax(f_i)  # takes max without propagating nan
 
         #  Loop to calculate similarity B x A
         for index, central in np.ndenumerate(self.array_B):
             if not self.array_B.mask[index]:
                 memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
                 f_i = np.ma.multiply(self.f_similarity(self.array_B[index], neighboursB), memb)
-                a = f_i.sum()
-                if np.isnan(a):
-                    print('here is nan at loop 2:', index)
                 if f_i.size != 0:
-                    s_BA[index] = np.amax(f_i)
+                    s_BA[index] = np.nanmax(f_i)  # takes max without propagating nan
 
         S_i = np.minimum(s_AB, s_BA)
 
