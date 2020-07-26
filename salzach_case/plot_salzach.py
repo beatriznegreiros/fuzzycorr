@@ -18,7 +18,6 @@ list_colors = ['darkred', 'sienna', 'chocolate', 'sandybrown', 'gold', 'yellow',
 for item in list_rasters:
     rast_path = str(current_dir) + '/rasters/' + item + '.tif'
     raster = plotter.RasterDataPlotter(rast_path)
-    #box_savename = str(current_dir) + '/rasters/' + item + '.png'
     path_fig = str(current_dir) + '/rasters/' + item + '_2gether.png'
     raster.plot_raster_w_window(path_fig, bounds, list_colors=list_colors, xy=(0, 0), width=120, height=140)'''
 
