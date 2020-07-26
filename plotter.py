@@ -7,6 +7,7 @@ import earthpy.plot as ep
 import matplotlib.patches as patches
 from matplotlib import colors
 import matplotlib
+import matplotlib.transforms
 
 
 class RasterDataPlotter:
@@ -32,33 +33,60 @@ class RasterDataPlotter:
         plt.savefig(outputpath, dpi=600)
         plt.clf()
 
-    def plot_raster(self, save_name, bounds, list_colors, title=None):
+    def plot_raster(self, save_name, bounds, list_colors, xy=None, width=None, height=None, box_name=None):
         raster_np = self.read_raster()
-        f, ax = plt.subplots(figsize=(10, 8))
+        fig1, ax1 = plt.subplots(figsize=(6, 8))
         cmap = matplotlib.colors.ListedColormap(list_colors)
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
-        #divcolor = colors.TwoSlopeNorm(vcenter=0., vmax=1., vmin=-0.2)
-        #im = ax.imshow(raster_np, cmap='Spectral', norm=divcolor)
-        im = ax.imshow(raster_np, cmap=cmap, norm=norm)
+        # divcolor = colors.TwoSlopeNorm(vcenter=0., vmax=1., vmin=-0.2)
+        # im = ax.imshow(raster_np, cmap='Spectral', norm=divcolor)
+        im = ax1.imshow(raster_np, cmap=cmap, norm=norm)
+        fig1.tight_layout()
         ep.colorbar(im, pad=0.3, size='5%')
-        plt.title(title)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        '''axins = zoomed_inset_axes(ax, 10, loc=1)  # zoom-factor: 2.5, location: upper-left
-        axins.plot()
-        x1, x2, y1, y2 = 0, 140, 0, 120  # specify the limits
-        axins.set_xlim(x1, x2)  # apply the x-limits
-        axins.set_ylim(y1, y2)  # apply the y-limits
-        plt.yticks(visible=False)
-        plt.xticks(visible=False)
-        mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")'''
-        rectangle = patches.Rectangle((100, 200), 120, 140, fill=False)
-        ax.add_patch(rectangle)
-        plt.savefig(save_name, dpi=600)
-        plt.show()
+        plt.setp(ax1, xticks=[], yticks=[])
 
-    def plot_patch(self, xy, width, height, save_name):
+        if xy is not None:
+            fig2, ax2 = plt.subplots(figsize=(10, 9))
+            box_np = raster_np[xy[0]:xy[0] + height+1, xy[1]:xy[1] + width+1]
+            im2 = ax2.imshow(box_np, cmap=cmap, norm=norm)
+            plt.axis('off')
+            cbar = ep.colorbar(im2, pad=0.3, size='5%')
+            cbar.ax.tick_params(labelsize=20)
+            #ax2.tick_params(axis='both', labelsize=20, top=True, bottom=False, left=True, labeltop=True, labelleft=True, labelbottom=False)
+            #fig2.tight_layout()
+            fig2.savefig(box_name, dpi=800, bbox_inches='tight')
+
+            # Create patch for the box:
+            rectangle = patches.Rectangle(xy, width, height, fill=False)
+            ax1.add_patch(rectangle)
+
+        fig1.savefig(save_name, dpi=2000)
+
+    def plot_comparison_raster(self, save_name, bounds, cmap, xy=None, width=None, height=None, box_name=None):
         raster_np = self.read_raster()
+        fig1, ax1 = plt.subplots(figsize=(6, 8))
+        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+        im1 = ax1.imshow(raster_np, cmap=cmap, norm=norm)
+        fig1.tight_layout()
+        ep.colorbar(im1, pad=0.3, size='5%')
+        plt.setp(ax1, xticks=[], yticks=[])
+
+        if xy is not None:
+            fig2, ax2 = plt.subplots(figsize=(10, 9))
+            box_np = raster_np[xy[0]:xy[0] + height+1, xy[1]:xy[1] + width+1]
+            im2 = ax2.imshow(box_np, cmap=cmap, norm=norm)
+            plt.axis('off')
+            cbar = ep.colorbar(im2, pad=0.3, size='5%')
+            cbar.ax.tick_params(labelsize=20)
+            #ax2.tick_params(axis='both', labelsize=20, top=True, bottom=False, left=True, labeltop=True, labelleft=True, labelbottom=False)
+            #fig2.tight_layout()
+            fig2.savefig(box_name, dpi=800, bbox_inches='tight')
+
+            # Create patch for the box:
+            rectangle = patches.Rectangle(xy, width, height, fill=False)
+            ax1.add_patch(rectangle)
+
+        fig1.savefig(save_name, dpi=2000)
 
 
 class DataPlotter:
