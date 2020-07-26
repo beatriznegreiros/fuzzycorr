@@ -33,60 +33,53 @@ class RasterDataPlotter:
         plt.savefig(outputpath, dpi=600)
         plt.clf()
 
-    def plot_raster(self, save_name, bounds, list_colors, xy=None, width=None, height=None, box_name=None):
+    def plot_raster_w_window(self, save_name, bounds, xy, width, height, list_colors=None, cmap=None):
         raster_np = self.read_raster()
-        fig1, ax1 = plt.subplots(figsize=(6, 8))
-        cmap = matplotlib.colors.ListedColormap(list_colors)
+        fig, ax = plt.subplots(1, 2, figsize=(10, 8))
+        fig.tight_layout()
+
+        if cmap is None and list_colors is not None:
+            cmap = matplotlib.colors.ListedColormap(list_colors)
+
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
-        # divcolor = colors.TwoSlopeNorm(vcenter=0., vmax=1., vmin=-0.2)
-        # im = ax.imshow(raster_np, cmap='Spectral', norm=divcolor)
-        im = ax1.imshow(raster_np, cmap=cmap, norm=norm)
-        fig1.tight_layout()
-        ep.colorbar(im, pad=0.3, size='5%')
-        plt.setp(ax1, xticks=[], yticks=[])
+        ax[0].imshow(raster_np, cmap=cmap, norm=norm)
+        rectangle = patches.Rectangle(xy, width, height, fill=False)
+        ax[0].add_patch(rectangle)
+        plt.setp(ax, xticks=[], yticks=[])
 
-        if xy is not None:
-            fig2, ax2 = plt.subplots(figsize=(10, 9))
-            box_np = raster_np[xy[0]:xy[0] + height+1, xy[1]:xy[1] + width+1]
-            im2 = ax2.imshow(box_np, cmap=cmap, norm=norm)
-            plt.axis('off')
-            cbar = ep.colorbar(im2, pad=0.3, size='5%')
-            cbar.ax.tick_params(labelsize=20)
-            #ax2.tick_params(axis='both', labelsize=20, top=True, bottom=False, left=True, labeltop=True, labelleft=True, labelbottom=False)
-            #fig2.tight_layout()
-            fig2.savefig(box_name, dpi=800, bbox_inches='tight')
+        #  Plot Patch
+        box_np = raster_np[xy[0]:xy[0] + height+1, xy[1]:xy[1] + width+1]
+        im = ax[1].imshow(box_np, cmap=cmap, norm=norm)
+        #ax[1].axis('off')
+        cbar = ep.colorbar(im, pad=0.3, size='5%')
+        cbar.ax.tick_params(labelsize=20)
+        fig.savefig(save_name, dpi=800, bbox_inches='tight')
 
-            # Create patch for the box:
-            rectangle = patches.Rectangle(xy, width, height, fill=False)
-            ax1.add_patch(rectangle)
-
-        fig1.savefig(save_name, dpi=2000)
-
-    def plot_comparison_raster(self, save_name, bounds, cmap, xy=None, width=None, height=None, box_name=None):
+    def plot_raster(self, save_name, bounds, list_colors=None, cmap=None):
         raster_np = self.read_raster()
         fig1, ax1 = plt.subplots(figsize=(6, 8))
+
+        if cmap is None and list_colors is not None:
+            cmap = matplotlib.colors.ListedColormap(list_colors)
+
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
         im1 = ax1.imshow(raster_np, cmap=cmap, norm=norm)
         fig1.tight_layout()
-        ep.colorbar(im1, pad=0.3, size='5%')
         plt.setp(ax1, xticks=[], yticks=[])
+        cbar = ep.colorbar(im1, pad=0.3, size='5%')
+        cbar.ax.tick_params(labelsize=20)
+        fig1.savefig(save_name, dpi=800, bbox_inches='tight')
 
-        if xy is not None:
-            fig2, ax2 = plt.subplots(figsize=(10, 9))
-            box_np = raster_np[xy[0]:xy[0] + height+1, xy[1]:xy[1] + width+1]
-            im2 = ax2.imshow(box_np, cmap=cmap, norm=norm)
-            plt.axis('off')
-            cbar = ep.colorbar(im2, pad=0.3, size='5%')
-            cbar.ax.tick_params(labelsize=20)
-            #ax2.tick_params(axis='both', labelsize=20, top=True, bottom=False, left=True, labeltop=True, labelleft=True, labelbottom=False)
-            #fig2.tight_layout()
-            fig2.savefig(box_name, dpi=800, bbox_inches='tight')
-
-            # Create patch for the box:
-            rectangle = patches.Rectangle(xy, width, height, fill=False)
-            ax1.add_patch(rectangle)
-
-        fig1.savefig(save_name, dpi=2000)
+    def plot_continuous_raster(self, save_name, cmap, vmax, vmin):
+        raster_np = self.read_raster()
+        fig1, ax1 = plt.subplots(figsize=(6, 8))
+        #norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+        im1 = ax1.imshow(raster_np, cmap=cmap, vmax=vmax, vmin=vmin)
+        fig1.tight_layout()
+        plt.setp(ax1, xticks=[], yticks=[])
+        cbar = ep.colorbar(im1, pad=0.3, size='5%')
+        cbar.ax.tick_params(labelsize=20)
+        fig1.savefig(save_name, dpi=800, bbox_inches='tight')
 
 
 class DataPlotter:

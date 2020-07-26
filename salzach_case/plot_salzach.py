@@ -4,7 +4,7 @@ from matplotlib import cm
 
 current_dir = Path.cwd()
 
-list_rasters = ['vali_Hydro_FT-2D_MAP_2013_clipped',
+'''list_rasters = ['vali_Hydro_FT-2D_MAP_2013_clipped',
                 'vali_aPC_MAP_2013_clipped',
                 'vali_meas_2013_clipped',
                 'vali_hydro_FT_manual_2013_clipped']
@@ -18,13 +18,11 @@ list_colors = ['darkred', 'sienna', 'chocolate', 'sandybrown', 'gold', 'yellow',
 for item in list_rasters:
     rast_path = str(current_dir) + '/rasters/' + item + '.tif'
     raster = plotter.RasterDataPlotter(rast_path)
-    box_savename = str(current_dir) + '/rasters/' + item + '.jpg'
-    path_fig = str(current_dir) + '/rasters/' + item + '_cut2.jpg'
-    raster.plot_raster(path_fig, bounds, list_colors=list_colors, xy=(0, 0), width=120, height=140, box_name=box_savename)
+    #box_savename = str(current_dir) + '/rasters/' + item + '.png'
+    path_fig = str(current_dir) + '/rasters/' + item + '_2gether.png'
+    raster.plot_raster_w_window(path_fig, bounds, list_colors=list_colors, xy=(0, 0), width=120, height=140)'''
 
-
-
-'''list_comparisons = ['vali_surrogate_meas_fuzzynum_n8hd4',
+list_comparisons = ['vali_surrogate_meas_fuzzynum_n8hd4',
                     'vali_hydrostoch_meas_fuzzynum_n8hd4',
                     'vali_hydroman_meas_fuzzynum_n8hd4']
 
@@ -34,6 +32,5 @@ cmap = cm.get_cmap('viridis', 7)
 for item in list_comparisons:
     rast_path = str(current_dir) + '/results/fuzzy_numerical/' + item + '.tif'
     rasterfuzzy = plotter.RasterDataPlotter(rast_path)
-    box_savename = str(current_dir) + '/results/figures/' + item + '.jpg'
-    path_fig = str(current_dir) + '/results/figures/' + item + '_cut2.jpg'
-    rasterfuzzy.plot_comparison_raster(path_fig, bounds, cmap=cmap, xy=(0, 0), width=120, height=140, box_name=box_savename)'''
+    path_fig = str(current_dir) + '/results/figures/' + item + '_2gether.png'
+    rasterfuzzy.plot_raster_w_window(path_fig, bounds, cmap=cmap, xy=(0, 0), width=120, height=140)
