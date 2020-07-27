@@ -60,7 +60,7 @@ class RasterDataPlotter:
 
     def plot_raster(self, save_name, bounds, list_colors=None, cmap=None):
         raster_np = self.read_raster()
-        fig1, ax1 = plt.subplots(figsize=(6, 8))
+        fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
 
         if cmap is None and list_colors is not None:
             cmap = matplotlib.colors.ListedColormap(list_colors)
@@ -69,19 +69,21 @@ class RasterDataPlotter:
         im1 = ax1.imshow(raster_np, cmap=cmap, norm=norm)
         fig1.tight_layout()
         plt.setp(ax1, xticks=[], yticks=[])
+        ax1.axis('off')
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
         fig1.savefig(save_name, dpi=600, bbox_inches='tight')
 
     def plot_continuous_raster(self, save_name, cmap, vmax, vmin):
         raster_np = self.read_raster()
-        fig1, ax1 = plt.subplots(figsize=(6, 8))
+        fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
         #norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
         im1 = ax1.imshow(raster_np, cmap=cmap, vmax=vmax, vmin=vmin)
         fig1.tight_layout()
         plt.setp(ax1, xticks=[], yticks=[])
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
-        cbar.ax.tick_params(labelsize=20)
+        cbar.ax.tick_params(labelsize=15)
+        ax1.axis('off')
         fig1.savefig(save_name, dpi=600, bbox_inches='tight')
 
 
