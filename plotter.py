@@ -34,7 +34,9 @@ class RasterDataPlotter:
         plt.clf()
 
     def plot_raster_w_window(self, save_name, bounds, xy, width, height, list_colors=None, cmap=None):
+        #xy: lower left corner from the lower left corner of the picture
         raster_np = self.read_raster()
+        print('Raster has size: ', raster_np.shape)
         fig, ax = plt.subplots(1, 2, figsize=(10, 8))
         fig.tight_layout()
 
@@ -48,12 +50,13 @@ class RasterDataPlotter:
         plt.setp(ax, xticks=[], yticks=[])
 
         #  Plot Patch
-        box_np = raster_np[xy[0]:xy[0] + height+1, xy[1]:xy[1] + width+1]
+        box_np = raster_np[xy[1]-1: xy[1] + height + 1, xy[0]-1: xy[0] + width+1]
         im = ax[1].imshow(box_np, cmap=cmap, norm=norm)
         #ax[1].axis('off')
         cbar = ep.colorbar(im, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
         fig.savefig(save_name, dpi=800, bbox_inches='tight')
+        plt.show()
 
     def plot_raster(self, save_name, bounds, list_colors=None, cmap=None):
         raster_np = self.read_raster()
@@ -68,7 +71,7 @@ class RasterDataPlotter:
         plt.setp(ax1, xticks=[], yticks=[])
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
-        fig1.savefig(save_name, dpi=800, bbox_inches='tight')
+        fig1.savefig(save_name, dpi=600, bbox_inches='tight')
 
     def plot_continuous_raster(self, save_name, cmap, vmax, vmin):
         raster_np = self.read_raster()
@@ -79,7 +82,7 @@ class RasterDataPlotter:
         plt.setp(ax1, xticks=[], yticks=[])
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
-        fig1.savefig(save_name, dpi=800, bbox_inches='tight')
+        fig1.savefig(save_name, dpi=600, bbox_inches='tight')
 
 
 class DataPlotter:

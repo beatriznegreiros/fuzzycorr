@@ -4,23 +4,24 @@ from matplotlib import cm
 
 current_dir = Path.cwd()
 
-list_rasters = ['diamond_exp_01_norm',
-                'diamond_sim_01_norm',
-                'hexagon_exp_01_norm',
-                'hexagon_sim_01_norm']
+list_rasters = ['diamond_fuzzynum_n4hd2',
+                'hexagon_fuzzynum_n4hd2']
 
 # Bounds for categories
 #bounds = [-3, -2.5, -2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
 #list_colors = ['darkred', 'sienna', 'chocolate', 'sandybrown', 'gold', 'yellow',
 #'greenyellow', 'lime', 'lightseagreen', 'deepskyblue', 'royalblue', 'navy']
 
-cmap = 'jet'
+#cmap = 'jet'
+
+bounds = [0.0, 0.17, 0.34, 0.51, 0.68, 0.85, 1.0]
+list_colors = ['red', 'tomato', 'orange', 'yellow', 'greenyellow', 'lime']
 
 for item in list_rasters:
-    rast_path = str(current_dir) + '/rasters/' + item + '.tif'
+    rast_path = str(current_dir) + '/results/' + item + '.tif'
     raster = plotter.RasterDataPlotter(rast_path)
-    path_fig = str(current_dir) + '/rasters/' + item + '_plot.png'
-    raster.plot_continuous_raster(path_fig, cmap=cmap, vmax=0.1, vmin=0)
+    path_fig = str(current_dir) + '/results/' + item + '_plot.png'
+    raster.plot_raster(path_fig, bounds, list_colors)
 
 '''list_comparisons = ['vali_surrogate_meas_fuzzynum_n8hd4',
                     'vali_hydrostoch_meas_fuzzynum_n8hd4',

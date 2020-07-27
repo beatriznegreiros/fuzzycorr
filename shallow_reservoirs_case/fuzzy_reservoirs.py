@@ -1,26 +1,30 @@
 from pathlib import Path
 import timeit
-import fuzzyrmse as fr
+import fuzzyevaluation as fr
 
 # ------------------------INPUT--------------------------------------
 # Neighborhood definition
-n = 2  # 'radius' of neighborhood
-halving_distance = 1
-comparison_name = "hexagon_comp_fuzzyrmse_testtospeedup"
+n = 4  # 'radius' of neighborhood
+halving_distance = 2
+comparison_name = "diamond_fuzzynum_n4hd2"
 
 # Create directory if not existent
 current_dir = Path.cwd()
 Path(current_dir / "rasters").mkdir(exist_ok=True)
-map_A_in = str(current_dir / "rasters/hexagon_sim_01_norm.tif")
-map_B_in = str(current_dir / "rasters/hexagon_exp_01_norm.tif")
+map_A_in = str(current_dir / "rasters/diamond_sim_01_norm.tif")
+map_B_in = str(current_dir / "rasters/diamond_exp_01_norm.tif")
+
+# Save directory
+Path(current_dir / "results").mkdir(exist_ok=True)
+save_dir = str(current_dir/'results')
 # ------------------------------------------------------------------
 
 # Start run time count
 start = timeit.default_timer()
 
 # Perform fuzzy comparison
-compareAB = fr.FuzzyComparison(map_A_in, map_B_in, current_dir, n, halving_distance)
-global_simil = compareAB.fuzzy_error(comparison_name)
+compareAB = fr.FuzzyComparison(map_A_in, map_B_in, n, halving_distance)
+global_simil = compareAB.fuzzy_numerical(comparison_name, save_dir=save_dir)
 
 # Print global similarity
 print('Fuzzy error [-]:', global_simil)

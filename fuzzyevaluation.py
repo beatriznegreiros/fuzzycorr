@@ -96,6 +96,7 @@ class FuzzyComparison:
     def fuzzy_numerical(self, comparison_name, save_dir, map_of_comparison=True):
         """ Compares a pair of raster maps using fuzzy numerical spatial comparison
 
+        :param save_dir: Directory where to save the results
         :param comparison_name: string, name of the comparison
         :param map_of_comparison: boolean, create map of comparison in the project directory if True
         :return: overall performance index
