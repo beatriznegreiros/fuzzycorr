@@ -20,9 +20,10 @@ class RasterDataPlotter:
         return raster_np
 
     def make_hist(self, legendx, legendy, fontsize, outputpath):
+
         plt.rcParams.update({'font.size': fontsize})
         raster_np = self.read_raster()
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8, 4))
         ax.hist(raster_np[~raster_np.mask], bins=60)
         np.savetxt('trial.csv', raster_np[~raster_np.mask], delimiter=',')
         plt.xlabel(legendx)
