@@ -19,7 +19,7 @@ class RasterDataPlotter:
             raster_np = src.read(1, masked=True)
         return raster_np
 
-    def make_hist(self, legendx, legendy, title, fontsize, outputpath):
+    def make_hist(self, legendx, legendy, fontsize, outputpath):
         plt.rcParams.update({'font.size': fontsize})
         raster_np = self.read_raster()
         fig, ax = plt.subplots()
@@ -50,13 +50,12 @@ class RasterDataPlotter:
         plt.setp(ax, xticks=[], yticks=[])
 
         #  Plot Patch
-        box_np = raster_np[xy[1]-1: xy[1] + height + 1, xy[0]-1: xy[0] + width+1]
+        box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
         im = ax[1].imshow(box_np, cmap=cmap, norm=norm)
-        #ax[1].axis('off')
+        ax[1].axis('off')
         cbar = ep.colorbar(im, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
         fig.savefig(save_name, dpi=800, bbox_inches='tight')
-        plt.show()
 
     def plot_raster(self, save_name, bounds, list_colors=None, cmap=None):
         raster_np = self.read_raster()
