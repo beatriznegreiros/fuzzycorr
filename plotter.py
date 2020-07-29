@@ -68,8 +68,9 @@ class RasterDataPlotter:
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
         im1 = ax1.imshow(raster_np, cmap=cmap, norm=norm)
         fig1.tight_layout()
-        plt.setp(ax1, xticks=[], yticks=[])
-        ax1.axis('off')
+        #plt.setp(ax1, xticks=[], yticks=[])
+        #ax1.axis('off')
+
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
         fig1.savefig(save_name, dpi=600, bbox_inches='tight')
