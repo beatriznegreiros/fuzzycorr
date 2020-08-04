@@ -1,0 +1,10 @@
+Fuzzy numerical spatial comparison 
+
+Compared maps: 
+C:\Users\Negreiros\valitools\shallow_reservoirs_case\rasters\diamond_sim_01_cubic.tif
+C:\Users\Negreiros\valitools\shallow_reservoirs_case\rasters\diamond_exp_01_cubic.tif
+
+Halving distance: 1 cells  
+Neighbourhood: 2 cells  
+
+Average fuzzy similarity: 0.9080

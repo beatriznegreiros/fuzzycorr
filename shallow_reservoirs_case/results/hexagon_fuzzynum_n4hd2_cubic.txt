@@ -1,0 +1,10 @@
+Fuzzy numerical spatial comparison 
+
+Compared maps: 
+C:\Users\Negreiros\valitools\shallow_reservoirs_case\rasters\hexagon\continuous_cubic\hexagon_sim_01_cubic.tif
+C:\Users\Negreiros\valitools\shallow_reservoirs_case\rasters\hexagon\continuous_cubic\hexagon_exp_01_cubic.tif
+
+Halving distance: 2 cells  
+Neighbourhood: 4 cells  
+
+Average fuzzy similarity: 0.8947
