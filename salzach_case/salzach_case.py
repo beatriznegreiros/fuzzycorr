@@ -13,7 +13,7 @@ list_files = ['vali_aPC_MAP_2013',
 
 # Parameters
 attribute = 'dz'
-interpol_method = 'cubic'
+interpol_method = 'linear'
 
 # Polygon of area of interest
 polyname = 'polygon_salzach'
