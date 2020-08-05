@@ -12,14 +12,14 @@ d = 0.00013  # in m
 n_classes = 6
 
 # Measured Data:
-raster_A = "hexagon_exp_005_norm"
+raster_A = "diamond_exp_01_norm"
 
 # Simulated Data:
-raster_B = "hexagon_sim_005_norm"
+raster_B = "diamond_sim_01_norm"
 
 # Selected output names for the classified rasters
-name_A = "hexagon_exp_005_class"
-name_B = "hexagon_sim_005_class"
+name_A = "diamond_exp_01_class"
+name_B = "diamond_sim_01_class"
 # --------------------------------------------------------------------
 
 dir = Path.cwd()
@@ -33,23 +33,15 @@ if '.' not in raster_B[-4:]:
     raster_B += '.tif'
 map_B_in = str(dir / "rasters/") + "/" + raster_B
 
-# Classification based on d84
-# Bins to classify the data Legend: HE (High Erosion), HIE (High Intermediate Erosion), IE (Intermediate Erosion),
-# LIE (Low Intermediate Erosion), LE (Low Erosion), Static,  LD (Low Deposition), LID (Low Intermediate Deposition),
-# ID (Intermediate Deposition), HID (High Intermediate Deposition), HD (High Deposition).
-#class_bins = [-100 * d, 50 * d, 100 * d, 200 * d, 500 * d, np.iinfo(np.int32).max]
-
-
 # Import raster as np array
-array_A = mo.MapArray(name_A, map_A_in)
-array_B = mo.MapArray(name_B, map_B_in)
+array_A = mo.MapArray(map_A_in)
+array_B = mo.MapArray(map_B_in)
 
 # Classify the array and save the output file as .tif raster
 nb_classes = array_A.nb_classes(n_classes)  # Extract the optimized intervals for the map A
 
-array_A.categorize_raster(nb_classes, dir)
-array_B.categorize_raster(nb_classes, dir)
-
+array_A.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + name_A + '.tif')
+array_B.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + name_B + '.tif')
 
 '''# Plot the histogram of maps and the breaks division
 #  Map of Measured values

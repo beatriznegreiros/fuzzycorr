@@ -20,19 +20,18 @@ list_files = ['vali_Hydro_FT-2D_MAP_2013_clipped',
 dir = Path.cwd()
 Path(dir / "rasters").mkdir(exist_ok=True)
 
-# Classification based on d84
-# Bins to classify the data Legend: HE (High Erosion), HIE (High Intermediate Erosion), IE (Intermediate Erosion),
-# LIE (Low Intermediate Erosion), LE (Low Erosion), Static,  LD (Low Deposition), LID (Low Intermediate Deposition),
-# ID (Intermediate Deposition), HID (High Intermediate Deposition), HD (High Deposition).
-# class_bins = [-100 * d, 50 * d, 100 * d, 200 * d, 500 * d, np.iinfo(np.int32).max]
 
 raster_meas = mo.MapArray(str(dir/'rasters') + '/' + 'vali_meas_2013_clipped.tif')
 nb_classes = raster_meas.nb_classes(12)
-raster_meas.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + 'vali_meas_2013_clipped_class_nbreaks.tif')
+#raster_meas.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + 'vali_meas_2013_clipped_class_nbreaks.tif')
+plt.hlines(1, -3, 3)
+plt.eventplot(nb_classes[1::], orientation='horizontal')
+plt.axis('off')
+plt.show()
 
-# Classify the array and save the output file as .tif raster
+'''# Classify the array and save the output file as .tif raster
 for file in list_files:
     array_ = mo.MapArray(str(dir/'rasters') + '/' + file + '.tif')
     map_output = (str(dir/'rasters') + '/' + file + '_class_nbreaks.tif')
-    array_.categorize_raster(nb_classes, map_output)
+    array_.categorize_raster(nb_classes, map_output)'''
 

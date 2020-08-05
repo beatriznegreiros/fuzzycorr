@@ -87,6 +87,23 @@ class RasterDataPlotter:
         ax1.axis('off')
         fig1.savefig(save_name, dpi=600, bbox_inches='tight')
 
+    def plot_categorical_raster(self, save_name, legend, xy, width, height):
+        raster_np = self.read_raster()
+        print('Raster has size: ', raster_np.shape)
+        fig, ax = plt.subplots(1, 2, figsize=(10, 8))
+        im = ax[0].imshow(raster_np)
+        fig.tight_layout()
+        rectangle = patches.Rectangle(xy, width, height, fill=False)
+        ax[0].add_patch(rectangle)
+        plt.setp(ax, xticks=[], yticks=[])
+
+        #  Plot Patch
+        box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
+        im = ax[1].imshow(box_np)
+        #ax[1].axis('off')
+        ep.draw_legend(im, titles=legend)
+        fig.savefig(save_name, dpi=800, bbox_inches='tight')
+
 
 class DataPlotter:
     def __init__(self, path_textfile, hist_title, variable):
