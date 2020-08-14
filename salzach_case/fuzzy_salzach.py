@@ -4,20 +4,20 @@ import fuzzyevaluation as fuzz
 
 # ------------------------INPUT--------------------------------------
 # Neighborhood definition
-n = 2  # 'radius' of neighborhood
+n = 8  # 'radius' of neighborhood
 halving_distance = 4
 
 # Output map and textfile
 current_dir = Path.cwd()
 Path(current_dir / "results/fuzzy_numerical").mkdir(exist_ok=True)  # create dir if not existent
-save_dir = str(current_dir / "results/fuzzy_numerical/surrogate_vs_hydrostoch")
+save_dir = str(current_dir / "results/fuzzy_numerical/n8hd4")
 
-comparison_name = "vali_surrogate_hydrostoch_fuzzynum_n2hd4"  # filename for the results (.txt) and comparison map (
+comparison_name = "testttt"  # filename for the results (.txt) and comparison map (
 # .tif)
 
 # Maps to compare
 map_A_in = str(current_dir / "rasters/vali_Hydro_FT-2D_MAP_2013_clipped.tif")
-map_B_in = str(current_dir / "rasters/vali_aPC_MAP_2013_clipped.tif")
+map_B_in = str(current_dir / "rasters/vali_meas_2013_clipped.tif")
 # ------------------------------------------------------------------
 
 # Start run time count

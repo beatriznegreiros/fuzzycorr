@@ -33,6 +33,7 @@ class FuzzyComparison:
             raster_np = src.read(1, masked=True)
             nodatavalue = src.nodata  # storing nodatavalue of raster
             meta = src.meta.copy()
+            print('Number of active cells (non-masked) of raster ', raster, ': ', np.ma.count(raster_np))
         return raster_np, nodatavalue, meta, meta['crs'], meta['dtype']
 
     def jaccard(self, a, b):

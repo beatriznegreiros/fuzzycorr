@@ -6,13 +6,13 @@ import fuzzyevaluation as fr
 # Neighborhood definition
 n = 4  # 'radius' of neighborhood
 halving_distance = 2
-comparison_name = "hexagon_fuzzynum_n4hd2_cubic"
+comparison_name = "testtt"
 
 # Create directory if not existent
 current_dir = Path.cwd()
 Path(current_dir / "rasters").mkdir(exist_ok=True)
-map_A_in = str(current_dir / "rasters/hexagon/continuous_cubic/hexagon_sim_01_cubic.tif")
-map_B_in = str(current_dir / "rasters/hexagon/continuous_cubic/hexagon_exp_01_cubic.tif")
+map_A_in = str(current_dir / "rasters/diamond_sim_01_norm.tif")
+map_B_in = str(current_dir / "rasters/diamond_exp_01_norm.tif")
 
 # Save directory
 Path(current_dir / "results").mkdir(exist_ok=True)

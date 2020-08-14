@@ -231,6 +231,9 @@ class MapArray:
         class_bins = breaks.bins.tolist()
         return class_bins
 
+    # todo:
+    # def equal_intervals(self, n_classes):
+
     def categorize_raster(self, class_bins, map_out, save_ascii=True):
         """ Classifies the raster according to the classification bins
         :param project_dir: path of the project directory
