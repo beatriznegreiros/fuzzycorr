@@ -1,0 +1,10 @@
+Fuzzy numerical spatial comparison 
+
+Compared maps: 
+C:\Users\Negreiros\valitools\salzach_case\rasters\vali_aPC_MAP_2013_clipped.tif
+C:\Users\Negreiros\valitools\salzach_case\rasters\vali_meas_2013_clipped.tif
+
+Halving distance: 4 cells  
+Neighbourhood: 4 cells  
+
+Average fuzzy similarity: 0.3283
