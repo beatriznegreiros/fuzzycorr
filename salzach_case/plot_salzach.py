@@ -20,9 +20,9 @@ legendy = 'Frequency'
                 'vali_meas_2013_clipped_class_nbreaks',
                 'vali_hydro_FT_manual_2013_clipped_class_nbreaks']'''
 
-list_rasters = ['vali_hydroman_meas_fuzzykappa',
-                'vali_hydrostoch_meas_fuzzykappa',
-                'vali_surrogate_meas_fuzzykappa'
+list_rasters = ['vali_hydroman_meas_fuzzykappa_n8hd4',
+                'vali_hydrostoch_meas_fuzzykappa_n8hd4',
+                'vali_surrogate_meas_fuzzykappa_n8hd4'
                 ]
 
 
