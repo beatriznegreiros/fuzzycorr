@@ -16,7 +16,7 @@ except:
 
 
 class SpatialField:
-    def __init__(self, name_dataset, pd, attribute, crs, project_dir, nodatavalue, res=None, ulc=(np.nan, np.nan),
+    def __init__(self, name_dataset, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
         self.pd = pd
         if not isinstance(name_dataset, str):
@@ -24,10 +24,6 @@ class SpatialField:
         if not isinstance(attribute, str):
             print("ERROR: attribute must be a string, check the name on your textfile")
         self.name = name_dataset
-        self.project_dir = project_dir
-        self.raster = str(project_dir / "rasters") + "/" + self.name + ".tif"
-        self.normraster = str(project_dir / "rasters") + "/" + self.name + "_norm.tif"
-        self.norm_ascii = str(project_dir / "rasters") + "/" + self.name + "_norm.asc"
         self.crs = CRS(crs)
         self.attribute = attribute
         self.nodatavalue = nodatavalue
