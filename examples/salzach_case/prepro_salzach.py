@@ -20,7 +20,7 @@ polyname = 'polygon_salzach'
 
 #  Raster Resolution: Change as appropriate
 #  NOTE: Fuzzy Analysis has unique resolution
-res = 20
+res = 10
 
 # Projection
 crs = 'EPSG:4326'
@@ -42,19 +42,18 @@ poly_path = str(current_dir / 'shapefiles') + '/' + polyname + '.shp'
 for file in list_files:
     # Path management
     path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
-    name_file = file + '_res' + str(res)
-    raster_file = str(current_dir / 'rasters') + '/' + file + '_res20.tif'
+    raster_out = str(current_dir / 'rasters') + '/' + file + '_res10_linear.tif'
 
     # Instanciating object of SpatialField
-    map_file = mo.SpatialField(name_file, pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
+    map_file = mo.SpatialField(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
 
     # Normalize points to a grid-ed array
     array_ = map_file.norm_array(method=interpol_method)
 
     # Write raster
-    map_file.array2raster(array_, raster_file, save_ascii=False)
+    map_file.array2raster(array_, raster_out, save_ascii=False)
 
     # Clip raster
-    clip_raster = str(current_dir / 'rasters') + '/' + file + '_res20_clipped' + '.tif'
+    clip_raster = str(current_dir / 'rasters') + '/' + file + '_res10_clipped_linear' + '.tif'
     #  map_file.create_polygon(poly_path, alpha=0.01)
-    map_file.clip_raster(poly_path, raster_file, clip_raster)
+    map_file.clip_raster(poly_path, raster_out, clip_raster)

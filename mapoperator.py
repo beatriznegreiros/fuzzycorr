@@ -16,14 +16,11 @@ except:
 
 
 class SpatialField:
-    def __init__(self, name_dataset, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
+    def __init__(self, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
         self.pd = pd
-        if not isinstance(name_dataset, str):
-            print("ERROR: name_dataset must be a string")
         if not isinstance(attribute, str):
             print("ERROR: attribute must be a string, check the name on your textfile")
-        self.name = name_dataset
         self.crs = CRS(crs)
         self.attribute = attribute
         self.nodatavalue = nodatavalue
@@ -86,7 +83,7 @@ class SpatialField:
     def norm_array(self, method='linear'):
         """ Normalizes the raw data in equally sparsed points depending on the selected resolution
         :return: interpolated and normalized array with selected resolution
-        https://github.com/rosskush/skspatial
+        see more at https://github.com/rosskush/skspatial
         """
         array = self.points_to_grid()
         x = np.arange(0, self.ncol)
@@ -105,24 +102,26 @@ class SpatialField:
 
         return out_array
 
-    def shape(self):
-        self.shapefile = str(self.project_dir / 'shapefiles') + "/" + self.name + ".shp"
-        self.gdf.to_file(self.shapefile)
-
-    def plain_raster(self, res):
-        """ Converts raw data to shapefile(.shp) and rasters(.tif) without normalizing
+    def plain_raster(self, shapefile, raster_file, res):
+        """ Converts shapefile(.shp) to rasters(.tif) without normalizing
+        :param shapefile: string, filename with path of the input shapefile (*.shp)
+        :param raster_file: stirng, filename with path of the output raster (*.tif)
         :param res: float, resolution of the cell
         :return: no output, saves the raster in the default directory
         """
-        self.shape()
-        source_ds = ogr.Open(self.shapefile)
+        if '.' not in shapefile[-4:]:
+            shapefile += '.shp'
+
+        if '.' not in raster_file[-4:]:
+            raster_file += '.tif'
+        source_ds = ogr.Open(shapefile)
         source_layer = source_ds.GetLayer()
         x_min, x_max, y_min, y_max = source_layer.GetExtent()
 
         # Create Target - TIFF
         cols = int((x_max - x_min) / res)
         rows = int((y_max - y_min) / res)
-        _raster = gdal.GetDriverByName('GTiff').Create(self.raster, cols, rows, 1, gdal.GDT_Float32)
+        _raster = gdal.GetDriverByName('GTiff').Create(raster_file, cols, rows, 1, gdal.GDT_Float32)
         _raster.SetGeoTransform((x_min, res, 0, y_max, 0, res))
         _band = _raster.GetRasterBand(1)
         _band.SetNoDataValue(self.nodatavalue)
@@ -130,20 +129,17 @@ class SpatialField:
         # Rasterize
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
-    def array2raster(self, array, path, save_ascii=True):
+    def array2raster(self, array, raster_file, save_ascii=True):
         """ Saves a raster using interpolation
-        :param save_ascii:
-        :param res: float, resolution of the cell
-        :param ulc: tuple, upper left corner
-        :param lrc: tuple, lower right corner
-        :param method: interpolation method {‘linear’, ‘nearest’, ‘cubic’}, more info at: https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
-        :return: no output, saves the raster in the default directory
+        :param raster_file: string, path to save the rasterfile
+        :param save_ascii: boolean, true to save also an ascii raster
+        :return: no output, saves the raster with the selected filename
         """
-        if '.' not in path[-4:]:
-            path += '.tif'
+        if '.' not in raster_file[-4:]:
+            raster_file += '.tif'
 
         self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
-        new_dataset = rio.open(path, 'w', driver='GTiff',
+        new_dataset = rio.open(raster_file, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
                                crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
         print(np.shape(array))
@@ -151,8 +147,8 @@ class SpatialField:
         new_dataset.close()
 
         if save_ascii:
-            map_asc = str(Path(path[0:-4] + '.asc'))
-            gdal.Translate(map_asc, path, format='AAIGrid')
+            map_asc = str(Path(raster_file[0:-4] + '.asc'))
+            gdal.Translate(map_asc, raster_file, format='AAIGrid')
 
         return new_dataset
 
@@ -187,6 +183,11 @@ class SpatialField:
         return krige_array
 
     def create_polygon(self, shape_polygon, alpha=np.nan):
+        """ Creates a polygon surrounding a cloud of shapepoints
+        :param shape_polygon: string, path to save the shapefile
+        :param alpha: float, excentricity of the alphashape (polygon) to be created
+        :return: no output, saves the polygon (*.shp) with the selected filename
+        """
         if np.isfinite(alpha):
             try:
                 polygon = alphashape.alphashape(self.gdf, alpha)
@@ -202,6 +203,12 @@ class SpatialField:
                 polygon.to_file(shape_polygon)
 
     def clip_raster(self, polygon, in_raster, out_raster):
+        """ Clips a raster based on the given polygon
+            :param polygon: string, file with path of the polygon (*.shp)
+            :param in_raster: string, file and path of the input raster (*.tif)
+            :param in_raster: string, file and path of the output raster (*.tif)
+            :return: no output, saves the raster (*.tif) with the selected filename
+        """
 
         gdal.Warp(out_raster, in_raster, cutlineDSName=polygon)
 
