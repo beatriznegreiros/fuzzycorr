@@ -114,7 +114,7 @@ class DataPlotter:
         lon, lat, attribute = file[:, 0], file[:, 1], file[:, 2]
 
         # Printing histograms of the map
-        plt.hist(attribute, bins=50, density=True)
+        _ = plt.hist(attribute, bins=50, density=True)
         #plt.title()
         plt.grid(True)
         plt.xlabel(legendx)
