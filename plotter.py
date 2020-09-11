@@ -19,12 +19,18 @@ class RasterDataPlotter:
             raster_np = src.read(1, masked=True)
         return raster_np
 
-    def make_hist(self, legendx, legendy, fontsize, outputpath):
+    def make_hist(self, legendx, legendy, fontsize, outputpath, figsize, set_ylim=None, set_xlim=None):
 
         plt.rcParams.update({'font.size': fontsize})
         raster_np = self.read_raster()
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=figsize)
         ax.hist(raster_np[~raster_np.mask], bins=60)
+
+        if set_ylim is not None:
+            ax.set_ylim(set_ylim)
+        if set_xlim is not None:
+            ax.set_xlim(set_xlim)
+
         np.savetxt('trial.csv', raster_np[~raster_np.mask], delimiter=',')
         plt.xlabel(legendx)
         plt.ylabel(legendy)

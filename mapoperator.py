@@ -12,7 +12,8 @@ try:
     from scipy import interpolate
     from pykrige.ok import OrdinaryKriging
 except:
-    print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
+    print(
+        'ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
 
 
 class SpatialField:
@@ -182,6 +183,31 @@ class SpatialField:
 
         return krige_array
 
+# TODO: finish rbf inteprolant
+    def rbf_norm_array(self, method):
+        print(self.x)
+        print(np.shape(self.x), np.shape(self.y), np.shape(self.z))
+        print(np.random.rand(100)*4.0-2.0)
+        rbfi = interpolate.Rbf(x=np.array(self.x), y=np.array(self.y), z=np.array(self.z), function=method)
+
+        array = self.points_to_grid()
+
+        x = np.arange(0, self.ncol)
+        y = np.arange(0, self.nrow)
+
+        # mask invalid values
+        array = np.ma.masked_invalid(array)
+        xx, yy = np.meshgrid(x, y)
+
+        # get only the valid values
+        x1 = xx[~array.mask]
+        y1 = yy[~array.mask]
+        #newarr = array[~array.mask]
+
+        out_array = rbfi(x1, y1)
+
+        return out_array
+
     def create_polygon(self, shape_polygon, alpha=np.nan):
         """ Creates a polygon surrounding a cloud of shapepoints
         :param shape_polygon: string, path to save the shapefile
@@ -233,9 +259,6 @@ class MapArray:
         print('The bins were optimized to:', breaks.bins)
         class_bins = breaks.bins.tolist()
         return class_bins
-
-    # todo:
-    # def equal_intervals(self, n_classes):
 
     def categorize_raster(self, class_bins, map_out, save_ascii=True):
         """ Classifies the raster according to the classification bins
