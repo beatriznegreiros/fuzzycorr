@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import genfromtxt
-from pathlib import Path
 import rasterio as rio
 import earthpy.plot as ep
 import matplotlib.patches as patches
 from matplotlib import colors
 import matplotlib
 import matplotlib.transforms
+import scipy.stats
 
 
 class RasterDataPlotter:
@@ -19,12 +19,22 @@ class RasterDataPlotter:
             raster_np = src.read(1, masked=True)
         return raster_np
 
-    def make_hist(self, legendx, legendy, fontsize, outputpath, figsize, set_ylim=None, set_xlim=None):
-
+    def make_hist(self, legendx, legendy, fontsize, output_file, figsize, set_ylim=None, set_xlim=None):
+        """
+        Create a histogram of numerical raster
+        :param legendx: string, legend of the x axis of he histogram
+        :param legendy: string, legend of the y axis of he histogram
+        :param fontsize: integer, size of the font
+        :param output_file: string, path for the output file
+        :param figsize: tuple of integers, size of the width x height of the figure
+        :param set_ylim: float, set the maximum limit of the y axis
+        :param set_ylim: float, set the maximum limit of the x axis
+        :output: saves the figure of the histogram
+        """
         plt.rcParams.update({'font.size': fontsize})
         raster_np = self.read_raster()
         fig, ax = plt.subplots(figsize=figsize)
-        ax.hist(raster_np[~raster_np.mask], bins=60)
+        _, bins, _ = ax.hist(raster_np[~raster_np.mask], bins=60)
 
         if set_ylim is not None:
             ax.set_ylim(set_ylim)
@@ -37,10 +47,27 @@ class RasterDataPlotter:
         # plt.title(title)
         plt.grid(True)
         plt.subplots_adjust(left=0.17, bottom=0.15)
-        plt.savefig(outputpath, dpi=600)
+
+        # Plot line with data mean (Sfuzzy)
+        plt.axvline(raster_np.mean(), color='k', linestyle='dashed', linewidth=1)
+        min_ylim, max_ylim = plt.ylim()
+        plt.text(raster_np.mean() * 1.1, max_ylim * 0.9, 'Sfuzzy: {:.4f}'.format(raster_np.mean()))
+
+        # Save fig
+        plt.savefig(output_file, dpi=300)
         plt.clf()
 
-    def plot_raster_w_window(self, save_name, bounds, xy, width, height, list_colors=None, cmap=None):
+    def plot_raster_w_window(self, output_file, xy, width, height, bounds, cmap=None, list_colors=None):
+        """
+        Create a figure of a raster with a zoomed window
+        :param output_file: path, file path of the figure
+        :param xy: tuple (x,y), origin of the zoomed window, the upper left corner
+        :param width: integer, width (number of cells) of the zoomed window
+        :param height: integer, height (number of cells) of the zoomed window
+        :param cmap: string, colormap to plot the raster
+        :param list_colors: list of colors (str), as alternative to using a colormap
+        :output: saves the figure of the raster
+        """
         #xy: lower left corner from the lower left corner of the picture
         raster_np = self.read_raster()
         print('Raster has size: ', raster_np.shape)
@@ -49,8 +76,8 @@ class RasterDataPlotter:
 
         if cmap is None and list_colors is not None:
             cmap = matplotlib.colors.ListedColormap(list_colors)
-
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+
         ax[0].imshow(raster_np, cmap=cmap, norm=norm)
         rectangle = patches.Rectangle(xy, width, height, fill=False)
         ax[0].add_patch(rectangle)
@@ -59,12 +86,13 @@ class RasterDataPlotter:
         #  Plot Patch
         box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
         im = ax[1].imshow(box_np, cmap=cmap, norm=norm)
-        ax[1].axis('off')
+        #ax[1].axis('off')
         cbar = ep.colorbar(im, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
-        fig.savefig(save_name, dpi=800, bbox_inches='tight')
 
-    def plot_raster(self, save_name, bounds, list_colors=None, cmap=None):
+        fig.savefig(output_file, dpi=600, bbox_inches='tight')
+
+    def plot_raster(self, output_file, bounds, list_colors=None, cmap=None):
         raster_np = self.read_raster()
         fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
 
@@ -79,9 +107,9 @@ class RasterDataPlotter:
 
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
-        fig1.savefig(save_name, dpi=600, bbox_inches='tight')
+        fig1.savefig(output_file, dpi=300, bbox_inches='tight')
 
-    def plot_continuous_raster(self, save_name, cmap, vmax, vmin):
+    def plot_continuous_raster(self, output_file, cmap, vmax, vmin):
         raster_np = self.read_raster()
         fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
         #norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
@@ -91,9 +119,9 @@ class RasterDataPlotter:
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=15)
         ax1.axis('off')
-        fig1.savefig(save_name, dpi=600, bbox_inches='tight')
+        fig1.savefig(output_file, dpi=300, bbox_inches='tight')
 
-    def plot_categorical_raster(self, save_name, legend, xy, width, height):
+    def plot_categorical_raster(self, output_file, legend, xy, width, height):
         raster_np = self.read_raster()
         print('Raster has size: ', raster_np.shape)
         fig, ax = plt.subplots(1, 2, figsize=(10, 8))
@@ -108,14 +136,14 @@ class RasterDataPlotter:
         im = ax[1].imshow(box_np)
         #ax[1].axis('off')
         ep.draw_legend(im, titles=legend)
-        fig.savefig(save_name, dpi=800, bbox_inches='tight')
+        fig.savefig(output_file, dpi=300, bbox_inches='tight')
 
 
 class DataPlotter:
     def __init__(self, path_textfile):
         self.textfile = path_textfile
 
-    def make_hist(self, legendx, legendy, outputpath):
+    def make_hist(self, legendx, legendy, output_file):
         file = genfromtxt(self.textfile, delimiter=',', skip_header=1)
         lon, lat, attribute = file[:, 0], file[:, 1], file[:, 2]
 
@@ -125,6 +153,6 @@ class DataPlotter:
         plt.grid(True)
         plt.xlabel(legendx)
         plt.ylabel(legendy)
-        plt.savefig(outputpath, dpi=600)
+        plt.savefig(output_file, dpi=300)
         plt.clf()
 
