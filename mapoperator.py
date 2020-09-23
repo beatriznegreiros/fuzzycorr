@@ -255,10 +255,12 @@ class MapArray:
             :return: list, optimized bins
         """
         # Classification based on Natural Breaks
-        breaks = mc.NaturalBreaks(self.array.ravel(), k=n_classes + 1)
-        print('The bins were optimized to:', breaks.bins)
-        class_bins = breaks.bins.tolist()
-        return class_bins
+        array_values = self.array[~self.array.mask].ravel()
+        breaks = mc.NaturalBreaks(array_values, k=n_classes)
+        print('The bins were optimized to:', breaks.bins)  # bins being [], (], (]....(] always including the right
+        print('Number of counts for each class, respectively:', breaks.counts)
+        print('max: ', array_values.max(), 'min: ', array_values.min())
+        return breaks.bins
 
     def categorize_raster(self, class_bins, map_out, save_ascii=True):
         """ Classifies the raster according to the classification bins
@@ -267,16 +269,26 @@ class MapArray:
         :return: no return, saves the classified raster in the chosen directory
         """
         # Classify the original image array (digitize makes nodatavalues take the class 0)
-        raster_class = np.digitize(self.array, class_bins, right=True)
+        raster_fi = np.ma.filled(self.array, fill_value=-np.inf)
+        class_bins[-1] = np.inf
+        class_bins = np.insert(class_bins, 0, -np.inf, axis=0)
+        print(class_bins)
 
+        raster_class = np.digitize(raster_fi, class_bins, right=True)  # bins[i-1] < array <= bins[i]
+
+        with np.printoptions(threshold=np.inf):
+            print(raster_class)
         # Assigns nodatavalues back to array
         raster_ma = np.ma.masked_where(raster_class == 0,
                                        raster_class,
                                        copy=True)
+        with np.printoptions(threshold=np.inf):
+            print(raster_ma)
 
         # Fill nodatavalues into array
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)
-
+        #raster_ma_fi = np.ma.filled(raster_class, fill_value=self.nodatavalue)
+        
         if raster_ma_fi.min() == self.nodatavalue:
             with rio.open(map_out, 'w', **self.meta) as outf:
                 outf.write(raster_ma_fi.astype(rio.float64), 1)

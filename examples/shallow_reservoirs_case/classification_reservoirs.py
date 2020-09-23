@@ -8,7 +8,7 @@ except:
     print('ModuleNotFoundError: Missing fundamental packages (required: pathlib, numpy, gdal).')
 
 # ---------------------INPUT------------------------------------------
-d = 0.00013  # in m d90
+#d = 0.00013  # in m d90
 n_classes = 6
 
 # Measured Data:
