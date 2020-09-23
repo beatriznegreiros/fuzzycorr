@@ -64,8 +64,9 @@ class RasterDataPlotter:
         :param xy: tuple (x,y), origin of the zoomed window, the upper left corner
         :param width: integer, width (number of cells) of the zoomed window
         :param height: integer, height (number of cells) of the zoomed window
-        :param cmap: string, colormap to plot the raster
-        :param list_colors: list of colors (str), as alternative to using a colormap
+        :param bounds: list of float, limits for each color of the colormap
+        :kwarg cmap: string, colormap to plot the raster
+        :kwarg list_colors: list of colors (str), as alternative to using a colormap
         :output: saves the figure of the raster
         """
         #xy: lower left corner from the lower left corner of the picture
