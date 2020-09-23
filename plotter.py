@@ -57,7 +57,7 @@ class RasterDataPlotter:
         plt.savefig(output_file, dpi=300)
         plt.clf()
 
-    def plot_raster_w_window(self, output_file, xy, width, height, bounds, cmap=None, list_colors=None):
+    def plot_raster_w_window(self, output_file, xy, width, height, bounds, **kwargs):
         """
         Create a figure of a raster with a zoomed window
         :param output_file: path, file path of the figure
@@ -74,10 +74,15 @@ class RasterDataPlotter:
         fig, ax = plt.subplots(1, 2, figsize=(10, 8))
         fig.tight_layout()
 
-        if cmap is None and list_colors is not None:
-            cmap = matplotlib.colors.ListedColormap(list_colors)
-        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+        # Creates a colormap based on the given list_colors, if the cmap is not given
+        if kwargs['cmap'] is None and kwargs['list_colors'] is not None:
+            cmap = matplotlib.colors.ListedColormap(kwargs['list_colors'])
+        elif kwargs['cmap'] is not None:
+            cmap = kwargs['cmap']
+        else:
+            print('Error: Insuficient number of arguments')
 
+        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
         ax[0].imshow(raster_np, cmap=cmap, norm=norm)
         rectangle = patches.Rectangle(xy, width, height, fill=False)
         ax[0].add_patch(rectangle)
