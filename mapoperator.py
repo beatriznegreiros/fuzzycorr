@@ -276,14 +276,10 @@ class MapArray:
 
         raster_class = np.digitize(raster_fi, class_bins, right=True)  # bins[i-1] < array <= bins[i]
 
-        with np.printoptions(threshold=np.inf):
-            print(raster_class)
         # Assigns nodatavalues back to array
         raster_ma = np.ma.masked_where(raster_class == 0,
                                        raster_class,
                                        copy=True)
-        with np.printoptions(threshold=np.inf):
-            print(raster_ma)
 
         # Fill nodatavalues into array
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)

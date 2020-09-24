@@ -104,7 +104,6 @@ class RasterDataPlotter:
 
         if cmap is None and list_colors is not None:
             cmap = matplotlib.colors.ListedColormap(list_colors)
-
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
         im1 = ax1.imshow(raster_np, cmap=cmap, norm=norm)
         fig1.tight_layout()
@@ -127,22 +126,17 @@ class RasterDataPlotter:
         ax1.axis('off')
         fig1.savefig(output_file, dpi=300, bbox_inches='tight')
 
-    def plot_categorical_raster(self, output_file, legend, xy, width, height):
+    def plot_categorical_raster(self, output_file, labels, cmap):
         raster_np = self.read_raster()
-        print('Raster has size: ', raster_np.shape)
-        fig, ax = plt.subplots(1, 2, figsize=(10, 8))
-        im = ax[0].imshow(raster_np)
-        fig.tight_layout()
-        rectangle = patches.Rectangle(xy, width, height, fill=False)
-        ax[0].add_patch(rectangle)
-        plt.setp(ax, xticks=[], yticks=[])
-
-        #  Plot Patch
-        box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
-        im = ax[1].imshow(box_np)
-        #ax[1].axis('off')
-        ep.draw_legend(im, titles=legend)
+        print('Classes identified in the raster: ', np.unique(raster_np))
+        #cmap = matplotlib.colors.ListedColormap(list_colors)
+        fig, ax = plt.subplots()
+        im = ax.imshow(raster_np, cmap=cmap)
+        ep.draw_legend(im, titles=labels)
+        ax.set_axis_off()
+        plt.show()
         fig.savefig(output_file, dpi=300, bbox_inches='tight')
+
 
 
 class DataPlotter:
