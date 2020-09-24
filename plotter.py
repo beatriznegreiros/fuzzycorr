@@ -51,7 +51,7 @@ class RasterDataPlotter:
         # Plot line with data mean (Sfuzzy)
         plt.axvline(raster_np.mean(), color='k', linestyle='dashed', linewidth=1)
         min_ylim, max_ylim = plt.ylim()
-        plt.text(raster_np.mean() * 1.1, max_ylim * 0.9, 'Sfuzzy: {:.4f}'.format(raster_np.mean()))
+        plt.text(raster_np.mean() * 0.70, max_ylim * 0.9, 'Sfuzzy: {:.4f}'.format(raster_np.mean()))
 
         # Save fig
         plt.savefig(output_file, dpi=300)
@@ -124,7 +124,7 @@ class RasterDataPlotter:
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=15)
         #ax1.axis('off')
-        fig1.savefig(output_file, dpi=300, bbox_inches='tight')
+        fig1.savefig(output_file, dpi=700, bbox_inches='tight')
 
     def plot_categorical_raster(self, output_file, labels, cmap):
         raster_np = self.read_raster()
