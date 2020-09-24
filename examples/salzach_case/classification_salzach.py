@@ -23,8 +23,8 @@ Path(dir / "rasters").mkdir(exist_ok=True)
 
 raster_meas = mo.MapArray(str(dir/'rasters') + '/' + 'vali_meas_2013_clipped.tif')
 nb_classes = raster_meas.nb_classes(12)
-'''raster_meas.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + 'vali_meas_2013_clipped_class_nbreaks.tif')
-plt.hlines(1, -3, 3)
+raster_meas.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + 'vali_meas_2013_clipped_class_nbreaks.tif')
+'''plt.hlines(1, -3, 3)
 plt.eventplot(nb_classes[1::], orientation='horizontal')
 plt.axis('off')
 plt.show()'''
