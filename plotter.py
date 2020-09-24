@@ -69,7 +69,7 @@ class RasterDataPlotter:
         :kwarg list_colors: list of colors (str), as alternative to using a colormap
         :output: saves the figure of the raster
         """
-        #xy: lower left corner from the lower left corner of the picture
+        #xy: upper left corner from the lower left corner of the picture
         raster_np = self.read_raster()
         print('Raster has size: ', raster_np.shape)
         fig, ax = plt.subplots(1, 2, figsize=(10, 8))
@@ -135,8 +135,27 @@ class RasterDataPlotter:
         ep.draw_legend(im, titles=labels)
         ax.set_axis_off()
         plt.show()
-        fig.savefig(output_file, dpi=300, bbox_inches='tight')
+        fig.savefig(output_file, dpi=700, bbox_inches='tight')
 
+    def plot_categorical_w_window(self, output_file, labels, cmap, xy, width, height):
+        raster_np = self.read_raster()
+        print('Classes identified in the raster: ', np.unique(raster_np))
+        #cmap = matplotlib.colors.ListedColormap(list_colors)
+        fig, ax = plt.subplots(1, 2)
+
+        ax[0].imshow(raster_np, cmap=cmap)
+        rectangle = patches.Rectangle(xy, width, height, fill=False)
+        ax[0].add_patch(rectangle)
+        plt.setp(ax, xticks=[], yticks=[])
+
+        #  Plot Patch
+        box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
+        im = ax[1].imshow(box_np, cmap=cmap)
+        # ax[1].axis('off')
+        cbar = ep.draw_legend(im, titles=labels)
+        #cbar.ax[].tick_params(labelsize=20)
+        #ax.set_axis_off()
+        fig.savefig(output_file, dpi=700, bbox_inches='tight')
 
 
 class DataPlotter:
