@@ -120,10 +120,10 @@ class RasterDataPlotter:
         #norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
         im1 = ax1.imshow(raster_np, cmap=cmap, vmax=vmax, vmin=vmin)
         fig1.tight_layout()
-        plt.setp(ax1, xticks=[], yticks=[])
+        plt.setp(ax1)
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=15)
-        ax1.axis('off')
+        #ax1.axis('off')
         fig1.savefig(output_file, dpi=300, bbox_inches='tight')
 
     def plot_categorical_raster(self, output_file, labels, cmap):
