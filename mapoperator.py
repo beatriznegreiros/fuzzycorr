@@ -311,10 +311,6 @@ class MapArray:
         """
         # Classify the original image array (digitize makes nodatavalues take the class 0)
         raster_fi = np.ma.filled(self.array, fill_value=-np.inf)
-        class_bins[-1] = np.inf
-        class_bins = np.insert(class_bins, 0, -np.inf, axis=0)
-        print(class_bins)
-
         raster_class = np.digitize(raster_fi, class_bins, right=True)  # bins[i-1] < array <= bins[i]
 
         # Assigns nodatavalues back to array
@@ -326,7 +322,8 @@ class MapArray:
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)
         # raster_ma_fi = np.ma.filled(raster_class, fill_value=self.nodatavalue)
 
-        if raster_ma_fi.min() == self.nodatavalue:
+        print(raster_ma_fi.min())
+        if raster_ma_fi.min() == self.nodatavalue or type(raster_ma_fi) != np.ma.MaskedArray:
             with rio.open(map_out, 'w', **self.meta) as outf:
                 outf.write(raster_ma_fi.astype(rio.float64), 1)
         else:

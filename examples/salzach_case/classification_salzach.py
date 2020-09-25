@@ -23,6 +23,9 @@ Path(dir / "rasters").mkdir(exist_ok=True)
 
 raster_random = mo.MapArray(str(dir/'rasters') + '/' + 'vali_meas_2013_random_clipped.tif')
 #nb_classes = raster_meas.nb_classes(12)
+# nb_classes[-1] = np.inf
+# nb_classses = np.insert(nb_classes, 0, -np.inf, axis=0)
+
 nb_classes = [-np.inf, -1.23137931, -0.84793103, -0.62173913, -0.43954545, -0.27785714,
               -0.12714286,  0.032, 0.189375, 0.36727273,  0.62470588,  1.00241379, np.inf]
 

@@ -12,14 +12,14 @@ except:
 n_classes = 6
 
 # Measured Data:
-raster_A = "diamond_exp_01_norm"
+raster_A = "diamond_experiment_01_random"
 
 # Simulated Data:
-raster_B = "diamond_sim_01_norm"
+raster_B = "hexagon_experiment_01_random"
 
 # Selected output names for the classified rasters
-name_A = "diamond_exp_01_class"
-name_B = "diamond_sim_01_class"
+name_A = "diamond_experiment_01_random_class"
+name_B = "hexagon_experiment_01_random_class"
 # --------------------------------------------------------------------
 
 dir = Path.cwd()
@@ -38,10 +38,12 @@ array_A = mo.MapArray(map_A_in)
 array_B = mo.MapArray(map_B_in)
 
 # Classify the array and save the output file as .tif raster
-nb_classes = array_A.nb_classes(n_classes)  # Extract the optimized intervals for the map A
+#nb_classes = array_A.nb_classes(n_classes)  # Extract the optimized intervals for the map A
+nb_classes_diamond = [-np.inf, 0.02767143, 0.04195055, 0.04669231, 0.05117692, 0.05647143, np.inf]
+nb_classes_hexagon = [-np.inf, 0.03088889, 0.04122222, 0.0485625,  0.05619444, 0.06488889, np.inf]
 
-array_A.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + name_A + '.tif')
-array_B.categorize_raster(nb_classes, map_out=str(dir/'rasters') + '/' + name_B + '.tif')
+array_A.categorize_raster(nb_classes_diamond, map_out=str(dir/'rasters') + '/' + name_A + '.tif')
+array_B.categorize_raster(nb_classes_hexagon, map_out=str(dir/'rasters') + '/' + name_B + '.tif')
 
 '''# Plot the histogram of maps and the breaks division
 #  Map of Measured values
