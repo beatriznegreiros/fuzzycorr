@@ -19,7 +19,18 @@ except:
 class SpatialField:
     def __init__(self, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
+        """
+        :param pd: pandas dataframe, can be obtained by reading the textfile as pandas dataframe
+        :param attribute: string, name of the attribute to burn in the raster (ex.: deltaZ, Z)
+        :param crs: string, coordinate reference system
+        :param nodatavalue: float, value to indicate nodata cells
+        :param res: float, resolution of the cell (cell size), is the same for x and y
+        :param ulc: tuple of floats, upper left corner coordinate
+        :param lrc: tuple of floats, lower right corner coordinate
+        """
+
         self.pd = pd
+
         if not isinstance(attribute, str):
             print("ERROR: attribute must be a string, check the name on your textfile")
         self.crs = CRS(crs)
@@ -73,11 +84,11 @@ class SpatialField:
         zi, yi, xi = np.histogram2d(self.y, self.x, bins=(int(self.nrow), int(self.ncol)), weights=self.z, normed=False,
                                     range=hrange)
         counts, _, _ = np.histogram2d(self.y, self.x, bins=(int(self.nrow), int(self.ncol)), range=hrange)
-        np.seterr(divide='ignore', invalid='ignore')  # we're dividing by zero but it's no big deal
+        np.seterr(divide='ignore', invalid='ignore')  # ignores errors if dividing by zero
         zi = np.divide(zi, counts)
-        np.seterr(divide=None, invalid=None)  # we'll set it back now
+        np.seterr(divide=None, invalid=None)  # set it back now
         zi = np.ma.masked_invalid(zi)
-        array = np.flipud(np.array(zi))
+        array = np.flipud(np.array(zi))  # flips each column upside down
 
         return array
 
@@ -87,21 +98,51 @@ class SpatialField:
         see more at https://github.com/rosskush/skspatial
         """
         array = self.points_to_grid()
-        x = np.arange(0, self.ncol)
+        x = np.arange(0, self.ncol)  # creates 1d array with values [0, ncol[
         y = np.arange(0, self.nrow)
 
         # mask invalid values
-        array = np.ma.masked_invalid(array)
-        xx, yy = np.meshgrid(x, y)
+        array = np.ma.masked_invalid(array)  # all invalid values are masked (ex.: np.inf or np.nan)
+        xx, yy = np.meshgrid(x, y)  # creates a grid of values with (x,y) based on the x and y provided
 
         # get only the valid values
-        x1 = xx[~array.mask]
+        x1 = xx[~array.mask]  # takes only unmasked points
         y1 = yy[~array.mask]
         newarr = array[~array.mask]
 
         out_array = interpolate.griddata((x1, y1), newarr.ravel(), (xx, yy), method=method, fill_value=self.nodatavalue)
 
         return out_array
+
+    def random_raster(self, raster_file, save_ascii=True, **kwargs):
+        """
+        :kwarg minmax: tuple of floats, (zmin, zmax) min and max ranges for random values
+        :return: array of random values within a range of the same size and chape as the original
+        """
+
+        if kwargs['minmax'] is None:
+            zmin, zmax = self.z.min(), self.z.max()
+        else:
+            zmin, zmax = kwargs['minmax']
+
+        array = np.random.uniform(low=zmin, high=zmax, size=(self.nrow, self.ncol))
+
+        if '.' not in raster_file[-4:]:
+            raster_file += '.tif'
+        self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
+
+        new_dataset = rio.open(raster_file, 'w', driver='GTiff',
+                               height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
+                               crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
+        print(np.shape(array))
+        new_dataset.write(array, 1)
+        new_dataset.close()
+
+        if save_ascii:
+            map_asc = str(Path(raster_file[0:-4] + '.asc'))
+            gdal.Translate(map_asc, raster_file, format='AAIGrid')
+
+        return new_dataset
 
     def plain_raster(self, shapefile, raster_file, res):
         """ Converts shapefile(.shp) to rasters(.tif) without normalizing
@@ -183,11 +224,11 @@ class SpatialField:
 
         return krige_array
 
-# TODO: finish rbf inteprolant
+    # TODO: finish rbf inteprolant
     def rbf_norm_array(self, method):
         print(self.x)
         print(np.shape(self.x), np.shape(self.y), np.shape(self.z))
-        print(np.random.rand(100)*4.0-2.0)
+        print(np.random.rand(100) * 4.0 - 2.0)
         rbfi = interpolate.Rbf(x=np.array(self.x), y=np.array(self.y), z=np.array(self.z), function=method)
 
         array = self.points_to_grid()
@@ -202,7 +243,7 @@ class SpatialField:
         # get only the valid values
         x1 = xx[~array.mask]
         y1 = yy[~array.mask]
-        #newarr = array[~array.mask]
+        # newarr = array[~array.mask]
 
         out_array = rbfi(x1, y1)
 
@@ -283,8 +324,8 @@ class MapArray:
 
         # Fill nodatavalues into array
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)
-        #raster_ma_fi = np.ma.filled(raster_class, fill_value=self.nodatavalue)
-        
+        # raster_ma_fi = np.ma.filled(raster_class, fill_value=self.nodatavalue)
+
         if raster_ma_fi.min() == self.nodatavalue:
             with rio.open(map_out, 'w', **self.meta) as outf:
                 outf.write(raster_ma_fi.astype(rio.float64), 1)

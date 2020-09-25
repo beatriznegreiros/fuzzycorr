@@ -10,6 +10,7 @@ except ModuleNotFoundError as e:
 
 class FuzzyComparison:
     def __init__(self, rasterA, rasterB, neigh=4, halving_distance=2):
+
         self.raster_A = rasterA
         self.raster_B = rasterB
         self.neigh = neigh
