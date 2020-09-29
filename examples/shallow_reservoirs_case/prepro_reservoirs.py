@@ -4,12 +4,9 @@ from pathlib import Path
 
 # ------------------------INPUT--------------------------------------
 #  Raw data input path
-data_A = "hexagon_experiment.csv"
-data_B = "hexagon_simulation.csv"
+raw_data = "hexagon_simulation.csv"
+name_map = "hexagon_sim_01_norm_linear"
 attribute = 'dz'
-
-name_map_A = "hexagon_exp_01_cubic"
-name_map_B = "hexagon_sim_01_cubic"
 
 #  Raster Resolution: Change as appropriate
 #  NOTE: Fuzzy Analysis has unique resolution
@@ -18,32 +15,32 @@ res = 0.1
 # Projection
 crs = 'EPSG:4326'
 nodatavalue = -9999
-interpol_method = 'cubic'
+interpol_method = 'linear'
+
+#  In case a polygon file is necessary
+dir = Path.cwd()
+path_poly = str(dir/ 'shapefiles') + '/polygon_hexagon.shp'
 # -----------------------------------------------------------------------
 
-# Create directories if not existent
-dir = Path.cwd()
+# Creates directories if not existent
 Path(dir / "shapefiles").mkdir(exist_ok=True)
 Path(dir / "rasters").mkdir(exist_ok=True)
+if '.' not in raw_data[-4:]:
+    raw_data += '.csv'
+path_A = str(dir / "raw_data/") + "/" + raw_data
 
-if '.' not in data_A[-4:]:
-    data_A += '.csv'
-path_A = str(dir / "raw_data/") + "/" + data_A
+#  Instanciates object of the class
+_map = mo.SpatialField(pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
+                       nodatavalue=nodatavalue, res=res)
 
-if '.' not in data_B[-4]:
-    data_A += '.csv'
-path_B = str(dir / "raw_data/") + "/" + data_B
+#  Creates a normalized and gridded array
+_array = _map.norm_array(method=interpol_method)
 
+#  Saves raster
+raster_path = str(dir / "rasters") + "/" + name_map + ".tif"
+_map.array2raster(_array, raster_path)
 
-map_A = mo.SpatialField(pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
-                        nodatavalue=nodatavalue, res=res)
-_arrayA = map_A.norm_array(method=interpol_method)
-out_A = str(dir / "rasters/") + "/" + name_map_A + ".tif"
-map_A.array2raster(_arrayA, out_A)
-
-
-map_B = mo.SpatialField(pd.read_csv(path_B, skip_blank_lines=True), attribute=attribute, crs=crs,
-                        nodatavalue=nodatavalue, res=res)
-_arrayB = map_B.norm_array(method=interpol_method)
-out_B = str(dir / "rasters/") + "/" + name_map_B + ".tif"
-map_B.array2raster(_arrayB, out_B)
+#  Creates polygon, clips and saves a raster with it
+#_map.create_polygon(path_poly, alpha=0.15)
+clipped_raster = str(dir / "rasters") + '/' + name_map + "_clipped.tif"
+_map.clip_raster(path_poly, raster_path, clipped_raster)

@@ -21,10 +21,10 @@ for item in list_rasters:
     raster.plot_raster(path_fig, bounds, list_colors)'''
 
 
-list_rasters = ['diamond_exp_01_norm',
-                'diamond_sim_01_norm',
-                'hexagon_exp_01_norm',
-                'hexagon_sim_01_norm']
+list_rasters = ['diamond_exp_01_norm_linear_clipped',
+                'diamond_sim_01_norm_linear_clipped',
+                'hexagon_exp_01_norm_linear_clipped',
+                'hexagon_sim_01_norm_linear_clipped']
 
 cmap = 'jet'
 
@@ -36,5 +36,5 @@ vmin = 0.006
 for item in list_rasters:
     rast_path = str(current_dir) + '/rasters/' + item + '.tif'
     raster = plotter.RasterDataPlotter(rast_path)
-    path_fig = str(current_dir) + '/rasters/' + item + '_plot2.png'
-    raster.plot_continuous_raster(path_fig, cmap, vmax, vmin)
+    path_fig = str(current_dir) + '/rasters/' + item + '_plot_clipped.png'
+    raster.plot_continuous_raster(path_fig, cmap, vmax, vmin, box='off')

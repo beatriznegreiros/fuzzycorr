@@ -114,7 +114,7 @@ class RasterDataPlotter:
         cbar.ax.tick_params(labelsize=20)
         fig1.savefig(output_file, dpi=300, bbox_inches='tight')
 
-    def plot_continuous_raster(self, output_file, cmap, vmax, vmin):
+    def plot_continuous_raster(self, output_file, cmap, vmax, vmin, **kwargs):
         raster_np = self.read_raster()
         fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
         #norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
@@ -123,8 +123,9 @@ class RasterDataPlotter:
         plt.setp(ax1)
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=15)
-        #ax1.axis('off')
-        fig1.savefig(output_file, dpi=700, bbox_inches='tight')
+        if kwargs['box'] == 'off':
+            ax1.axis('off')
+        fig1.savefig(output_file, dpi=200, bbox_inches='tight')
 
     def plot_categorical_raster(self, output_file, labels, cmap):
         raster_np = self.read_raster()
@@ -134,8 +135,8 @@ class RasterDataPlotter:
         im = ax.imshow(raster_np, cmap=cmap)
         ep.draw_legend(im, titles=labels)
         ax.set_axis_off()
-        plt.show()
-        fig.savefig(output_file, dpi=700, bbox_inches='tight')
+        #plt.show()
+        fig.savefig(output_file, dpi=200, bbox_inches='tight')
 
     def plot_categorical_w_window(self, output_file, labels, cmap, xy, width, height):
         raster_np = self.read_raster()

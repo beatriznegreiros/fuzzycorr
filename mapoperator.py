@@ -258,6 +258,9 @@ class SpatialField:
         if np.isfinite(alpha):
             try:
                 polygon = alphashape.alphashape(self.gdf, alpha)
+                polygon.crs = self.crs
+                polygon.to_file(shape_polygon)
+                print('Polygon *.shp saved successfully.')
             except FileNotFoundError as e:
                 print(e)
         else:
@@ -268,6 +271,7 @@ class SpatialField:
             else:
                 polygon.crs = self.crs
                 polygon.to_file(shape_polygon)
+                print('Polygon *.shp saved successfully.')
 
     def clip_raster(self, polygon, in_raster, out_raster):
         """ Clips a raster based on the given polygon
