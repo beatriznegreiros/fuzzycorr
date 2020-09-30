@@ -4,13 +4,13 @@ from pathlib import Path
 
 # ------------------------INPUT--------------------------------------
 #  Raw data input path
-raw_data = "hexagon_simulation.csv"
-name_map = "hexagon_sim_01_norm_linear"
+raw_data = "diamond_simulation.csv"
+name_map = "diamond_sim_02_norm_linear"
 attribute = 'dz'
 
 #  Raster Resolution: Change as appropriate
 #  NOTE: Fuzzy Analysis has unique resolution
-res = 0.1
+res = 0.2
 
 # Projection
 crs = 'EPSG:4326'
@@ -19,7 +19,7 @@ interpol_method = 'linear'
 
 #  In case a polygon file is necessary
 dir = Path.cwd()
-path_poly = str(dir/ 'shapefiles') + '/polygon_hexagon.shp'
+path_poly = str(dir/ 'shapefiles') + '/polygon_diamond.shp'
 # -----------------------------------------------------------------------
 
 # Creates directories if not existent

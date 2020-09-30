@@ -6,12 +6,12 @@ import fuzzyevaluation as fuzz
 # Neighborhood definition
 n = 4  # 'radius' of neighborhood
 halving_distance = 2
-comparison_name = "diamond_model_vs_random"
+comparison_name = "diamond_model_vs_random_fuzzynum_n4hd2"
 
 # Create directory if not existent
 current_dir = Path.cwd()
 Path(current_dir / "rasters").mkdir(exist_ok=True)
-map_A_in = str(current_dir / "rasters/diamond_sim_01_norm.tif")
+map_A_in = str(current_dir / "rasters/diamond_exp_01_norm_linear_clipped.tif")
 map_B_in = str(current_dir / "rasters/diamond_experiment_01_random.tif")
 
 # Save directory

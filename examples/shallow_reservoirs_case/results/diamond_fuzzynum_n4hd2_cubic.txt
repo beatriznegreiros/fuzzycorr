@@ -1,10 +1,10 @@
 Fuzzy numerical spatial comparison 
 
 Compared maps: 
-C:\Users\Negreiros\valitools\shallow_reservoirs_case\rasters\diamond_sim_01_cubic.tif
-C:\Users\Negreiros\valitools\shallow_reservoirs_case\rasters\diamond_exp_01_cubic.tif
+C:\Users\Negreiros\valitools\examples\shallow_reservoirs_case\rasters\diamond_exp_01_norm_cubic_clipped.tif
+C:\Users\Negreiros\valitools\examples\shallow_reservoirs_case\rasters\diamond_sim_01_norm_cubic_clipped.tif
 
 Halving distance: 2 cells  
 Neighbourhood: 4 cells  
 
-Average fuzzy similarity: 0.9081
+Average fuzzy similarity: 0.9079
