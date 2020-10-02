@@ -65,7 +65,6 @@ class FuzzyComparison:
 
     def neighbours(self, array, x, y):
         """ Captures the neighbours and their memberships
-
         :param array: array A or B
         :param x: int, cell in x
         :param y: int, cell in y
@@ -97,12 +96,12 @@ class FuzzyComparison:
 
     def fuzzy_numerical(self, comparison_name, save_dir, map_of_comparison=True):
         """ Compares a pair of raster maps using fuzzy numerical spatial comparison
-
-        :param save_dir: Directory where to save the results
+        :param save_dir: string, directory where to save the results
         :param comparison_name: string, name of the comparison
         :param map_of_comparison: boolean, create map of comparison in the project directory if True
-        :return: overall performance index
+        :return: Global Fuzzy Similarity and comparison map
         """
+
         print('Performing fuzzy numerical comparison...')
         # Two-way similarity, first A x B then B x A
         s_AB = np.full(np.shape(self.array_A), self.nodatavalue, dtype=self.dtype_A)
@@ -146,11 +145,12 @@ class FuzzyComparison:
 
     def fuzzy_rmse(self, comparison_name, save_dir, map_of_comparison=True):
         """ Compares a pair of raster maps using fuzzy root mean square error as spatial comparison
-
         :param comparison_name: string, name of the comparison
-        :param map_of_comparison: boolean, create map of of local squared errors (in the project directory) if True
-        :return: overall rmse
+        :param save_dir: string, directory where to save the results of the map comparison
+        :param map_of_comparison: boolean, if True it creates map of of local squared errors (in the project directory)
+        :return: global fuzzy RMSE and comparison map
         """
+
         print('Performing fuzzy RMSE comparison...')
 
         # Two-way similarity, first A x B then B x A
