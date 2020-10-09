@@ -4,11 +4,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="valitools-Beatriz-Negreiros",  # Replace with your own username
+    name="valitools-Beatriz-Negreiros",
     version="0.0.1",
     author="Beatriz Negreiros",
     author_email="beatriznegreiros@outlook.com",
-    description="Fuzzy map comparison for model evaluation",
+    description="Fuzzy map comparison for numerical model evaluation",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://beatriznegreiros.github.io/valitools/",
