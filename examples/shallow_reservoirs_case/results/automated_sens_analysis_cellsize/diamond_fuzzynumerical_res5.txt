@@ -1,0 +1,10 @@
+Fuzzy numerical spatial comparison 
+
+Compared maps: 
+C:\Users\Negreiros\valitools\examples\shallow_reservoirs_case\rasters/automated_sens_analysis_cellsize/diamond_experiment_clipped.tif
+C:\Users\Negreiros\valitools\examples\shallow_reservoirs_case\rasters/automated_sens_analysis_cellsize/diamond_simulation_clipped.tif
+
+Halving distance: 4 cells  
+Neighbourhood: 8 cells  
+
+Average fuzzy similarity: 0.9072
