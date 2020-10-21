@@ -1,6 +1,6 @@
 from pathlib import Path
 import timeit
-import fuzzyevaluation as fuzz
+import fuzzycomp as fuzz
 
 # ------------------------INPUT--------------------------------------
 # Neighborhood definition

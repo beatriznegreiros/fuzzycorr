@@ -1,6 +1,6 @@
 from pathlib import Path
-import mapoperator as mo
-import fuzzyevaluation as fuzz
+import preprocessing as mo
+import fuzzycomp as fuzz
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,8 +24,8 @@ for res in np.array([0.05, 0.1, 0.2]):
     for data_item in data_to_compare:
         print('performingg')
         raw_data = str(dir / 'raw_data') + '/' + data_item + '.csv'
-        _map = mo.SpatialField(pd.read_csv(raw_data, skip_blank_lines=True), attribute=attribute, crs=crs,
-                               nodatavalue=nodatavalue, res=res)
+        _map = mo.PreProFuzzy(pd.read_csv(raw_data, skip_blank_lines=True), attribute=attribute, crs=crs,
+                              nodatavalue=nodatavalue, res=res)
         _array = _map.norm_array(method=interpol_method)
         raster_path = str(dir / "rasters") + "/automated_sens_analysis_cellsize/" + data_item + ".tif"
         _map.array2raster(_array, raster_path)

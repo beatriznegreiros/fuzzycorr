@@ -8,17 +8,56 @@ except ModuleNotFoundError as e:
     print(e)
 
 
+def read_raster(raster):
+    with rio.open(raster) as src:
+        raster_np = src.read(1, masked=True)
+        nodatavalue = src.nodata  # storing nodatavalue of raster
+        meta = src.meta.copy()
+        print('Number of active cells (non-masked) of raster ', raster, ': ', np.ma.count(raster_np))
+    return raster_np, nodatavalue, meta, meta['crs'], meta['dtype']
+
+
+def jaccard(a, b):
+    jac = 1 - (a * b) / (2 * abs(a) + 2 * abs(b) - a * b)
+    return jac
+
+
+def f_similarity(centrall_cell, neighbours):
+    """ Calculates the similarity function for each pair of values (fuzzy numerical method)
+    :param centrall_cell: float, cell under analysis in map A
+    :param neighbours: np.array of floats, neighbours in map B
+    :return: np.array of floats, each similarity between each of two cells
+    """
+    simil_neigh = np.zeros(np.shape(neighbours))
+    for index, entry in np.ndenumerate(neighbours):
+        simil_neigh[index] = 1 - (abs(entry - centrall_cell)) / max(abs(entry), abs(centrall_cell))
+    return simil_neigh
+
+
+def squared_error(centrall_cell, neighbours):
+    """ Calculates the error measure fuzzy rmse
+    :param centrall_cell: float, cell under analysis in map A
+    :param neighbours: np.array of floats, neighbours in map B
+    :return: np.array of floats, each similarity between each of two cells
+    """
+    simil_neigh = (neighbours - centrall_cell) ** 2
+    return simil_neigh
+
+
 class FuzzyComparison:
     def __init__(self, rasterA, rasterB, neigh=4, halving_distance=2):
-
+        """ Performing fuzzy map comparison
+            :param rasterA: string, path of the raster to be compared with rasterB
+            :param rasterB: string, path of the raster to be compared with rasterA
+            :param neigh: integer, neighborhood being considered (number of cells from the central cell), default is 4
+            :param halving_distance: integer, distance (in cells) to which the membership decays to its half, default is 2
+        """
         self.raster_A = rasterA
         self.raster_B = rasterB
         self.neigh = neigh
         self.halving_distance = halving_distance
-        self.array_A, self.nodatavalue, self.meta_A, self.src_A, self.dtype_A = \
-            self.read_raster(self.raster_A)
-        self.array_B, self.nodatavalue_B, self.meta_B, self.src_B, self.dtype_B = \
-            self.read_raster(self.raster_B)
+        self.array_A, self.nodatavalue, self.meta_A, self.src_A, self.dtype_A = read_raster(self.raster_A)
+        self.array_B, self.nodatavalue_B, self.meta_B, self.src_B, self.dtype_B = read_raster(self.raster_B)
 
         if halving_distance <= 0:
             print('Halving distance must be at least 1')
@@ -28,40 +67,6 @@ class FuzzyComparison:
             sys.exit('MapError: Maps have different coordinate system')
         if self.dtype_A != self.dtype_B:
             print('Warning: Maps have different data types, I will use the datatype of the first map')
-
-    def read_raster(self, raster):
-        with rio.open(raster) as src:
-            raster_np = src.read(1, masked=True)
-            nodatavalue = src.nodata  # storing nodatavalue of raster
-            meta = src.meta.copy()
-            print('Number of active cells (non-masked) of raster ', raster, ': ', np.ma.count(raster_np))
-        return raster_np, nodatavalue, meta, meta['crs'], meta['dtype']
-
-    def jaccard(self, a, b):
-        jac = 1 - (a * b) / (2 * abs(a) + 2 * abs(b) - a * b)
-        return jac
-
-    def f_similarity(self, centrall_cell, neighbours):
-        """ calculate the similarity function for each pair of values (fuzzy numerical method)
-
-        :param centrall_cell: float, cell under analysis in map A
-        :param neighbours: np.array of floats, neighbours in map B
-        :return: np.array of floats, each similarity between each of two cells
-        """
-        simil_neigh = np.zeros(np.shape(neighbours))
-        for index, entry in np.ndenumerate(neighbours):
-            simil_neigh[index] = 1 - (abs(entry - centrall_cell)) / max(abs(entry), abs(centrall_cell))
-        return simil_neigh
-
-    def squared_error(self, centrall_cell, neighbours):
-        """ Calculate the error measure fuzzy rmse
-
-        :param centrall_cell: float, cell under analysis in map A
-        :param neighbours: np.array of floats, neighbours in map B
-        :return: np.array of floats, each similarity between each of two cells
-        """
-        simil_neigh = (neighbours - centrall_cell) ** 2
-        return simil_neigh
 
     def neighbours(self, array, x, y):
         """ Captures the neighbours and their memberships
@@ -111,7 +116,7 @@ class FuzzyComparison:
         for index, central in np.ndenumerate(self.array_A):
             if not self.array_A.mask[index]:
                 memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
-                f_i = np.ma.multiply(self.f_similarity(self.array_A[index], neighboursA), memb)
+                f_i = np.ma.multiply(f_similarity(self.array_A[index], neighboursA), memb)
                 if f_i.size != 0:
                     s_AB[index] = np.nanmax(f_i)  # takes max without propagating nan
 
@@ -119,7 +124,7 @@ class FuzzyComparison:
         for index, central in np.ndenumerate(self.array_B):
             if not self.array_B.mask[index]:
                 memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
-                f_i = np.ma.multiply(self.f_similarity(self.array_B[index], neighboursB), memb)
+                f_i = np.ma.multiply(f_similarity(self.array_B[index], neighboursB), memb)
                 if f_i.size != 0:
                     s_BA[index] = np.nanmax(f_i)  # takes max without propagating nan
 
@@ -161,7 +166,7 @@ class FuzzyComparison:
         for index, central in np.ndenumerate(self.array_A):
             if not self.array_A.mask[index]:
                 memb, neighboursA = self.neighbours(self.array_B, index[0], index[1])
-                f_i = np.ma.divide(self.squared_error(self.array_A[index], neighboursA), memb)
+                f_i = np.ma.divide(squared_error(self.array_A[index], neighboursA), memb)
                 if f_i.size != 0:
                     s_AB[index] = np.amin(f_i)
 
@@ -169,7 +174,7 @@ class FuzzyComparison:
         for index, central in np.ndenumerate(self.array_B):
             if not self.array_B.mask[index]:
                 memb, neighboursB = self.neighbours(self.array_A, index[0], index[1])
-                f_i = np.ma.divide(self.squared_error(self.array_B[index], neighboursB), memb)
+                f_i = np.ma.divide(squared_error(self.array_B[index], neighboursB), memb)
                 if f_i.size != 0:
                     s_BA[index] = np.amin(f_i)
 

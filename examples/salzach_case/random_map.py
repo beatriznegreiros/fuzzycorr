@@ -1,7 +1,7 @@
-import mapoperator as mo
+import preprocessing as mo
 from pathlib import Path
 import pandas as pd
-import fuzzyevaluation as fuzz
+import fuzzycomp as fuzz
 
 file = 'vali_meas_2013'
 
@@ -31,8 +31,8 @@ random_raster = str(current_dir / 'rasters') + '/' + file + '_random.tif'
 clipped_random_raster = str(current_dir / 'rasters') + '/' + file + '_random_clipped.tif'
 
 # Instanciating object of SpatialField
-map_file = mo.SpatialField(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
-                           nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
+map_file = mo.PreProFuzzy(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
+                          nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
 
 # Create random raster
 map_file.random_raster(random_raster, minmax=None)

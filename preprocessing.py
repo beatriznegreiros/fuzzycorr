@@ -13,26 +13,39 @@ try:
     from pykrige.ok import OrdinaryKriging
 except:
     print(
-        'ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
+        'ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, '
+        'alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
 
 
-class SpatialField:
+def clip_raster(polygon, in_raster, out_raster):
+    """ Clips a raster based on the given polygon
+        :param polygon: string, file with path of the polygon (*.shp)
+        :param in_raster: string, file and path of the input raster (*.tif)
+        :param in_raster: string, file and path of the output raster (*.tif)
+        :return: no output, saves the raster (*.tif) with the selected filename
+    """
+
+    gdal.Warp(out_raster, in_raster, cutlineDSName=polygon)
+
+
+class PreProFuzzy:
     def __init__(self, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
-        """
+        """ Performing pre-processing
         :param pd: pandas dataframe, can be obtained by reading the textfile as pandas dataframe
         :param attribute: string, name of the attribute to burn in the raster (ex.: deltaZ, Z)
         :param crs: string, coordinate reference system
         :param nodatavalue: float, value to indicate nodata cells
         :param res: float, resolution of the cell (cell size), is the same for x and y
-        :param ulc: tuple of floats, upper left corner coordinate
-        :param lrc: tuple of floats, lower right corner coordinate
+        :param ulc: tuple of floats, upper left corner coordinate, optional
+        :param lrc: tuple of floats, lower right corner coordinate, optional
         """
 
         self.pd = pd
 
         if not isinstance(attribute, str):
             print("ERROR: attribute must be a string, check the name on your textfile")
+
         self.crs = CRS(crs)
         self.attribute = attribute
         self.nodatavalue = nodatavalue
@@ -74,8 +87,9 @@ class SpatialField:
         self.nrow = int(np.ceil((self.ymax - self.ymin) / self.res))  # dely
 
     def points_to_grid(self):
-        """ Create a grid of new points in the desired resolution to be interpolated
+        """ Creates a grid of new points in the desired resolution to be interpolated
         :return: array of size nrow, ncol
+
         http://chris35wills.github.io/gridding_data/
         """
         hrange = ((self.ymin, self.ymax),
@@ -95,7 +109,8 @@ class SpatialField:
     def norm_array(self, method='linear'):
         """ Normalizes the raw data in equally sparsed points depending on the selected resolution
         :return: interpolated and normalized array with selected resolution
-        see more at https://github.com/rosskush/skspatial
+
+        https://github.com/rosskush/skspatial
         """
         array = self.points_to_grid()
         x = np.arange(0, self.ncol)  # creates 1d array with values [0, ncol[
@@ -115,7 +130,7 @@ class SpatialField:
         return out_array
 
     def random_raster(self, raster_file, save_ascii=True, **kwargs):
-        """
+        """ Creates a raster of randomly generated values
         :kwarg minmax: tuple of floats, (zmin, zmax) min and max ranges for random values
         :return: array of random values within a range of the same size and chape as the original
         """
@@ -129,12 +144,14 @@ class SpatialField:
 
         if '.' not in raster_file[-4:]:
             raster_file += '.tif'
+
         self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
 
         new_dataset = rio.open(raster_file, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
                                crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
-        print(np.shape(array))
+        print('The array has size: ', np.shape(array))
+
         new_dataset.write(array, 1)
         new_dataset.close()
 
@@ -149,7 +166,7 @@ class SpatialField:
         :param shapefile: string, filename with path of the input shapefile (*.shp)
         :param raster_file: stirng, filename with path of the output raster (*.tif)
         :param res: float, resolution of the cell
-        :return: no output, saves the raster in the default directory
+        :return: saves the raster in the default directory
         """
         if '.' not in shapefile[-4:]:
             shapefile += '.shp'
@@ -175,7 +192,7 @@ class SpatialField:
         """ Saves a raster using interpolation
         :param raster_file: string, path to save the rasterfile
         :param save_ascii: boolean, true to save also an ascii raster
-        :return: no output, saves the raster with the selected filename
+        :return: saves the raster with the selected filename
         """
         if '.' not in raster_file[-4:]:
             raster_file += '.tif'
@@ -218,42 +235,15 @@ class SpatialField:
 
         # krige_array, ss = OK.execute('points', x, y, n_closest_points=n_closest_points,backend=backend)
         krige_array, ss = OK.execute('points', xp, yp, n_closest_points=n_closest_points, backend=backend)
-
         krige_array = np.reshape(krige_array, (self.nrow, self.ncol))
-        # print(krige_array.shape)
 
         return krige_array
-
-    # TODO: finish rbf inteprolant
-    def rbf_norm_array(self, method):
-        print(self.x)
-        print(np.shape(self.x), np.shape(self.y), np.shape(self.z))
-        print(np.random.rand(100) * 4.0 - 2.0)
-        rbfi = interpolate.Rbf(x=np.array(self.x), y=np.array(self.y), z=np.array(self.z), function=method)
-
-        array = self.points_to_grid()
-
-        x = np.arange(0, self.ncol)
-        y = np.arange(0, self.nrow)
-
-        # mask invalid values
-        array = np.ma.masked_invalid(array)
-        xx, yy = np.meshgrid(x, y)
-
-        # get only the valid values
-        x1 = xx[~array.mask]
-        y1 = yy[~array.mask]
-        # newarr = array[~array.mask]
-
-        out_array = rbfi(x1, y1)
-
-        return out_array
 
     def create_polygon(self, shape_polygon, alpha=np.nan):
         """ Creates a polygon surrounding a cloud of shapepoints
         :param shape_polygon: string, path to save the shapefile
         :param alpha: float, excentricity of the alphashape (polygon) to be created
-        :return: no output, saves the polygon (*.shp) with the selected filename
+        :return: saves the polygon (*.shp) with the selected filename
         """
         if np.isfinite(alpha):
             try:
@@ -273,19 +263,12 @@ class SpatialField:
                 polygon.to_file(shape_polygon)
                 print('Polygon *.shp saved successfully.')
 
-    def clip_raster(self, polygon, in_raster, out_raster):
-        """ Clips a raster based on the given polygon
-            :param polygon: string, file with path of the polygon (*.shp)
-            :param in_raster: string, file and path of the input raster (*.tif)
-            :param in_raster: string, file and path of the output raster (*.tif)
-            :return: no output, saves the raster (*.tif) with the selected filename
-        """
 
-        gdal.Warp(out_raster, in_raster, cutlineDSName=polygon)
-
-
-class MapArray:
+class PreProCategorization:
     def __init__(self, raster):
+        """ Clips a raster based on the given polygon
+            :param raster: string, path of the raster to be categorized
+        """
         self.raster = raster
 
         with rio.open(self.raster) as src:
@@ -295,7 +278,7 @@ class MapArray:
         self.array = raster_np
 
     def nb_classes(self, n_classes):
-        """ Class bins based on the Natural Breaks method
+        """ Generates class bins based on the Natural Breaks method
             :param n_classes: integer, number of classes
             :return: list, optimized bins
         """
@@ -311,7 +294,7 @@ class MapArray:
         """ Classifies the raster according to the classification bins
         :param project_dir: path of the project directory
         :param class_bins: list
-        :return: no return, saves the classified raster in the chosen directory
+        :return: saves the classified raster in the chosen directory
         """
         # Classify the original image array (digitize makes nodatavalues take the class 0)
         raster_fi = np.ma.filled(self.array, fill_value=-np.inf)

@@ -1,6 +1,6 @@
 try:
     import matplotlib.pyplot as plt
-    import mapoperator as mo
+    import preprocessing as mo
     from pathlib import Path
     import numpy as np
     import gdal
@@ -21,7 +21,7 @@ dir = Path.cwd()
 Path(dir / "rasters").mkdir(exist_ok=True)
 
 
-raster_random = mo.MapArray(str(dir/'rasters') + '/' + 'vali_meas_2013_random_clipped.tif')
+raster_random = mo.PreProCategorization(str(dir / 'rasters') + '/' + 'vali_meas_2013_random_clipped.tif')
 #nb_classes = raster_meas.nb_classes(12)
 # nb_classes[-1] = np.inf
 # nb_classses = np.insert(nb_classes, 0, -np.inf, axis=0)

@@ -1,4 +1,4 @@
-import mapoperator as mo
+import preprocessing as mo
 import pandas as pd
 from pathlib import Path
 
@@ -30,8 +30,8 @@ if '.' not in raw_data[-4:]:
 path_A = str(dir / "raw_data/") + "/" + raw_data
 
 #  Instanciates object of the class
-_map = mo.SpatialField(pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
-                       nodatavalue=nodatavalue, res=res)
+_map = mo.PreProFuzzy(pd.read_csv(path_A, skip_blank_lines=True), attribute=attribute, crs=crs,
+                      nodatavalue=nodatavalue, res=res)
 
 #  Creates a normalized and gridded array
 _array = _map.norm_array(method=interpol_method)

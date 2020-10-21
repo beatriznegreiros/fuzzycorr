@@ -1,7 +1,7 @@
-import mapoperator as mo
+import preprocessing as mo
 from pathlib import Path
 import pandas as pd
-import fuzzyevaluation as fuzz
+import fuzzycomp as fuzz
 
 file = "diamond_experiment"
 
@@ -23,8 +23,8 @@ path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
 random_raster = str(current_dir / 'rasters') + '/' + file + '_01_random.tif'
 
 # Instanciating object of SpatialField
-map_file = mo.SpatialField(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
-                           nodatavalue=nodatavalue, res=res)
+map_file = mo.PreProFuzzy(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs,
+                          nodatavalue=nodatavalue, res=res)
 
 # Create random raster
 map_file.random_raster(random_raster, minmax=None)

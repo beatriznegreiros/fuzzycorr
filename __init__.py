@@ -1,2 +1,2 @@
-import fuzzyevaluation, mapoperator, plotter
-__all__ = ['fuzzyevaluation', 'mapoperator', 'plotter']
+import fuzzycomp, preprocessing, visualization
+__all__ = ['fuzzycomp.py', 'preprocessing.py', 'visualization.py']

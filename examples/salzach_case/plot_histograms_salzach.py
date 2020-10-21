@@ -1,4 +1,4 @@
-import plotter
+import visualization
 from pathlib import Path
 
 current_dir = Path.cwd()
@@ -18,6 +18,6 @@ list_rasters = ['vali_Hydro_FT-2D_MAP_2013',
 
 for raster in list_rasters:
     path_raster = str(current_dir) + '/raw_data/' + raster + '.csv'
-    histA = plotter.DataPlotter(path_raster)
+    histA = visualization.DataPlotter(path_raster)
     outA = str(current_dir) + '/analysis/' + 'hist_rawdata_' + raster + '.png'
     histA.make_hist('Bed level change [m]', 'Frequencies', output_file=outA)

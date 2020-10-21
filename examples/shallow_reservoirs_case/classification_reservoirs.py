@@ -1,6 +1,6 @@
 try:
     import matplotlib.pyplot as plt
-    import mapoperator as mo
+    import preprocessing as mo
     from pathlib import Path
     import numpy as np
     import gdal
@@ -34,8 +34,8 @@ if '.' not in raster_B[-4:]:
 map_B_in = str(dir / "rasters/") + "/" + raster_B
 
 # Import raster as np array
-array_A = mo.MapArray(map_A_in)
-array_B = mo.MapArray(map_B_in)
+array_A = mo.PreProCategorization(map_A_in)
+array_B = mo.PreProCategorization(map_B_in)
 
 # Classify the array and save the output file as .tif raster
 #nb_classes = array_A.nb_classes(n_classes)  # Extract the optimized intervals for the map A
