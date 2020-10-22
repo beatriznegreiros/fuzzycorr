@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="valitools-Beatriz-Negreiros",
+    name="fuzzycorr-Beatriz-Negreiros",
     version="0.0.1",
     author="Beatriz Negreiros",
     author_email="beatriz.negreiros@iws.uni-stuttgart.de",
     description="Fuzzy map comparison for the evaluation of hydro-morphodynamic numerical models",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://beatriznegreiros.github.io/valitools/",
+    url="https://beatriznegreiros.github.io/fuzzycorr/",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
