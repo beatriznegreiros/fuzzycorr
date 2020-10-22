@@ -1,6 +1,6 @@
 try:
     import matplotlib.pyplot as plt
-    import preprocessing as mo
+    import prepro as mo
     from pathlib import Path
     import numpy as np
     import gdal

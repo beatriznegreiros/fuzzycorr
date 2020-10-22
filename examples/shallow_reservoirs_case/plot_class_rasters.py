@@ -1,4 +1,4 @@
-import visualization
+import plotter
 from pathlib import Path
 from matplotlib import cm
 
@@ -19,6 +19,6 @@ cmap = cm.get_cmap('jet', 6)
 
 for item in list_rasters:
     rast_path = str(current_dir) + '/rasters/' + item + '.tif'
-    raster = visualization.RasterDataPlotter(rast_path)
+    raster = plotter.RasterDataPlotter(rast_path)
     path_fig = str(current_dir) + '/rasters/' + item + '_plot_clipped.png'
     raster.plot_categorical_raster(path_fig, labels, cmap=cmap)

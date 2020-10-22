@@ -1,5 +1,5 @@
 from pathlib import Path
-import visualization
+import plotter
 
 list_files = ['diamond_fuzzynum_n4hd2',
               'hexagon_fuzzynum_n4hd2']
@@ -12,6 +12,6 @@ current_dir = Path.cwd()
 for file in list_files:
     path_raster = str(current_dir / 'results') + '/' + file + '.tif'
     outputpath = str(current_dir / 'analysis') + '/' + 'hist_' + file + '.png'
-    raster = visualization.RasterDataPlotter(path_raster)
+    raster = plotter.RasterDataPlotter(path_raster)
     raster.make_hist(legendx, legendy, fontsize=17, output_file=outputpath, figsize=(6, 4.2),
                      set_xlim=(0.35, 1), set_ylim=(0, 140))

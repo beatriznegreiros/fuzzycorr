@@ -1,5 +1,5 @@
 from pathlib import Path
-import preprocessing as mo
+import prepro as mo
 import fuzzycomp as fuzz
 import pandas as pd
 import numpy as np

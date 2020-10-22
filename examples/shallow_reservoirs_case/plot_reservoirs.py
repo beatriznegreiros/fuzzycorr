@@ -1,4 +1,4 @@
-import visualization
+import plotter
 from pathlib import Path
 from matplotlib import cm
 
@@ -38,6 +38,6 @@ vmin = 0.0
 
 for item in list_rasters:
     rast_path = str(current_dir) + '/results/' + item + '.tif'
-    raster = visualization.RasterDataPlotter(rast_path)
+    raster = plotter.RasterDataPlotter(rast_path)
     path_fig = str(current_dir) + '/results/' + item + '_plot_clipped.png'
     raster.plot_continuous_raster(path_fig, cmap, vmax, vmin, box='off')

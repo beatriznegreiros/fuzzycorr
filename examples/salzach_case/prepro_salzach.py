@@ -1,7 +1,7 @@
 from pathlib import Path
-import preprocessing as pp
+import prepro as pp
 import pandas as pd
-import fuzzycomp as fuzz
+
 
 # ---------------Data Pre-processing---------------------------------
 # ------------------------INPUT--------------------------------------
@@ -30,14 +30,14 @@ nodatavalue = -9999
 ulc = (4571800, 5308230)
 lrc = (4575200, 5302100)
 
-# -----------------------------------------------------------------------
-
 # Create directories if not existent
 current_dir = Path.cwd()
 Path(current_dir / 'shapefiles').mkdir(exist_ok=True)
 Path(current_dir / 'rasters').mkdir(exist_ok=True)
 
 poly_path = str(current_dir / 'shapefiles') + '/' + polyname + '.shp'
+
+# -----------------------------------------------------------------------
 
 for file in list_files:
     # Path management
@@ -56,4 +56,4 @@ for file in list_files:
     # Clip raster
     clip_raster = str(current_dir / 'rasters') + '/' + file + '_res5_clipped' + '.tif'
     #  map_file.create_polygon(poly_path, alpha=0.01)
-    map_file.clip_raster(poly_path, raster_out, clip_raster)
+    pp.clip_raster(poly_path, raster_out, clip_raster)

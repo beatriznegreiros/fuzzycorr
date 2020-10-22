@@ -7,7 +7,6 @@ import matplotlib.patches as patches
 from matplotlib import colors
 import matplotlib
 import matplotlib.transforms
-import scipy.stats
 
 
 class RasterDataPlotter:
@@ -57,7 +56,7 @@ class RasterDataPlotter:
         plt.savefig(output_file, dpi=300)
         plt.clf()
 
-    def plot_raster_w_window(self, output_file, xy, width, height, bounds, **kwargs):
+    def plot_continuous_w_window(self, output_file, xy, width, height, bounds, **kwargs):
         """
         Create a figure of a raster with a zoomed window
         :param output_file: path, file path of the figure

@@ -1,4 +1,4 @@
-import visualization
+import plotter
 from pathlib import Path
 from matplotlib import cm
 
@@ -39,9 +39,9 @@ list_colors = ['darkred', 'sienna', 'chocolate', 'sandybrown', 'gold', 'yellow',
 
 for item in list_rasters:
     rast_path = str(current_dir) + '/rasters/' + item + '.tif'
-    raster = visualization.RasterDataPlotter(rast_path)
+    raster = plotter.RasterDataPlotter(rast_path)
     path_fig = str(current_dir) + '/rasters/figures/' + item + '.png'
-    raster.plot_raster_w_window(output_file=path_fig, xy=(0, 0), width=170, height=270, cmap=None, list_colors=list_colors, bounds=bounds)
+    raster.plot_continuous_w_window(output_file=path_fig, xy=(0, 0), width=170, height=270, cmap=None, list_colors=list_colors, bounds=bounds)
 
 
 #bounds = [-0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0]

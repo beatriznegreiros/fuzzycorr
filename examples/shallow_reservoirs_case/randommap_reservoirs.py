@@ -1,4 +1,4 @@
-import preprocessing as mo
+import prepro as mo
 from pathlib import Path
 import pandas as pd
 import fuzzycomp as fuzz
