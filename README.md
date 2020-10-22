@@ -34,9 +34,9 @@ could be applied to assess hydro-morphodynamic model's validity and aid modelers
 ### Repo's description
 
 This repository contains the following modules:
-- prepro.py: This module's capabilities include the reading, normalizing and rasterizing vector data. These are preprocessing steps for fuzzy map comparison (module fuzzycomp).
-- fuzzycomp.py: Module for performing fuzzy map comparison in continuous valued rasters. The reader is referred to [Hagen(2006)](https://www.researchgate.net/publication/242690490_Comparing_Continuous_Valued_Raster_Data_A_Cross_Disciplinary_Literature_Scan) for more details. Future methods may be developed
-- plotter.py: Module for the visualization of output and input rasters.
+- ``prepro.py``: This module's capabilities include the reading, normalizing and rasterizing vector data. These are preprocessing steps for fuzzy map comparison (module fuzzycomp).
+- ``fuzzycomp.py``: Module for performing fuzzy map comparison in continuous valued rasters. The reader is referred to [Hagen(2006)](https://www.researchgate.net/publication/242690490_Comparing_Continuous_Valued_Raster_Data_A_Cross_Disciplinary_Literature_Scan) for more details. Future methods may be developed
+- ``plotter.py``: Module for the visualization of output and input rasters.
 
 ### Usage
 - The docstrings of the package are located in the folder ``docs``.
@@ -59,8 +59,9 @@ The necessary modules for running this repo are specified in the ``environment.y
 
 ### References
 
-https://github.com/rosskush/skspatial &nbsp;&nbsp; | &nbsp;&nbsp;
-http://chris35wills.github.io/gridding_data/
+[Ross Kushnereit](https://github.com/rosskush/skspatial)
+&nbsp;&nbsp; | &nbsp;&nbsp;
+[Chris Wills](http://chris35wills.github.io/gridding_data/)
 
 ### Developed in:
 
