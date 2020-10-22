@@ -56,4 +56,7 @@ The necessary modules for running this repo are specified in the ``environment.y
 - navigate with the Anaconda Prompt through your directories to the ``.yml`` file
 - type ``conda env create -f environment.yml`` and your environment is ready to go under the name ``env-valitools``
 
+### References
 
+https://github.com/rosskush/skspatial
+http://chris35wills.github.io/gridding_data/
