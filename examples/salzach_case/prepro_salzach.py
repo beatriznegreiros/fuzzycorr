@@ -1,5 +1,5 @@
 from pathlib import Path
-import preprocessing as mo
+import preprocessing as pp
 import pandas as pd
 import fuzzycomp as fuzz
 
@@ -45,7 +45,7 @@ for file in list_files:
     raster_out = str(current_dir / 'rasters') + '/' + file + '_res5.tif'
 
     # Instanciating object of SpatialField
-    map_file = mo.PreProFuzzy(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
+    map_file = pp.PreProFuzzy(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
 
     # Normalize points to a grid-ed array
     array_ = map_file.norm_array(method=interpol_method)
