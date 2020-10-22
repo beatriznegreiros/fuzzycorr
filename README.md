@@ -34,13 +34,13 @@ could be applied to assess hydro-morphodynamic model's validity and aid modelers
 ### Repo's description
 
 This repository contains the following modules (both can run as stand-alone):
-- mapoperator: This module's capabilities include the reading, normalizing and rasterizing spatial data.
-- fuzzynumerical: Module for model evaluation based on fuzzy numerical map comparison. Future methods may be developed
-- plotter: Module for the visualization of output rasters.
+- preprocessing.py: This module's capabilities include the reading, normalizing and rasterizing spatial data.
+- ffuzzycomp.py: Module for model evaluation based on fuzzy numerical map comparison. Future methods may be developed
+- visualization.py: Module for the visualization of output and input rasters.
 
 Examples of usage on the package are found in the directory ``examples``. In each of the case studies the organization of the files are done as following:
-- raw_data: Stores the data directory which the code will read
-- rasters: Rasters will be saved and searched for here
+- raw_data: Where the the raw data (.csv) is placed.
+- rasters: Location for saving the rasters
 - analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
 - shapefiles: Contains shapefiles output or to be converted to rasters, as well as polygons used in the clipping of rasters.
 - results: Output of fuzzy comparisons are saved here.
@@ -58,7 +58,7 @@ The necessary modules for running this repo are specified in the ``environment.y
 
 ### References
 
-https://github.com/rosskush/skspatial 
+https://github.com/rosskush/skspatial &nbsp;&nbsp; | &nbsp;&nbsp;
 http://chris35wills.github.io/gridding_data/
 
 ### Developed in:
