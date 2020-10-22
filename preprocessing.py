@@ -211,34 +211,6 @@ class PreProFuzzy:
 
         return new_dataset
 
-    def ok_2D(self, n_closest_points=None, variogram_model='linear', verbose=False,
-              coordinates_type='geographic', backend='vectorized'):  # Ordinary Kriging
-
-        # Credit to 'https://github.com/bsmurphy/PyKrige'
-
-        OK = OrdinaryKriging(self.x, self.y, self.z, variogram_model=variogram_model, verbose=verbose,
-                             enable_plotting=False, coordinates_type=coordinates_type)
-        x, y = np.arange(0, self.ncol), np.arange(0, self.nrow)
-
-        xpts = np.arange(self.xmin + self.res / 2, self.xmax + self.res / 2, self.res)
-        ypts = np.arange(self.ymin + self.res / 2, self.ymax + self.res / 2, self.res)
-        ypts = ypts[::-1]
-
-        xp, yp = [], []
-        for yi in ypts:
-            for xi in xpts:
-                xp.append(xi)
-                yp.append(yi)
-
-        if n_closest_points is not None:
-            backend = 'loop'
-
-        # krige_array, ss = OK.execute('points', x, y, n_closest_points=n_closest_points,backend=backend)
-        krige_array, ss = OK.execute('points', xp, yp, n_closest_points=n_closest_points, backend=backend)
-        krige_array = np.reshape(krige_array, (self.nrow, self.ncol))
-
-        return krige_array
-
     def create_polygon(self, shape_polygon, alpha=np.nan):
         """ Creates a polygon surrounding a cloud of shapepoints
         :param shape_polygon: string, path to save the shapefile
