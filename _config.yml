@@ -1,4 +1,4 @@
 theme: jekyll-theme-minimal
-title: valitools
+title: fuzzycorr
 logo: logo.png
-description: Package for evaluating hydro-morphodynamic numerical models using fuzzy map comparison
+description: A package for correlating simulations with observations via fuzzy map comparison
