@@ -58,5 +58,9 @@ The necessary modules for running this repo are specified in the ``environment.y
 
 ### References
 
-https://github.com/rosskush/skspatial
+https://github.com/rosskush/skspatial 
 http://chris35wills.github.io/gridding_data/
+
+### Developed in:
+
+[![Image](Logo_LWW.JPG)](https://www.iws.uni-stuttgart.de/lww/)

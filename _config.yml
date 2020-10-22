@@ -1,4 +1,4 @@
 theme: jekyll-theme-minimal
 title: valitools
-logo: (docs/logo.png)
+logo: logo.PNG
 description: Package for evaluating hydro-morphodynamic numerical models using fuzzy map comparison
