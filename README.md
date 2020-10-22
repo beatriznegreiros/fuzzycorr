@@ -33,21 +33,16 @@ could be applied to assess hydro-morphodynamic model's validity and aid modelers
 
 ### Repo's description
 
-This repository contains the following modules (both can run as stand-alone):
-- preprocessing.py: This module's capabilities include the reading, normalizing and rasterizing spatial data.
-- ffuzzycomp.py: Module for model evaluation based on fuzzy numerical map comparison. Future methods may be developed
-- visualization.py: Module for the visualization of output and input rasters.
+This repository contains the following modules:
+- prepro.py: This module's capabilities include the reading, normalizing and rasterizing vector data. These are preprocessing steps for fuzzy map comparison (module fuzzycomp).
+- fuzzycomp.py: Module for performing fuzzy map comparison in continuous valued rasters. The reader is referred to [Hagen(2006)](https://www.researchgate.net/publication/242690490_Comparing_Continuous_Valued_Raster_Data_A_Cross_Disciplinary_Literature_Scan) for more details. Future methods may be developed
+- plotter.py: Module for the visualization of output and input rasters.
 
-Examples of usage on the package are found in the directory ``examples``. In each of the case studies the organization of the files are done as following:
-- raw_data: Where the the raw data (.csv) is placed.
-- rasters: Location for saving the rasters
-- analysis: Figures related to the analysis of the data, histograms, initial overviews etc.
-- shapefiles: Contains shapefiles output or to be converted to rasters, as well as polygons used in the clipping of rasters.
-- results: Output of fuzzy comparisons are saved here.
-
+### Usage
+- The docstrings are located in the folder ``docs``.
+- The best way to learn the usage is by examples. In the directory ``examples``, the usage of the modules are demonstrated in a case study.
 
 ### Code description
-
 The repository is coded in  ``Python 3.6 x`` 
 
 ### Dependencies and Environment
