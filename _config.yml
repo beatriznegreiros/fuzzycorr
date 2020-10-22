@@ -1,5 +1,5 @@
 theme: jekyll-theme-minimal
 title: valitools
 logo: logo.png
-description: Validation and calibration tools for numerical models
+description: Package for validating hydro-morphodynamic numerical models using fuzzy map comparison
 
