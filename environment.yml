@@ -1,4 +1,4 @@
-name: env-valitools
+name: env-fuzzycorr
 channels:
   - conda-forge
 dependencies:
