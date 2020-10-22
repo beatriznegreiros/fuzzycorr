@@ -39,8 +39,14 @@ This repository contains the following modules:
 - plotter.py: Module for the visualization of output and input rasters.
 
 ### Usage
-- The docstrings are located in the folder ``docs``.
+- The docstrings of the package are located in the folder ``docs``.
 - The best way to learn the usage is by examples. In the directory ``examples``, the usage of the modules are demonstrated in a case study.
+Example:
+- Inside the folder ``salzach_case``, the results from a hydro-morphodynamic numerical simulation ( i.e., simulated bed elevation change, deltaZ) are located in ``raw_data``. For more details on the hydro-morphodynamic numerical models the reader is referred to [Beckers et al (2020)](https://www.researchgate.net/publication/342181386_Bayesian_Calibration_and_Validation_of_a_Large-scale_and_Time-demanding_Sediment_Transport_Model).
+- ``prepro_salzach.py``: example of the usage of the class ``PreProFuzzy`` of the module ``prepro.py``, where vector data is interpolated and rasterized.
+- ``classification_salzach.py``: example of the usage of the class ``PreProCategorization`` of the module ``prepro.py``.
+- ``fuzzycomparison_salzach.py``: example of the usage of the class ``FuzzyComparison`` of the module ``fuzzycomp.py``, which creates a correlation (similarity) measure between simulated and observed datasets.
+- ``plot_salzach.py``, ``plot_class_rasters.py`` and ``plot_histograms_salzach.py``: example of the usage of the module ``plotter.py``.
 
 ### Code description
 The repository is coded in  ``Python 3.6 x`` 
@@ -49,7 +55,7 @@ The repository is coded in  ``Python 3.6 x``
 
 The necessary modules for running this repo are specified in the ``environment.yml`` file, to install all packages in the environment simply:
 - navigate with the Anaconda Prompt through your directories to the ``.yml`` file
-- type ``conda env create -f environment.yml`` and your environment is ready to go under the name ``env-valitools``
+- type ``conda env create -f environment.yml`` and your environment is ready to go under the name ``env-fuzzycorr``
 
 ### References
 
