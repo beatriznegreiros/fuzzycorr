@@ -1,9 +1,6 @@
 ## Fuzzy Map Comparison for the Evaluation of Hydro-morphodynamic Numerical Models 
 ---
-This repository contains the work developed during a Master Thesis on fuzzy map comparison methods to assess the performance of hydro-morphodynamic numerical models.
-
-Further improvements are being done and the final code will be available
-at the end of October. 
+This repository contains the work developed for a Master Thesis on fuzzy map comparison methods to evaluate the performance of hydro-morphodynamic numerical models.
 
 - For usage please read the Lincense terms.
 
