@@ -6,9 +6,7 @@ import pandas as pd
 # ---------------Data Pre-processing---------------------------------
 # ------------------------INPUT--------------------------------------
 #  Raw data input path
-list_files = ['vali_aPC_MAP_2013',
-              'vali_hydro_FT_manual_2013',
-              'vali_Hydro_FT-2D_MAP_2013',
+list_files = ['vali_hydro_FT_manual_2013',
               'vali_meas_2013']
 
 # Parameters
@@ -53,7 +51,7 @@ for file in list_files:
     # Write raster
     map_file.array2raster(array_, raster_out, save_ascii=False)
 
-    # Clip raster
+    # Clip raster and save it
     clip_raster = str(current_dir / 'rasters') + '/' + file + '_res5_clipped' + '.tif'
-    #  map_file.create_polygon(poly_path, alpha=0.01)
+    # map_file.create_polygon(poly_path, alpha=0.01)
     pp.clip_raster(poly_path, raster_out, clip_raster)

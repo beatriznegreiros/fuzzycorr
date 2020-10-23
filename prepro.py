@@ -257,7 +257,7 @@ class PreProCategorization:
         # Classification based on Natural Breaks
         array_values = self.array[~self.array.mask].ravel()
         breaks = mc.NaturalBreaks(array_values, k=n_classes)
-        print('The bins were optimized to:', breaks.bins)  # bins being [], (], (]....(] always including the right
+        print('The upper bound of the classes are:', breaks.bins)  # bins being (], (], (]....(] always including the right
         print('Number of counts for each class, respectively:', breaks.counts)
         print('max: ', array_values.max(), 'min: ', array_values.min())
         return breaks.bins
@@ -265,7 +265,7 @@ class PreProCategorization:
     def categorize_raster(self, class_bins, map_out, save_ascii=True):
         """ Classifies the raster according to the classification bins
         :param project_dir: path of the project directory
-        :param class_bins: list
+        :param class_bins: list of floats,
         :return: saves the classified raster in the chosen directory
         """
         # Classify the original image array (digitize makes nodatavalues take the class 0)
@@ -281,7 +281,6 @@ class PreProCategorization:
         raster_ma_fi = np.ma.filled(raster_ma, fill_value=self.nodatavalue)
         # raster_ma_fi = np.ma.filled(raster_class, fill_value=self.nodatavalue)
 
-        print(raster_ma_fi.min())
         if raster_ma_fi.min() == self.nodatavalue or type(raster_ma_fi) != np.ma.MaskedArray:
             with rio.open(map_out, 'w', **self.meta) as outf:
                 outf.write(raster_ma_fi.astype(rio.float64), 1)

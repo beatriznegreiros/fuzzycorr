@@ -37,7 +37,7 @@ map_file = pp.PreProFuzzy(pd.read_csv(path_file, skip_blank_lines=True), attribu
                           nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
 
 # Create random raster
-map_file.random_raster(random_raster, minmax=None)
+map_file.random_raster(random_raster, minmax=None, save_ascii=False)
 
 # Clip random raster
 pp.clip_raster(poly_path, in_raster=random_raster, out_raster=clipped_random_raster)

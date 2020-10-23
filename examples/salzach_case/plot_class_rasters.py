@@ -4,15 +4,12 @@ from matplotlib import cm
 
 current_dir = Path.cwd()
 
-list_rasters = ['vali_Hydro_FT-2D_MAP_2013_clipped_class_nbreaks',
-                'vali_aPC_MAP_2013_clipped_class_nbreaks',
-                'vali_meas_2013_clipped_class_nbreaks',
-                'vali_hydro_FT_manual_2013_clipped_class_nbreaks']
+list_rasters = ['vali_meas_class_nbreaks',
+                'vali_hydro_FT_manual_class_nbreaks']
 
 # Bounds for categories
 labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 
-#list_colors = ['greenyellow', 'lime', 'lightseagreen', 'deepskyblue', 'royalblue', 'navy']
 
 cmap = cm.get_cmap('jet', 12)
 

@@ -1,6 +1,7 @@
 from pathlib import Path
 import timeit
 import fuzzycomp as fuzz
+import plotter
 
 # ------------------------INPUT--------------------------------------
 # Neighborhood definition
@@ -9,17 +10,17 @@ halving_distance = 4
 
 # Output map and textfile
 current_dir = Path.cwd()
-Path(current_dir / "results/fuzzy_numerical").mkdir(exist_ok=True)  # create dir if not existent
-save_dir = str(current_dir / "results/fuzzy_numerical/fuzzynumerical_comparison_w_randomraster")
+Path(current_dir / "results").mkdir(exist_ok=True)  # create dir if not existent
+save_dir = str(current_dir / "results")
 
-comparison_name = "vali_random_n8hd4"  # filename for the results (.txt) and comparison map (
+comparison_name = "salzach_sim_versus_obs_n8hd4"  # filename for the results (.txt) and comparison map (
 # .tif)
 
 # Maps to compare
-map_A_in = str(current_dir / "rasters/vali_meas_2013_res5_clipped.tif")
-map_B_in = str(current_dir / 'rasters') + '/' + 'vali_meas_2013_random_clipped.tif'
+map_A_in = str(current_dir / "rasters/vali_hydro_FT_manual_2013_res5_clipped.tif")
+map_B_in = str(current_dir / "rasters/vali_meas_2013_res5_clipped.tif")
 # ------------------------------------------------------------------
-
+'''
 # Start run time count
 start = timeit.default_timer()
 
@@ -34,4 +35,11 @@ print('Average fuzzy similarity:', global_simil)
 stop = timeit.default_timer()
 
 # Print run time:
-print('Enlapsed time: ', stop - start, 's')
+print('Enlapsed time: ', stop - start, 's')'''
+
+# Plotting comparison map
+cmap = 'inferno'
+raster = plotter.RasterDataPlotter(str(current_dir / "results/salzach_sim_versus_obs_n8hd4.tif"))
+path_fig = str(current_dir) + '/results/' + comparison_name + '.png'
+raster.plot_continuous_raster(path_fig, cmap)
+

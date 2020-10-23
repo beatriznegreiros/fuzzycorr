@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy import genfromtxt
 import rasterio as rio
 import earthpy.plot as ep
 import matplotlib.patches as patches
@@ -9,14 +8,19 @@ import matplotlib
 import matplotlib.transforms
 
 
+def read_raster(path):
+    with rio.open(path) as src:
+        raster_np = src.read(1, masked=True)
+    return raster_np
+
+
 class RasterDataPlotter:
     def __init__(self, path):
+        """
+        Class of raster for plotting
+        :param path: string, path of the raster to be plotted
+        """
         self.path = path
-
-    def read_raster(self):
-        with rio.open(self.path) as src:
-            raster_np = src.read(1, masked=True)
-        return raster_np
 
     def make_hist(self, legendx, legendy, fontsize, output_file, figsize, set_ylim=None, set_xlim=None):
         """
@@ -31,7 +35,7 @@ class RasterDataPlotter:
         :output: saves the figure of the histogram
         """
         plt.rcParams.update({'font.size': fontsize})
-        raster_np = self.read_raster()
+        raster_np = read_raster(self.path)
         fig, ax = plt.subplots(figsize=figsize)
         _, bins, _ = ax.hist(raster_np[~raster_np.mask], bins=60)
 
@@ -56,7 +60,7 @@ class RasterDataPlotter:
         plt.savefig(output_file, dpi=300)
         plt.clf()
 
-    def plot_continuous_w_window(self, output_file, xy, width, height, bounds, **kwargs):
+    def plot_continuous_w_window(self, output_file, xy, width, height, bounds, cmap=None, list_colors=None):
         """
         Create a figure of a raster with a zoomed window
         :param output_file: path, file path of the figure
@@ -64,21 +68,21 @@ class RasterDataPlotter:
         :param width: integer, width (number of cells) of the zoomed window
         :param height: integer, height (number of cells) of the zoomed window
         :param bounds: list of float, limits for each color of the colormap
-        :kwarg cmap: string, colormap to plot the raster
-        :kwarg list_colors: list of colors (str), as alternative to using a colormap
+        :param cmap: string, optional, colormap to plot the raster
+        :param list_colors: list of colors (str), optional, as alternative to using a colormap
         :output: saves the figure of the raster
         """
-        #xy: upper left corner from the lower left corner of the picture
-        raster_np = self.read_raster()
+        # xy: upper left corner from the lower left corner of the picture
+        raster_np = read_raster(self.path)
         print('Raster has size: ', raster_np.shape)
         fig, ax = plt.subplots(1, 2, figsize=(10, 8))
         fig.tight_layout()
 
         # Creates a colormap based on the given list_colors, if the cmap is not given
-        if kwargs['cmap'] is None and kwargs['list_colors'] is not None:
-            cmap = matplotlib.colors.ListedColormap(kwargs['list_colors'])
-        elif kwargs['cmap'] is not None:
-            cmap = kwargs['cmap']
+        if cmap is None and list_colors is not None:
+            cmap = matplotlib.colors.ListedColormap(list_colors)
+        elif cmap is not None and list_colors is None:
+            pass
         else:
             print('Error: Insuficient number of arguments')
 
@@ -91,56 +95,72 @@ class RasterDataPlotter:
         #  Plot Patch
         box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
         im = ax[1].imshow(box_np, cmap=cmap, norm=norm)
-        #ax[1].axis('off')
+        # ax[1].axis('off')
         cbar = ep.colorbar(im, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=20)
 
         fig.savefig(output_file, dpi=600, bbox_inches='tight')
 
-    def plot_raster(self, output_file, bounds, list_colors=None, cmap=None):
-        raster_np = self.read_raster()
+    def plot_continuous_raster(self, output_file, cmap, vmax=np.nan, vmin=np.nan, box=True):
+        """
+        Create a figure of a continuous valued raster
+        :param output_file: path, file path of the figure
+        :param cmap: string, colormap to plot the raster
+        :param vmax: float, optional, value maximum of the scale, this value is used in the normalization of the colormap
+        :param vmin: float, optional, value minimum of the scale, this value is used in the normalization of the colormap
+        :param box: boolean, if False it sets off the frame of the picture
+        :output: saves the figure of the raster
+        """
+        raster_np = read_raster(self.path)
         fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
-
-        if cmap is None and list_colors is not None:
-            cmap = matplotlib.colors.ListedColormap(list_colors)
-        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
-        im1 = ax1.imshow(raster_np, cmap=cmap, norm=norm)
-        fig1.tight_layout()
-        #plt.setp(ax1, xticks=[], yticks=[])
-        #ax1.axis('off')
-
-        cbar = ep.colorbar(im1, pad=0.3, size='5%')
-        cbar.ax.tick_params(labelsize=20)
-        fig1.savefig(output_file, dpi=300, bbox_inches='tight')
-
-    def plot_continuous_raster(self, output_file, cmap, vmax, vmin, **kwargs):
-        raster_np = self.read_raster()
-        fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
-        #norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
-        im1 = ax1.imshow(raster_np, cmap=cmap, vmax=vmax, vmin=vmin)
+        # norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+        if np.isfinite(vmax) and np.isfinite(vmin):
+            im1 = ax1.imshow(raster_np, cmap=cmap, vmax=vmax, vmin=vmin)
+        else:
+            im1 = ax1.imshow(raster_np, cmap=cmap, vmax=raster_np.max(), vmin=raster_np.min())
         fig1.tight_layout()
         plt.setp(ax1)
         cbar = ep.colorbar(im1, pad=0.3, size='5%')
         cbar.ax.tick_params(labelsize=15)
-        if kwargs['box'] == 'off':
+        if not box:
             ax1.axis('off')
         fig1.savefig(output_file, dpi=200, bbox_inches='tight')
 
-    def plot_categorical_raster(self, output_file, labels, cmap):
-        raster_np = self.read_raster()
+    def plot_categorical_raster(self, output_file, labels, cmap, box=True):
+        """
+        Create a figure of a categorical raster
+        :param output_file: path, file path of the figure
+        :param labels: list of strings, labels (i.e., titles)for the categories
+        :param cmap: string, colormap to plot the raster
+        :param box: boolean, if False it sets off the frame of the picture
+        :output: saves the figure of the raster
+        """
+        raster_np = read_raster(self.path)
         print('Classes identified in the raster: ', np.unique(raster_np))
-        #cmap = matplotlib.colors.ListedColormap(list_colors)
+        # cmap = matplotlib.colors.ListedColormap(list_colors)
         fig, ax = plt.subplots()
         im = ax.imshow(raster_np, cmap=cmap)
         ep.draw_legend(im, titles=labels)
         ax.set_axis_off()
-        #plt.show()
+        # plt.show()
+        if not box:
+            ax.axis('off')
         fig.savefig(output_file, dpi=200, bbox_inches='tight')
 
-    def plot_categorical_w_window(self, output_file, labels, cmap, xy, width, height):
-        raster_np = self.read_raster()
+    def plot_categorical_w_window(self, output_file, labels, cmap, xy, width, height, box=True):
+        """
+        Create a figure of a categorical raster with a zoomed window
+        :param output_file: path, file path of the figure
+        :param labels: list of strings, labels (i.e., titles)for the categories
+        :param cmap: string, colormap to plot the raster
+        :param xy: tuple (x,y), origin of the zoomed window, the upper left corner
+        :param width: integer, width (number of cells) of the zoomed window
+        :param height: integer, height (number of cells) of the zoomed window
+        :output: saves the figure of the raster
+        """
+        raster_np = read_raster(self.path)
         print('Classes identified in the raster: ', np.unique(raster_np))
-        #cmap = matplotlib.colors.ListedColormap(list_colors)
+        # cmap = matplotlib.colors.ListedColormap(list_colors)
         fig, ax = plt.subplots(1, 2)
 
         ax[0].imshow(raster_np, cmap=cmap)
@@ -151,27 +171,9 @@ class RasterDataPlotter:
         #  Plot Patch
         box_np = raster_np[xy[1]: xy[1] + height, xy[0]: xy[0] + width]
         im = ax[1].imshow(box_np, cmap=cmap)
-        # ax[1].axis('off')
         cbar = ep.draw_legend(im, titles=labels)
-        #cbar.ax[].tick_params(labelsize=20)
-        #ax.set_axis_off()
+        # cbar.ax[].tick_params(labelsize=20)
+
+        if not box:
+            ax.axis('off')
         fig.savefig(output_file, dpi=700, bbox_inches='tight')
-
-
-class DataPlotter:
-    def __init__(self, path_textfile):
-        self.textfile = path_textfile
-
-    def make_hist(self, legendx, legendy, output_file):
-        file = genfromtxt(self.textfile, delimiter=',', skip_header=1)
-        lon, lat, attribute = file[:, 0], file[:, 1], file[:, 2]
-
-        # Printing histograms of the map
-        _ = plt.hist(attribute, bins=50, density=True)
-        #plt.title()
-        plt.grid(True)
-        plt.xlabel(legendx)
-        plt.ylabel(legendy)
-        plt.savefig(output_file, dpi=300)
-        plt.clf()
-
