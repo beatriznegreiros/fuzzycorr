@@ -1,4 +1,4 @@
 theme: jekyll-theme-minimal
 title: fuzzycorr
 logo: logo.png
-description: A package for correlating simulations with observations via fuzzy map comparison
+description: A Python package for correlating simulated with observed datasets via fuzzy map comparison.
