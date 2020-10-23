@@ -28,9 +28,9 @@ This work addresses such necessity in evaluating model performance through the u
 could be applied to assess hydro-morphodynamic model's validity and aid modelers on designing calibration procedures.
 
 
-### Repo's description
+### Package description
 
-This repository contains the following modules:
+This package contains the following modules:
 - ``prepro.py``: This module's capabilities include the reading, normalizing and rasterizing vector data. These are preprocessing steps for fuzzy map comparison (module fuzzycomp).
 - ``fuzzycomp.py``: Module for performing fuzzy map comparison in continuous valued rasters. The reader is referred to [Hagen(2006)](https://www.researchgate.net/publication/242690490_Comparing_Continuous_Valued_Raster_Data_A_Cross_Disciplinary_Literature_Scan) for more details. Future methods may be developed
 - ``plotter.py``: Module for the visualization of output and input rasters.
