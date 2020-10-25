@@ -11,7 +11,6 @@ try:
     from pyproj import CRS
     from scipy import interpolate
 except:
-except:
     print(
         'ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, '
         'alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
