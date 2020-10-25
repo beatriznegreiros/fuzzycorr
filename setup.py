@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.0.1",
     author="Beatriz Negreiros",
     author_email="beatriz.negreiros@iws.uni-stuttgart.de",
-    description="Fuzzy map comparison for the evaluation of hydro-morphodynamic numerical models",
+    description="A Python package for correlating simulated and observed datasets via Fuzzy Map Comparison",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://beatriznegreiros.github.io/fuzzycorr/",

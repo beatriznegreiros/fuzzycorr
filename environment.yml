@@ -13,6 +13,5 @@ dependencies:
   - pathlib
   - pyproj
   - scipy
-  - pykrige
   - earthpy
   - matplotlib

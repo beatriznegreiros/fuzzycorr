@@ -10,7 +10,7 @@ try:
     from pathlib import Path
     from pyproj import CRS
     from scipy import interpolate
-    from pykrige.ok import OrdinaryKriging
+except:
 except:
     print(
         'ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, '
