@@ -1,0 +1,44 @@
+
+class FuzzyComparison(builtins.object)
+ |  Methods defined here:
+ |  
+ |  __init__(self, rasterA, rasterB, neigh=4, halving_distance=2)
+ |      Performing fuzzy map comparison
+ |      :param rasterA: string, path of the raster to be compared with rasterB
+ |      :param rasterB: string, path of the raster to be compared with rasterA
+ |      :param neigh: integer, neighborhood being considered (number of cells from the central cell), default is 4
+ |      :param halving_distance: integer, distance (in cells) to which the membership decays to its half, default is 2
+ |  
+ |  fuzzy_numerical(self, comparison_name, save_dir, map_of_comparison=True)
+ |      Compares a pair of raster maps using fuzzy numerical spatial comparison
+ |      :param save_dir: string, directory where to save the results
+ |      :param comparison_name: string, name of the comparison
+ |      :param map_of_comparison: boolean, create map of comparison in the project directory if True
+ |      :return: Global Fuzzy Similarity and comparison map
+ |  
+ |  fuzzy_rmse(self, comparison_name, save_dir, map_of_comparison=True)
+ |      Compares a pair of raster maps using fuzzy root mean square error as spatial comparison
+ |      :param comparison_name: string, name of the comparison
+ |      :param save_dir: string, directory where to save the results of the map comparison
+ |      :param map_of_comparison: boolean, if True it creates map of of local squared errors (in the project directory)
+ |      :return: global fuzzy RMSE and comparison map
+ |  
+ |  neighbours(self, array, x, y)
+ |      Captures the neighbours and their memberships
+ |      :param array: array A or B
+ |      :param x: int, cell in x
+ |      :param y: int, cell in y
+ |      :return: np.array (float) membership of the neighbours (without mask), np.array (float) neighbours' cells (without mask)
+ |  
+ |  save_comparison_raster(self, array_local_measures, dir, file_name)
+ |  
+ |  save_results(self, measure, dir, name)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
