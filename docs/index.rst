@@ -4,8 +4,8 @@
    contain the root ``toctree`` directive.
 
 
-Description
-===========
+FuzzyCorr
+=========
 
 This repository contains the work developed for a Master Thesis on fuzzy map comparison methods to evaluate the performance of hydro-morphodynamic numerical models. Please read the License terms for code usage and re-distribution.
 
