@@ -41,7 +41,6 @@ class PreProFuzzy:
 
     def __init__(self, df, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
-        self.df = df
 
         if not isinstance(attribute, str):
             print("ERROR: attribute must be a string, check the name on your textfile")
@@ -51,10 +50,10 @@ class PreProFuzzy:
         self.nodatavalue = nodatavalue
 
         # Standardize the dataframe
-        self.df.dropna(how='any', inplace=True, axis=0)
+        df.dropna(how='any', inplace=True, axis=0)
         # Create the dictionary with new label names and then rename for standardization
-        new_names = {self.df.columns[0]: 'x', self.df.columns[1]: 'y', self.df.columns[2]: self.attribute}
-        self.df = self.df.rename(columns=new_names)
+        new_names = {df.columns[0]: 'x', df.columns[1]: 'y', df.columns[2]: self.attribute}
+        self.df = df.rename(columns=new_names)
 
         # Create geodataframe from the dataframe
         gdf = geopandas.GeoDataFrame(self.df, geometry=geopandas.points_from_xy(self.df.x, self.df.y))
@@ -87,7 +86,7 @@ class PreProFuzzy:
         self.nrow = int(np.ceil((self.ymax - self.ymin) / self.res))  # dely
 
     def points_to_grid(self):
-        """ Creates a grid of new points in the desired resolution to be interpolated
+        """Creates a grid of new points in the target resolution
 
         :returns: array of size nrow, ncol
 
@@ -109,11 +108,11 @@ class PreProFuzzy:
         return array
 
     def norm_array(self, method='linear'):
-        """ Normalizes the raw data in equally sparsed points depending on the selected resolution
+        """ Normalizes the raw data in equally distanced points depending on the selected resolution
 
         :returns: interpolated and normalized array with selected resolution
 
-        Hints:
+        Hint:
             Read more at https://github.com/rosskush/skspatial
         """
         array = self.points_to_grid()
