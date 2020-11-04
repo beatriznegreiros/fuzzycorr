@@ -28,7 +28,7 @@ def clip_raster(polygon, in_raster, out_raster):
 
 
 class PreProFuzzy:
-    """ Performing pre-processing
+    """Parent pre-processing structure for the comparison of numeric maps
 
     :param pd: pandas dataframe, can be obtained by reading the textfile as pandas dataframe
     :param attribute: string, name of the attribute to burn in the raster (ex.: deltaZ, Z)
@@ -151,11 +151,11 @@ class PreProFuzzy:
         if '.' not in raster_file[-4:]:
             raster_file += '.tif'
 
-        self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
+        transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
 
         new_dataset = rio.open(raster_file, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
-                               crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
+                               crs=self.crs, transform=transform, nodata=self.nodatavalue)
         print('The array has size: ', np.shape(array))
 
         new_dataset.write(array, 1)
@@ -168,10 +168,10 @@ class PreProFuzzy:
         return new_dataset
 
     def plain_raster(self, shapefile, raster_file, res):
-        """ Converts shapefile(.shp) to rasters(.tif) without normalizing
+        """Converts a shapefile(.shp) to a GeoTIFF raster without normalizing
 
         :param shapefile: string, filename with path of the input shapefile (*.shp)
-        :param raster_file: stirng, filename with path of the output raster (*.tif)
+        :param raster_file: string, filename with path of the output raster (*.tif)
         :param res: float, resolution of the cell
 
         :returns: saves the raster in the default directory
@@ -197,7 +197,7 @@ class PreProFuzzy:
         gdal.RasterizeLayer(_raster, [1], source_layer, options=['ATTRIBUTE=' + self.attribute])
 
     def array2raster(self, array, raster_file, save_ascii=True):
-        """ Saves a raster using interpolation
+        """Saves a raster using interpolation
 
         :param raster_file: string, path to save the rasterfile
         :param save_ascii: boolean, true to save also an ascii raster
@@ -207,10 +207,10 @@ class PreProFuzzy:
         if '.' not in raster_file[-4:]:
             raster_file += '.tif'
 
-        self.transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
+        transform = rio.transform.from_origin(self.xmin, self.ymax, self.res, self.res)
         new_dataset = rio.open(raster_file, 'w', driver='GTiff',
                                height=array.shape[0], width=array.shape[1], count=1, dtype=array.dtype,
-                               crs=self.crs, transform=self.transform, nodata=self.nodatavalue)
+                               crs=self.crs, transform=transform, nodata=self.nodatavalue)
         print(np.shape(array))
         new_dataset.write(array, 1)
         new_dataset.close()
@@ -249,8 +249,9 @@ class PreProFuzzy:
 
 
 class PreProCategorization:
-    """Clips a raster based on the given polygon
-        :param raster: string, path of the raster to be categorized
+    """Structured for ... (UNCLEAR)
+
+    :param raster: string, path of the raster to be categorized
     """
     def __init__(self, raster):
         self.raster = raster
@@ -279,8 +280,9 @@ class PreProCategorization:
     def categorize_raster(self, class_bins, map_out, save_ascii=True):
         """Classifies the raster according to the classification bins
 
-        :param project_dir: path of the project directory
+        :param map_out: path of the project directory
         :param class_bins: list of floats
+        :param save_ascii: bool
 
         :returns: saves the classified raster in the chosen directory
         """
