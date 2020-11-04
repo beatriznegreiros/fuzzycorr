@@ -17,18 +17,19 @@ except ImportError:
 
 def clip_raster(polygon, in_raster, out_raster):
     """ Clips a raster based on the given polygon
-        :param polygon: string, file with path of the polygon (*.shp)
-        :param in_raster: string, file and path of the input raster (*.tif)
-        :param in_raster: string, file and path of the output raster (*.tif)
-        :return: no output, saves the raster (*.tif) with the selected filename
+
+    :param polygon: string, file with path of the polygon (*.shp)
+    :param in_raster: string, file and path of the input raster (*.tif)
+    :param in_raster: string, file and path of the output raster (*.tif)
+    :return: no output, saves the raster (*.tif) with the selected filename
     """
 
     gdal.Warp(out_raster, in_raster, cutlineDSName=polygon)
 
 
 class PreProFuzzy:
-    """ Performing
-     pre-processing
+    """ Performing pre-processing
+
     :param pd: pandas dataframe, can be obtained by reading the textfile as pandas dataframe
     :param attribute: string, name of the attribute to burn in the raster (ex.: deltaZ, Z)
     :param crs: string, coordinate reference system

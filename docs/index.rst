@@ -2,12 +2,10 @@
    sphinx-quickstart on Tue Nov 04 10:43:23 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root ``toctree`` directive.
-.. contents::
-   :depth: 3
-..
 
-Fuzzy Map Comparison for the Evaluation of Hydro-morphodynamic Numerical Models
-================================================================================
+
+Description
+===========
 
 This repository contains the work developed for a Master Thesis on fuzzy map comparison methods to evaluate the performance of hydro-morphodynamic numerical models. Please read the License terms for code usage and re-distribution.
 
@@ -24,7 +22,7 @@ The algorithms provided with ``fuzzycorr`` address the necessity in evaluating (
 Usage
 =====
 
-The best way to learn the usage is by examples. In the directory  ``examples``, the usage of the modules are demonstrated in a case study. Inside the folder ``salzach_case``, the results from a hydro-morphodynamic numerical simulation ( i.e., simulated bed elevation change, deltaZ) are located in ``raw_data``. For more details on the hydro-morphodynamic numerical refer to `Beckers et al (2020) <https://www.researchgate.net/publication/342181386_Bayesian_Calibration_and_Validation_of_a_Large-scale_and_Time-demanding_Sediment_Transport_Model>`__.
+The best way to learn the usage is by examples. In the directory  ``examples``, the usage of the modules are demonstrated in a case study. Inside the folder ``salzach_case``, the results from a hydro-morphodynamic numerical simulation ( i.e., simulated bed elevation change, deltaZ) are located in ``raw_data``. For more details on the hydro-morphodynamic numerical refer to `Beckers et al. (2020) <https://www.researchgate.net/publication/342181386_Bayesian_Calibration_and_Validation_of_a_Large-scale_and_Time-demanding_Sediment_Transport_Model>`__.
 
    -  ``prepro_salzach.py``: example of the usage of the class ``PreProFuzzy`` of the module ``prepro.py``, where vector data is interpolated and rasterized.
    -  ``classification_salzach.py``: example of the usage of the class ``PreProCategorization`` of the module ``prepro.py``.
@@ -80,28 +78,18 @@ References
 `Ross Kushnereit <https://github.com/rosskush/skspatial>`__
 `Chris Wills <http://chris35wills.github.io/gridding_data/>`__
 
-Developed in:
--------------
-
-|Image|
-
-.. |Image| image:: Logo_LWW.JPG
-   :target: https://www.iws.uni-stuttgart.de/lww/
-
-
-
 Disclaimer and License
 ======================
 
 Disclaimer (general)
 --------------------
 
-No warranty is expressed or implied regarding the usefulness or completeness of the information provided for *hylas* and its documentation. References to commercial products do not imply endorsement by the Authors of *hylas*. The concepts, materials, and methods used in the codes and described in the docs are for informational purposes only. The Authors have made substantial effort to ensure the accuracy of the code and the docs and the Authors shall not be held liable, nor their employers or funding sponsors, for calculations and/or decisions made on the basis of application of *hylas*. The information is provided "as is" and anyone who chooses to use the information is responsible for her or his own choices as to what to do with the code, docs, and data and the individual is responsible for the results that follow from their decisions.
+No warranty is expressed or implied regarding the usefulness or completeness of the information provided for *fuzzycorr* and its documentation. References to commercial products do not imply endorsement by the Authors of *fuzzycorr*. The concepts, materials, and methods used in the codes and described in the docs are for informational purposes only. The Authors have made substantial effort to ensure the accuracy of the code and the docs and the Authors shall not be held liable, nor their employers or funding sponsors, for calculations and/or decisions made on the basis of application of *fuzzycorr*. The information is provided "as is" and anyone who chooses to use the information is responsible for her or his own choices as to what to do with the code, docs, and data and the individual is responsible for the results that follow from their decisions.
 
 BSD 3-Clause License
 --------------------
 
-Copyright (c) 2020, Sebastian Schwindt and all other the Authors of *hylas*.
+Copyright (c) 2020, Beatriz Negreiros and all other the Authors of *fuzzycorr*.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -128,4 +116,3 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-

@@ -73,13 +73,8 @@ html_theme_options = {
     'navigation_depth': 5,
     'canonical_url': '',
     'display_version': True,
-    'launch_buttons': {
-                        'binderhub_url': 'https://mybinder.org',
-                        'thebe': True,
-                        'collapse_navigation': False},
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
-    'vcs_pageview_mode': '',
     'style_nav_header_background': 'White',
     # Toc options
     'collapse_navigation': True,
