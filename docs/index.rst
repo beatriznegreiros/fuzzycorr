@@ -13,11 +13,20 @@ Sediment transport and hydraulic processes can be reproduced with numerical mode
 
 1. Comparison via statistical methods such as RMSE (Root Mean Squared Error) or visual human comparison. However, local measures of similarity (or a similarity) like the RMSE are very sensible to uncertainty of location and amount, thus indicating low agreement even when overall patterns were adequately simulated.
 
-1. Visual comparison captures global similarity, which is one of the reasons why modelers often use it for model validation. Humans are capable of finding patterns without deliberately trying, and therefore, this type of comparison provides substantial advantages over local similarity measures. Nevertheless, more research has to be done to implement automated validation tools that emulate human thinking. This is necessary because human comparison is not transparent, prone to subjective interpretations, time consuming, and hardly reproducible.
+2. Visual comparison captures global similarity, which is one of the reasons why modelers often use it for model validation. Humans are capable of finding patterns without deliberately trying, and therefore, this type of comparison provides substantial advantages over local similarity measures. Nevertheless, more research has to be done to implement automated validation tools that emulate human thinking. This is necessary because human comparison is not transparent, prone to subjective interpretations, time consuming, and hardly reproducible.
 
 In this context, the concept of fuzzy set theory has capacities to consider similarity of spatial pattern analogous to human thinking. For instance, fuzziness of location introduces a tolerance regarding spatial uncertainty in the results of hydro-morphodynamic models. To this end, fuzzy logic enables an objective validation of such models by overcoming  uncertainties in the model structure, parameters and input data.
 
 The algorithms provided with ``fuzzycorr`` address the necessity in evaluating (or validating) model performance through the use of fuzzy map comparison. Future developments aim to go beyond a one-way validation towards a two-way communication between the validation algorithms and the models. The two-way communication represents a feedback loop that will eventually enable an automated calibration of numerical hydro-morphodynamic models.
+
+Install dependencies
+--------------------
+
+The necessary modules for running this repo are specified in ``environment.yml``. To install all packages in the environment:
+
+* Navigate ( ``cd``) with the Anaconda Prompt through your directories to the ``.yml`` file
+* Type ``conda env create -f environment.yml``
+* Active the new environment with ``conda activate env-fuzzycorr``
 
 Usage
 =====
@@ -30,7 +39,7 @@ The best way to learn the usage is by examples. In the directory  ``examples``, 
    -  ``plot_salzach.py``, ``plot_class_rasters.py`` and ``performance_salzach``: example of the usage of the module ``plotter.py``.
    -  ``random_map``: example of generating a raster following a uniform random distribution, which uses the module ``prepro.py``.
 
-``fuzzycorr`` structure
+Structure
 =======================
 
 This package contains the following modules, which were designed in *Python 3.6*:
@@ -42,35 +51,28 @@ This package contains the following modules, which were designed in *Python 3.6*
 
 
 Pre- and post-processing: prepro.py
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: prepro
    :members:
    :private-members:
 
 Fuzzy map comparison core: fuzzycomp.py
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: fuzzycomp
    :members:
    :private-members:
 
 Plot routines: plotter.py
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: plotter
    :members:
    :private-members:
 
 
-Dependencies and Environment
-----------------------------
 
-The necessary modules for running this repo are specified in ``environment.yml``. To install all packages in the environment:
-
-* Navigate ( ``cd``) with the Anaconda Prompt through your directories to the ``.yml`` file
-* Type ``conda env create -f environment.yml``
-* Active the new environment with ``conda activate env-fuzzycorr``
 
 References
 ----------
