@@ -77,8 +77,8 @@ Plot routines: plotter.py
 References
 ----------
 
-`Ross Kushnereit <https://github.com/rosskush/skspatial>`__
-`Chris Wills <http://chris35wills.github.io/gridding_data/>`__
+* `Ross Kushnereit <https://github.com/rosskush/skspatial>`__
+* `Chris Wills <http://chris35wills.github.io/gridding_data/>`__
 
 Disclaimer and License
 ======================
