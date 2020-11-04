@@ -39,9 +39,9 @@ class PreProFuzzy:
     :param lrc: tuple of floats, lower right corner coordinate, optional
     """
 
-    def __init__(self, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
+    def __init__(self, df, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
-        self.pd = pd
+        self.df = df
 
         if not isinstance(attribute, str):
             print("ERROR: attribute must be a string, check the name on your textfile")
@@ -51,13 +51,13 @@ class PreProFuzzy:
         self.nodatavalue = nodatavalue
 
         # Standardize the dataframe
-        self.pd.dropna(how='any', inplace=True, axis=0)
+        self.df.dropna(how='any', inplace=True, axis=0)
         # Create the dictionary with new label names and then rename for standardization
-        new_names = {self.pd.columns[0]: 'x', self.pd.columns[1]: 'y', self.pd.columns[2]: self.attribute}
-        self.pd = self.pd.rename(columns=new_names)
+        new_names = {self.df.columns[0]: 'x', self.df.columns[1]: 'y', self.df.columns[2]: self.attribute}
+        self.df = self.df.rename(columns=new_names)
 
         # Create geodataframe from the dataframe
-        gdf = geopandas.GeoDataFrame(self.pd, geometry=geopandas.points_from_xy(self.pd.x, self.pd.y))
+        gdf = geopandas.GeoDataFrame(self.df, geometry=geopandas.points_from_xy(self.df.x, self.df.y))
         gdf.crs = self.crs
         self.gdf = gdf
         self.x = gdf.geometry.x.values
