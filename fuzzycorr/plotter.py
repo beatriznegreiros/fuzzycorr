@@ -9,22 +9,32 @@ import matplotlib.transforms
 
 
 def read_raster(path):
+    """Opens a raster
+
+    Args:
+        path (str): directory and name of a raster
+
+    Returns:
+        ``ndarray``: a numpy array of the raster
+    """
     with rio.open(path) as src:
         raster_np = src.read(1, masked=True)
     return raster_np
 
 
 class RasterDataPlotter:
+    """
+    Class of raster for plotting
+    
+    :param path: string, path of the raster to be plotted
+    """
+    
     def __init__(self, path):
-        """
-        Class of raster for plotting
-        :param path: string, path of the raster to be plotted
-        """
         self.path = path
 
     def make_hist(self, legendx, legendy, fontsize, output_file, figsize, set_ylim=None, set_xlim=None):
-        """
-        Create a histogram of numerical raster
+        """ Creates a histogram of numerical raster
+        
         :param legendx: string, legend of the x axis of he histogram
         :param legendy: string, legend of the y axis of he histogram
         :param fontsize: integer, size of the font
@@ -32,7 +42,8 @@ class RasterDataPlotter:
         :param figsize: tuple of integers, size of the width x height of the figure
         :param set_ylim: float, set the maximum limit of the y axis
         :param set_ylim: float, set the maximum limit of the x axis
-        :output: saves the figure of the histogram
+        
+        :returns: saves the figure of the histogram
         """
         plt.rcParams.update({'font.size': fontsize})
         raster_np = read_raster(self.path)
@@ -70,7 +81,7 @@ class RasterDataPlotter:
         :param bounds: list of float, limits for each color of the colormap
         :param cmap: string, optional, colormap to plot the raster
         :param list_colors: list of colors (str), optional, as alternative to using a colormap
-        :output: saves the figure of the raster
+        :returns: saves the figure of the raster
         """
         # xy: upper left corner from the lower left corner of the picture
         raster_np = read_raster(self.path)
@@ -102,14 +113,15 @@ class RasterDataPlotter:
         fig.savefig(output_file, dpi=600, bbox_inches='tight')
 
     def plot_continuous_raster(self, output_file, cmap, vmax=np.nan, vmin=np.nan, box=True):
-        """
-        Create a figure of a continuous valued raster
+        """Creates a figure of a continuous valued raster
+        
         :param output_file: path, file path of the figure
         :param cmap: string, colormap to plot the raster
         :param vmax: float, optional, value maximum of the scale, this value is used in the normalization of the colormap
         :param vmin: float, optional, value minimum of the scale, this value is used in the normalization of the colormap
         :param box: boolean, if False it sets off the frame of the picture
-        :output: saves the figure of the raster
+        
+        :returns: saves the figure of the raster
         """
         raster_np = read_raster(self.path)
         fig1, ax1 = plt.subplots(figsize=(6, 8), frameon=False)
@@ -127,13 +139,14 @@ class RasterDataPlotter:
         fig1.savefig(output_file, dpi=200, bbox_inches='tight')
 
     def plot_categorical_raster(self, output_file, labels, cmap, box=True):
-        """
-        Create a figure of a categorical raster
+        """Creates a figure of a categorical raster
+
         :param output_file: path, file path of the figure
         :param labels: list of strings, labels (i.e., titles)for the categories
         :param cmap: string, colormap to plot the raster
         :param box: boolean, if False it sets off the frame of the picture
-        :output: saves the figure of the raster
+
+        :returns: saves the figure of the raster
         """
         raster_np = read_raster(self.path)
         print('Classes identified in the raster: ', np.unique(raster_np))
@@ -148,15 +161,16 @@ class RasterDataPlotter:
         fig.savefig(output_file, dpi=200, bbox_inches='tight')
 
     def plot_categorical_w_window(self, output_file, labels, cmap, xy, width, height, box=True):
-        """
-        Create a figure of a categorical raster with a zoomed window
+        """Creates a figure of a categorical raster with a zoomed window
+
         :param output_file: path, file path of the figure
         :param labels: list of strings, labels (i.e., titles)for the categories
         :param cmap: string, colormap to plot the raster
         :param xy: tuple (x,y), origin of the zoomed window, the upper left corner
         :param width: integer, width (number of cells) of the zoomed window
         :param height: integer, height (number of cells) of the zoomed window
-        :output: saves the figure of the raster
+
+        :returns: saves the figure of the raster
         """
         raster_np = read_raster(self.path)
         print('Classes identified in the raster: ', np.unique(raster_np))

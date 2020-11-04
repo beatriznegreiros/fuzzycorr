@@ -18,12 +18,22 @@ def read_raster(raster):
 
 
 def jaccard(a, b):
+    """Creates a ...
+
+    Args:
+        a (float):
+        b (float):
+
+    Returns:
+        ``float``: ``jac``
+    """
     jac = 1 - (a * b) / (2 * abs(a) + 2 * abs(b) - a * b)
     return jac
 
 
 def f_similarity(centrall_cell, neighbours):
     """ Calculates the similarity function for each pair of values (fuzzy numerical method)
+
     :param centrall_cell: float, cell under analysis in map A
     :param neighbours: np.array of floats, neighbours in map B
     :return: np.array of floats, each similarity between each of two cells
@@ -36,22 +46,25 @@ def f_similarity(centrall_cell, neighbours):
 
 def squared_error(centrall_cell, neighbours):
     """ Calculates the error measure fuzzy rmse
+
     :param centrall_cell: float, cell under analysis in map A
     :param neighbours: np.array of floats, neighbours in map B
     :return: np.array of floats, each similarity between each of two cells
     """
+
     simil_neigh = (neighbours - centrall_cell) ** 2
     return simil_neigh
 
 
 class FuzzyComparison:
+    """ Performing fuzzy map comparison
+                :param rasterA: string, path of the raster to be compared with rasterB
+                :param rasterB: string, path of the raster to be compared with rasterA
+                :param neigh: integer, neighborhood being considered (number of cells from the central cell), default is 4
+                :param halving_distance: integer, distance (in cells) to which the membership decays to its half, default is 2
+    """
+
     def __init__(self, rasterA, rasterB, neigh=4, halving_distance=2):
-        """ Performing fuzzy map comparison
-            :param rasterA: string, path of the raster to be compared with rasterB
-            :param rasterB: string, path of the raster to be compared with rasterA
-            :param neigh: integer, neighborhood being considered (number of cells from the central cell), default is 4
-            :param halving_distance: integer, distance (in cells) to which the membership decays to its half, default is 2
-        """
         self.raster_A = rasterA
         self.raster_B = rasterB
         self.neigh = neigh
@@ -101,6 +114,7 @@ class FuzzyComparison:
 
     def fuzzy_numerical(self, comparison_name, save_dir, map_of_comparison=True):
         """ Compares a pair of raster maps using fuzzy numerical spatial comparison
+
         :param save_dir: string, directory where to save the results
         :param comparison_name: string, name of the comparison
         :param map_of_comparison: boolean, create map of comparison in the project directory if True
@@ -150,9 +164,11 @@ class FuzzyComparison:
 
     def fuzzy_rmse(self, comparison_name, save_dir, map_of_comparison=True):
         """ Compares a pair of raster maps using fuzzy root mean square error as spatial comparison
+
         :param comparison_name: string, name of the comparison
         :param save_dir: string, directory where to save the results of the map comparison
         :param map_of_comparison: boolean, if True it creates map of of local squared errors (in the project directory)
+
         :return: global fuzzy RMSE and comparison map
         """
 
@@ -199,7 +215,7 @@ class FuzzyComparison:
         return S
 
     def save_results(self, measure, dir, name):
-        # Saves a results file
+        """Saves a results file"""
         if '.' not in name[-4:]:
             name += '.txt'
         result_file = dir + '/' + name
@@ -212,7 +228,7 @@ class FuzzyComparison:
         file1.close()
 
     def save_comparison_raster(self, array_local_measures, dir, file_name):
-        # Create map of comparison
+        """Create map of comparison"""
         if '.' not in file_name[-4:]:
             file_name += '.tif'
         comp_map = dir + "/" + file_name

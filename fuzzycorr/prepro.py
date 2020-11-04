@@ -10,9 +10,8 @@ try:
     from pathlib import Path
     from pyproj import CRS
     from scipy import interpolate
-except:
-    print(
-        'ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, '
+except ImportError:
+    print('ModuleNotFoundError: Missing fundamental packages (required: geopandas, ogr, gdal, rasterio, numpy, pandas, '
         'alphashape, mapclassify, pathlib, pyproj, scipy and pykrige).')
 
 
@@ -28,18 +27,19 @@ def clip_raster(polygon, in_raster, out_raster):
 
 
 class PreProFuzzy:
+    """ Performing
+     pre-processing
+    :param pd: pandas dataframe, can be obtained by reading the textfile as pandas dataframe
+    :param attribute: string, name of the attribute to burn in the raster (ex.: deltaZ, Z)
+    :param crs: string, coordinate reference system
+    :param nodatavalue: float, value to indicate nodata cells
+    :param res: float, resolution of the cell (cell size), is the same for x and y
+    :param ulc: tuple of floats, upper left corner coordinate, optional
+    :param lrc: tuple of floats, lower right corner coordinate, optional
+    """
+
     def __init__(self, pd, attribute, crs, nodatavalue, res=None, ulc=(np.nan, np.nan),
                  lrc=(np.nan, np.nan)):
-        """ Performing pre-processing
-        :param pd: pandas dataframe, can be obtained by reading the textfile as pandas dataframe
-        :param attribute: string, name of the attribute to burn in the raster (ex.: deltaZ, Z)
-        :param crs: string, coordinate reference system
-        :param nodatavalue: float, value to indicate nodata cells
-        :param res: float, resolution of the cell (cell size), is the same for x and y
-        :param ulc: tuple of floats, upper left corner coordinate, optional
-        :param lrc: tuple of floats, lower right corner coordinate, optional
-        """
-
         self.pd = pd
 
         if not isinstance(attribute, str):
@@ -87,9 +87,11 @@ class PreProFuzzy:
 
     def points_to_grid(self):
         """ Creates a grid of new points in the desired resolution to be interpolated
-        :return: array of size nrow, ncol
 
-        http://chris35wills.github.io/gridding_data/
+        :returns: array of size nrow, ncol
+
+        Hints:
+            Read more at http://chris35wills.github.io/gridding_data/
         """
         hrange = ((self.ymin, self.ymax),
                   (self.xmin, self.xmax))  # any points outside of this will be condisdered outliers and not used
@@ -107,9 +109,11 @@ class PreProFuzzy:
 
     def norm_array(self, method='linear'):
         """ Normalizes the raw data in equally sparsed points depending on the selected resolution
-        :return: interpolated and normalized array with selected resolution
 
-        https://github.com/rosskush/skspatial
+        :returns: interpolated and normalized array with selected resolution
+
+        Hints:
+            Read more at https://github.com/rosskush/skspatial
         """
         array = self.points_to_grid()
         x = np.arange(0, self.ncol)  # creates 1d array with values [0, ncol[
@@ -130,8 +134,10 @@ class PreProFuzzy:
 
     def random_raster(self, raster_file, save_ascii=True, **kwargs):
         """ Creates a raster of randomly generated values
+
         :kwarg minmax: tuple of floats, (zmin, zmax) min and max ranges for random values
-        :return: array of random values within a range of the same size and chape as the original
+
+        :returns: array of random values within a range of the same size and chape as the original
         """
 
         if kwargs['minmax'] is None:
@@ -162,10 +168,12 @@ class PreProFuzzy:
 
     def plain_raster(self, shapefile, raster_file, res):
         """ Converts shapefile(.shp) to rasters(.tif) without normalizing
+
         :param shapefile: string, filename with path of the input shapefile (*.shp)
         :param raster_file: stirng, filename with path of the output raster (*.tif)
         :param res: float, resolution of the cell
-        :return: saves the raster in the default directory
+
+        :returns: saves the raster in the default directory
         """
         if '.' not in shapefile[-4:]:
             shapefile += '.shp'
@@ -189,9 +197,11 @@ class PreProFuzzy:
 
     def array2raster(self, array, raster_file, save_ascii=True):
         """ Saves a raster using interpolation
+
         :param raster_file: string, path to save the rasterfile
         :param save_ascii: boolean, true to save also an ascii raster
-        :return: saves the raster with the selected filename
+
+        :returns: saves the raster with the selected filename
         """
         if '.' not in raster_file[-4:]:
             raster_file += '.tif'
@@ -212,9 +222,11 @@ class PreProFuzzy:
 
     def create_polygon(self, shape_polygon, alpha=np.nan):
         """ Creates a polygon surrounding a cloud of shapepoints
+
         :param shape_polygon: string, path to save the shapefile
         :param alpha: float, excentricity of the alphashape (polygon) to be created
-        :return: saves the polygon (*.shp) with the selected filename
+
+        :returns: saves the polygon (*.shp) with the selected filename
         """
         if np.isfinite(alpha):
             try:
@@ -236,10 +248,10 @@ class PreProFuzzy:
 
 
 class PreProCategorization:
+    """Clips a raster based on the given polygon
+        :param raster: string, path of the raster to be categorized
+    """
     def __init__(self, raster):
-        """ Clips a raster based on the given polygon
-            :param raster: string, path of the raster to be categorized
-        """
         self.raster = raster
 
         with rio.open(self.raster) as src:
@@ -250,8 +262,10 @@ class PreProCategorization:
 
     def nb_classes(self, n_classes):
         """ Generates class bins based on the Natural Breaks method
-            :param n_classes: integer, number of classes
-            :return: list, optimized bins
+
+        :param n_classes: integer, number of classes
+
+        :returns: list of optimized bins
         """
         # Classification based on Natural Breaks
         array_values = self.array[~self.array.mask].ravel()
@@ -262,10 +276,12 @@ class PreProCategorization:
         return breaks.bins
 
     def categorize_raster(self, class_bins, map_out, save_ascii=True):
-        """ Classifies the raster according to the classification bins
+        """Classifies the raster according to the classification bins
+
         :param project_dir: path of the project directory
-        :param class_bins: list of floats,
-        :return: saves the classified raster in the chosen directory
+        :param class_bins: list of floats
+
+        :returns: saves the classified raster in the chosen directory
         """
         # Classify the original image array (digitize makes nodatavalues take the class 0)
         raster_fi = np.ma.filled(self.array, fill_value=-np.inf)
