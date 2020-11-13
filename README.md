@@ -36,7 +36,7 @@ This package contains the following modules:
 - ``plotter.py``: Module for the visualization of output and input rasters.
 
 ### Usage
-- The docstrings of the package are located in the folder ``docs``.
+- Documentation: [readthedocs](https://fuzzycorr.readthedocs.io)
 - The best way to learn the usage is by examples. In the directory ``examples``, the usage of the modules are demonstrated in a case study.
 Example:
 - Inside the folder ``salzach_case``, the results from a hydro-morphodynamic numerical simulation ( i.e., simulated bed elevation change, deltaZ) are located in ``raw_data``. For more details on the hydro-morphodynamic numerical models the reader is referred to [Beckers et al (2020)](https://www.researchgate.net/publication/342181386_Bayesian_Calibration_and_Validation_of_a_Large-scale_and_Time-demanding_Sediment_Transport_Model).
