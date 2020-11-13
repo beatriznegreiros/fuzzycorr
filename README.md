@@ -47,7 +47,7 @@ Example:
   - ``random_map``: example of generating a raster followin a uniformly random disribution, which uses the module ``prepro.py``.
 
 ### Code description
-The repository is coded in  ``Python 3.6 x`` 
+The repository is coded in  ``Python 3`` 
 
 ### Dependencies and Environment
 
