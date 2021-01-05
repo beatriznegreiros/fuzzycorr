@@ -1,4 +1,4 @@
-import prepro as pp
+import fuzzycorr.prepro as pp
 from pathlib import Path
 import pandas as pd
 
@@ -13,7 +13,7 @@ attribute = 'dz'
 res = 5
 
 # Projection
-crs = 'EPSG:4326'
+crs = 'EPSG:5684'
 nodatavalue = -9999
 
 # Corners of raster

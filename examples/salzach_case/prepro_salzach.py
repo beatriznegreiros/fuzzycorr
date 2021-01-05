@@ -1,5 +1,5 @@
 from pathlib import Path
-import prepro as pp
+import fuzzycorr.prepro as pp
 import pandas as pd
 
 
@@ -21,7 +21,7 @@ polyname = 'polygon_salzach'
 res = 5
 
 # Projection
-crs = 'EPSG:4326'
+crs = 'EPSG:5684'
 nodatavalue = -9999
 
 # Corners of raster
@@ -42,7 +42,7 @@ for file in list_files:
     path_file = str(current_dir / 'raw_data') + '/' + file + '.csv'
     raster_out = str(current_dir / 'rasters') + '/' + file + '_res5.tif'
 
-    # Instanciating object of SpatialField
+    # Instantiate object of class PreProFuzzy
     map_file = pp.PreProFuzzy(pd.read_csv(path_file, skip_blank_lines=True), attribute=attribute, crs=crs, nodatavalue=nodatavalue, res=res, ulc=ulc, lrc=lrc)
 
     # Normalize points to a grid-ed array
@@ -53,5 +53,5 @@ for file in list_files:
 
     # Clip raster and save it
     clip_raster = str(current_dir / 'rasters') + '/' + file + '_res5_clipped' + '.tif'
-    # map_file.create_polygon(poly_path, alpha=0.01)
+    map_file.create_polygon(poly_path, alpha=0.01)
     pp.clip_raster(poly_path, raster_out, clip_raster)

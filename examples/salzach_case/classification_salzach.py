@@ -1,6 +1,6 @@
 try:
     import matplotlib.pyplot as plt
-    import prepro as pp
+    import fuzzycorr.prepro as pp
     from pathlib import Path
     import numpy as np
     import gdal
