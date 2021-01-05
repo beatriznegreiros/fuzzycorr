@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fuzzycorr-Beatriz-Negreiros",
-    version="0.0.1",
+    version="0.0.2",
     author="Beatriz Negreiros",
     author_email="beatriz.negreiros@iws.uni-stuttgart.de",
     description="A Python package for correlating simulated and observed datasets via Fuzzy Map Comparison",
