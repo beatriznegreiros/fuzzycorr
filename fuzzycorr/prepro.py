@@ -1,7 +1,7 @@
 try:
     import geopandas
-    import ogr
-    import gdal
+    from osgeo import ogr
+    from osgeo import gdal
     import rasterio as rio
     import numpy as np
     import pandas as pd
