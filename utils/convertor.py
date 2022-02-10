@@ -1,4 +1,4 @@
-import gdal
+from osgeo import gdal
 from pathlib import Path
 
 current_dir = Path.cwd()

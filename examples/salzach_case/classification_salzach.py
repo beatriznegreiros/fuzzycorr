@@ -3,7 +3,7 @@ try:
     import fuzzycorr.prepro as pp
     from pathlib import Path
     import numpy as np
-    import gdal
+    from osgeo import gdal
 except:
     print('ModuleNotFoundError: Missing fundamental packages (required: pathlib, numpy, gdal).')
 
