@@ -1,6 +1,6 @@
 try:
     import geopandas
-    import ogr
+    from osgeo import ogr
     from osgeo import gdal
     import rasterio as rio
     import numpy as np
